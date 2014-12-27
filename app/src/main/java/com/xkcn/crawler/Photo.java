@@ -1,0 +1,119 @@
+package com.xkcn.crawler;
+
+/**
+ * Created by khoinguyen on 12/22/14.
+ */
+public class Photo {
+    String photo100;
+    String photo250;
+    String photo500;
+    String photoHigh;
+    long identifier;
+    String permalink;
+    String permalinkMeta;
+    String notesUrl;
+    int heightHighRes;
+    int widthHighRes;
+    String title;
+    String tags;
+
+    public Photo() {
+
+    }
+
+    public String getPhoto100() {
+        return photo100;
+    }
+
+    public void setPhoto100(String photo100) {
+        this.photo100 = photo100;
+    }
+
+    public String getPhoto250() {
+        return photo250;
+    }
+
+    public void setPhoto250(String photo250) {
+        this.photo250 = photo250;
+    }
+
+    public String getPhoto500() {
+        return photo500;
+    }
+
+    public void setPhoto500(String photo500) {
+        this.photo500 = photo500;
+    }
+
+    public String getPhotoHigh() {
+        return photoHigh;
+    }
+
+    public void setPhotoHigh(String photoHigh) {
+        this.photoHigh = photoHigh;
+    }
+
+    public long getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(long identifier) {
+        this.identifier = identifier;
+    }
+
+    public String getPermalink() {
+        return permalink;
+    }
+
+    public void setPermalink(String permalink) {
+        this.permalink = permalink;
+    }
+
+    public String getNotesUrl() {
+        return notesUrl;
+    }
+
+    public void setNotesUrl(String notesUrl) {
+        this.notesUrl = notesUrl;
+    }
+
+    public int getHeightHighRes() {
+        return heightHighRes;
+    }
+
+    public void setHeightHighRes(int heightHighRes) {
+        this.heightHighRes = heightHighRes;
+    }
+
+    public int getWidthHighRes() {
+        return widthHighRes;
+    }
+
+    public void setWidthHighRes(int widthHighRes) {
+        this.widthHighRes = widthHighRes;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getTags() {
+        return tags;
+    }
+
+    public void setTags(String tags) {
+        this.tags = tags;
+    }
+
+    public String getPermalinkMeta() {
+        return permalinkMeta;
+    }
+
+    public void setPermalinkMeta(String permalinkMeta) {
+        this.permalinkMeta = permalinkMeta;
+    }
+}
