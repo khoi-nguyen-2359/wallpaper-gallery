@@ -9,7 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.xkcn.crawler.event.UpdateEvent;
+import com.xkcn.crawler.event.UpdateFinishedEvent;
 
 import java.util.List;
 
@@ -44,6 +44,7 @@ public class PhotoPageFragment extends Fragment {
     }
 
     private void populatePhotoList() {
+        U.d("khoi", "populatePhotoList");
         List<Photo> photoList = PhotoDao.query(getArguments().getInt(ARG_PAGE));
         adapterPhotos.setDataPhotos(photoList);
         adapterPhotos.notifyDataSetChanged();
@@ -63,7 +64,7 @@ public class PhotoPageFragment extends Fragment {
         listPhoto.setPadding(0, statusBarHeight, 0, navBarHeight);
     }
 
-    public void onEventMainThread(UpdateEvent event) {
+    public void onEventMainThread(UpdateFinishedEvent event) {
         populatePhotoList();
     }
 

@@ -1,17 +1,16 @@
 package com.xkcn.crawler;
 
-import android.app.IntentService;
-import android.content.Intent;
+import android.app.Service;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.content.Intent;
+import android.os.IBinder;
 import android.os.Looper;
-import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.xkcn.crawler.event.UpdateEvent;
+import com.xkcn.crawler.event.CrawlNextPageEvent;
+import com.xkcn.crawler.event.UpdateFinishedEvent;
 
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -24,10 +23,11 @@ import java.util.regex.Pattern;
 
 import de.greenrobot.event.EventBus;
 
-public class UpdateService extends IntentService {
+public class UpdateService extends Service {
     public static final String XPATH_POST_ID = "//*[@id=\"post-%d\"]";
 
-    private static final String ACTION_UPDATE = "com.xkcn.crawler.action.UPDATE";
+    public static final String ACTION_UPDATE = "com.xkcn.crawler.action.UPDATE";
+
     private boolean isWaitingHtml;
     private Pattern pattern;
     private WebView webview;
@@ -39,21 +39,7 @@ public class UpdateService extends IntentService {
         context.startService(intent);
     }
 
-    public UpdateService() {
-        super("UpdateService");
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-        if (intent != null) {
-            final String action = intent.getAction();
-            if (ACTION_UPDATE.equals(action)) {
-                handleUpdate();
-            }
-        }
-    }
-
-    private void handleUpdate() {
+    private void createWebBrowser() {
         pattern = Pattern.compile("permalinkMeta.*>\\n.*<p>(.*)</p>");
 
         webview = new WebView(this);
@@ -70,7 +56,7 @@ public class UpdateService extends IntentService {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                Log.d("khoi", "page finished");
+                U.d("khoi", "page %d finished", crawlingPage);
                 if (isWaitingHtml == false)
                     return;
 
@@ -78,15 +64,47 @@ public class UpdateService extends IntentService {
                 view.loadUrl("javascript:window.jsi.processHTML(document.getElementsByTagName('html')[0].innerHTML);");
             }
         });
+    }
 
-        startPageCrawling(1);
-        Looper.loop();
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        createWebBrowser();
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        EventBus.getDefault().unregister(this);
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        if (ACTION_UPDATE.equals(action)) {
+            startPageCrawling(1);
+        }
+
+        return super.onStartCommand(intent, flags, startId);
     }
 
     private void startPageCrawling(int page) {
         crawlingPage = page;
         isWaitingHtml = true;
         webview.loadUrl("http://xkcn.info/page/" + crawlingPage);
+    }
+
+    public void onEventMainThread(CrawlNextPageEvent e) {
+        U.d("khoi", "onEventMainThread");
+        startPageCrawling(e.getPage());
     }
 
     public Photo parsePhotoNode(TagNode post) {
@@ -119,10 +137,14 @@ public class UpdateService extends IntentService {
                 Matcher matcher = pattern.matcher(templateText);
                 if (matcher.find()) {
                     String permalinkMetaValue = matcher.group(1);
-                    U.d("khoi", "match=%s", permalinkMetaValue);
+                    U.d("khoi", "url=%s", photo.getPermalink());
                     photo.setPermalinkMeta(permalinkMetaValue);
                 }
             }
+
+//            TagNode gridOverlay = post.findElementByAttValue("class", "gridOverlay", false, true);
+//            if (gridOverlay != null) {
+//            }
         }
 
         return photo;
@@ -155,12 +177,12 @@ public class UpdateService extends IntentService {
 
             int count = PhotoDao.bulkInsertPhoto(photoList);
             if (count != 0 && count == photoList.size()) {
-                startPageCrawling(crawlingPage + 1);
+                EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));
             } else {
                 U.d("khoi", "processHTML done");
-                EventBus.getDefault().post(new UpdateEvent());
+                EventBus.getDefault().post(new UpdateFinishedEvent());
                 U.saveLastUpdate(System.currentTimeMillis());
-                Looper.myLooper().quit();
+                stopSelf();
             }
         }
     }
