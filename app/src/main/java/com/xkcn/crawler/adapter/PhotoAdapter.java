@@ -9,11 +9,14 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.R;
+import com.xkcn.crawler.event.SelectPhotoEvent;
 import com.xkcn.crawler.imageloader.RoundedTransformation;
 import com.xkcn.crawler.db.Photo;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by khoinguyen on 12/22/14.
@@ -49,13 +52,20 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder viewHolder, int i) {
+    public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
 
         Picasso.with(context)
                 .load(dataPhotos.get(i).getPhoto500())
                 .transform(new RoundedTransformation(10, 1))
 //                .transform(new ScaleTransformation(0.8f))
                 .into(viewHolder.ivPhoto);
+
+        viewHolder.ivPhoto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                EventBus.getDefault().post(new SelectPhotoEvent(dataPhotos.get(i)));
+            }
+        });
     }
 
     @Override

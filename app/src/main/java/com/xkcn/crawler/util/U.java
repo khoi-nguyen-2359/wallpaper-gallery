@@ -1,10 +1,13 @@
 package com.xkcn.crawler.util;
 
+import android.annotation.TargetApi;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
+import android.view.View;
 import android.view.WindowManager;
 
 import com.xkcn.crawler.XkcnApp;
@@ -70,6 +73,27 @@ public final class U {
         display.getSize(size);
 
         return size;
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static void showSystemUI(View decorView) {
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+        );
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    public static void hideSystemUI(View decorView) {
+        decorView.setSystemUiVisibility(
+                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_IMMERSIVE
+        );
     }
 
     public static void saveLastUpdate(long lastUpdate) {

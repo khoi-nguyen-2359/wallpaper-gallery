@@ -1,9 +1,12 @@
 package com.xkcn.crawler.db;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public class Photo {
+public class Photo implements Parcelable {
     String photo100;
     String photo250;
     String photo500;
@@ -115,5 +118,52 @@ public class Photo {
 
     public void setPermalinkMeta(String permalinkMeta) {
         this.permalinkMeta = permalinkMeta;
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(photo100);
+        dest.writeString(photo250);
+        dest.writeString(photo500);
+        dest.writeString(photoHigh);
+        dest.writeLong(identifier);
+        dest.writeString(permalink);
+        dest.writeString(permalinkMeta);
+        dest.writeString(notesUrl);
+        dest.writeInt(heightHighRes);
+        dest.writeInt(widthHighRes);
+        dest.writeString(title);
+        dest.writeString(tags);
+    }
+
+    public static final Parcelable.Creator<Photo> CREATOR
+            = new Parcelable.Creator<Photo>() {
+        public Photo createFromParcel(Parcel in) {
+            return new Photo(in);
+        }
+
+        public Photo[] newArray(int size) {
+            return new Photo[size];
+        }
+    };
+
+    private Photo(Parcel in) {
+        photo100 = in.readString();
+        photo250 = in.readString();
+        photo500 = in.readString();
+        photoHigh = in.readString();
+        identifier = in.readLong();
+        permalink = in.readString();
+        permalinkMeta = in.readString();
+        notesUrl = in.readString();
+        heightHighRes = in.readInt();
+        widthHighRes = in.readInt();
+        title = in.readString();
+        tags = in.readString();
     }
 }

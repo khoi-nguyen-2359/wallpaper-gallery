@@ -33,6 +33,7 @@ dependencies {
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
 
     compile 'de.greenrobot:eventbus:2.4.0'
+    compile 'com.jakewharton:butterknife:6.0.0'
 
 //    compile 'com.github.satyan:sugar:1.3'
 
