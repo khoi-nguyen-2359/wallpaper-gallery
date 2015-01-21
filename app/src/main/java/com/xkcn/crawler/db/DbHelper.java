@@ -1,9 +1,9 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.db;
 
 import android.content.Context;
-import android.database.Cursor;
 
 import com.readystatesoftware.sqliteasset.SQLiteAssetHelper;
+import com.xkcn.crawler.XkcnApp;
 
 /**
  * Created by khoinguyen on 12/26/14.

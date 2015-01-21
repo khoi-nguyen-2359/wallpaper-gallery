@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.util;
 
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -6,6 +6,8 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.WindowManager;
+
+import com.xkcn.crawler.XkcnApp;
 
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;

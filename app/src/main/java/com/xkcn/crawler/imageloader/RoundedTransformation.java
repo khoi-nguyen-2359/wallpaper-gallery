@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.imageloader;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapShader;

@@ -1,8 +1,10 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
+
+import com.xkcn.crawler.fragment.PhotoPageFragment;
 
 /**
  * Created by khoinguyen on 12/23/14.
@@ -16,7 +18,7 @@ public class PhotoPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return PhotoPageFragment.instantiate(position+1);
+        return PhotoPageFragment.instantiate(position + 1);
     }
 
     @Override

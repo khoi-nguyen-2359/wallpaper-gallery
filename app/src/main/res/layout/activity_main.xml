@@ -8,9 +8,4 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <!--<fragment-->
-        <!--android:name="com.xkcn.crawler.PhotoPageFragment"-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"/>-->
-
 </RelativeLayout>

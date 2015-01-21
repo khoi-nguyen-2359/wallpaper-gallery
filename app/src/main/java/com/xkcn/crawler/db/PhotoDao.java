@@ -1,9 +1,10 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.db;
 
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
+
+import com.xkcn.crawler.util.U;
 
 import java.util.ArrayList;
 import java.util.List;

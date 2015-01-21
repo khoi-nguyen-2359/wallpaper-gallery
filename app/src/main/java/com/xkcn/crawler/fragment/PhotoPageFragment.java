@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,6 +9,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.xkcn.crawler.R;
+import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.adapter.PhotoAdapter;
+import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
 
 import java.util.List;

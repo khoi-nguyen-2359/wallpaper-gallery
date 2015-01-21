@@ -1,14 +1,16 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.service;
 
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
-import android.os.Looper;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
 

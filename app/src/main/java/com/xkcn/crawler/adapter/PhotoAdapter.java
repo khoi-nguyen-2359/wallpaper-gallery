@@ -1,6 +1,5 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.adapter;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -8,16 +7,13 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.LruCache;
 import com.squareup.picasso.Picasso;
+import com.xkcn.crawler.R;
+import com.xkcn.crawler.imageloader.RoundedTransformation;
+import com.xkcn.crawler.db.Photo;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static android.content.Context.ACTIVITY_SERVICE;
-import static android.content.pm.ApplicationInfo.FLAG_LARGE_HEAP;
-import static android.os.Build.VERSION.SDK_INT;
-import static android.os.Build.VERSION_CODES.HONEYCOMB;
 
 /**
  * Created by khoinguyen on 12/22/14.

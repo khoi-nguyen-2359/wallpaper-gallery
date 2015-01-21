@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.db;
 
 /**
  * Created by khoinguyen on 12/22/14.
