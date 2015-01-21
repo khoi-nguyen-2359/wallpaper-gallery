@@ -24,6 +24,7 @@ public class PhotoPageFragment extends Fragment {
     private RecyclerView listPhoto;
     private PhotoAdapter adapterPhotos;
     private View root;
+    private int nPhotoCol;
 
     public static PhotoPageFragment instantiate(int page) {
         PhotoPageFragment f = new PhotoPageFragment();
@@ -38,9 +39,14 @@ public class PhotoPageFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         root = inflater.inflate(R.layout.fragment_photo_page, container, false);
+        initData();
         initPhotoList();
         populatePhotoList();
         return root;
+    }
+
+    private void initData() {
+        nPhotoCol = getResources().getInteger(R.integer.photo_page_col);
     }
 
     private void populatePhotoList() {
@@ -54,7 +60,7 @@ public class PhotoPageFragment extends Fragment {
         listPhoto = (RecyclerView) root.findViewById(R.id.photo_list);
         listPhoto.setHasFixedSize(true);
 
-        StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(2, StaggeredGridLayoutManager.VERTICAL);
+        StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(nPhotoCol, StaggeredGridLayoutManager.VERTICAL);
         listPhoto.setLayoutManager(rcvLayoutMan);
         adapterPhotos = new PhotoAdapter(getActivity());
         listPhoto.setAdapter(adapterPhotos);

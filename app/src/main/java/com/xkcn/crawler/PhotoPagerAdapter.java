@@ -7,10 +7,10 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 /**
  * Created by khoinguyen on 12/23/14.
  */
-public class PhotoPageAdapter extends FragmentStatePagerAdapter {
+public class PhotoPagerAdapter extends FragmentStatePagerAdapter {
     public static final int MAX_PAGE = 446;
 
-    public PhotoPageAdapter(FragmentManager fm) {
+    public PhotoPagerAdapter(FragmentManager fm) {
         super(fm);
     }
 

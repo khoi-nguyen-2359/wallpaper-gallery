@@ -1,16 +1,9 @@
 package com.xkcn.crawler;
 
-import android.database.ContentObserver;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.support.v4.content.CursorLoader;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -28,7 +21,7 @@ public class MainActivity extends ActionBarActivity {
 
     private void initViews() {
         pager = (ViewPager) findViewById(R.id.viewpager);
-        pager.setAdapter(new PhotoPageAdapter(getSupportFragmentManager()));
+        pager.setAdapter(new PhotoPagerAdapter(getSupportFragmentManager()));
     }
 
     private void checkToUpdate() {

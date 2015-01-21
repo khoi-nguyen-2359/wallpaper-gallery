@@ -4,4 +4,6 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="item_photo_corner_radius">10dp</dimen>
     <dimen name="item_photo_content_padding">0dp</dimen>
+
+    <integer name="photo_page_col">1</integer>
 </resources>
