@@ -26,6 +26,7 @@ public final class PhotoDao {
     public static final String COL_WIDTH_HIGH_RES = "WIDTH_HIGH_RES";
     public static final String COL_TITLE = "TITLE";
     public static final String COL_TAGS = "TAGS";
+    public static final String COL_NOTES = "NOTES";
 
     public static Photo toPhoto(Cursor cursor) {
         Photo photo = new Photo();
@@ -42,8 +43,28 @@ public final class PhotoDao {
         if ((idx = cursor.getColumnIndex(COL_WIDTH_HIGH_RES)) != -1)    photo.setWidthHighRes(cursor.getInt(idx));
         if ((idx = cursor.getColumnIndex(COL_TITLE)) != -1)             photo.setTitle(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_TAGS)) != -1)              photo.setTags(cursor.getString(idx));
+        if ((idx = cursor.getColumnIndex(COL_NOTES)) != -1)             photo.setNotes(cursor.getInt(idx));
 
         return photo;
+    }
+
+    public static ContentValues toContentValues(Photo photo) {
+        ContentValues cv = new ContentValues();
+        cv.put(COL_IDENTIFIER, photo.getIdentifier());
+        cv.put(COL_PHOTO100, photo.getPhoto100());
+        cv.put(COL_PHOTO250, photo.getPhoto250());
+        cv.put(COL_PHOTO500, photo.getPhoto500());
+        cv.put(COL_PHOTO_HIGH, photo.getPhotoHigh());
+        cv.put(COL_PERMALINK, photo.getPermalink());
+        cv.put(COL_PERMALINK_META, photo.getPermalinkMeta());
+        cv.put(COL_NOTES_URL, photo.getNotesUrl());
+        cv.put(COL_HEIGHT_HIGH_RES, photo.getHeightHighRes());
+        cv.put(COL_WIDTH_HIGH_RES, photo.getWidthHighRes());
+        cv.put(COL_TITLE, photo.getTitle());
+        cv.put(COL_TAGS, photo.getTags());
+        cv.put(COL_NOTES, photo.getNotes());
+
+        return cv;
     }
 
     public static List<Photo> query(int page) {
@@ -51,7 +72,7 @@ public final class PhotoDao {
 
         SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
 
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * 15) + ",15");
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * 15) + ",15");
         if (c != null) {
             Photo photo = null;
             while (c.moveToNext()) {
@@ -72,20 +93,7 @@ public final class PhotoDao {
         List<ContentValues> listCv = new ArrayList<>();
         ContentValues cv = null;
         for (Photo photo : photoList) {
-            cv = new ContentValues();
-            cv.put(COL_IDENTIFIER, photo.getIdentifier());
-            cv.put(COL_PHOTO100, photo.getPhoto100());
-            cv.put(COL_PHOTO250, photo.getPhoto250());
-            cv.put(COL_PHOTO500, photo.getPhoto500());
-            cv.put(COL_PHOTO_HIGH, photo.getPhotoHigh());
-            cv.put(COL_PERMALINK, photo.getPermalink());
-            cv.put(COL_PERMALINK_META, photo.getPermalinkMeta());
-            cv.put(COL_NOTES_URL, photo.getNotesUrl());
-            cv.put(COL_HEIGHT_HIGH_RES, photo.getHeightHighRes());
-            cv.put(COL_WIDTH_HIGH_RES, photo.getWidthHighRes());
-            cv.put(COL_TITLE, photo.getTitle());
-            cv.put(COL_TAGS, photo.getTags());
-
+            cv = toContentValues(photo);
             listCv.add(cv);
         }
 
@@ -121,8 +129,8 @@ public final class PhotoDao {
             db.endTransaction();
         }
 
-        U.d("khoi", "bulkInsert affected=%d", nAffected);
-        U.d("khoi", "bulkInsert inserted=%d", nInserted);
+        U.dd("bulkInsert affected=%d", nAffected);
+        U.dd("bulkInsert inserted=%d", nInserted);
 
         return nInserted;
     }

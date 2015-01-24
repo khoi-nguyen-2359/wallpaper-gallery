@@ -31,12 +31,20 @@ public final class U {
         }
     }
 
+    public static void dd(String format, Object... args) {
+        if (args != null && args.length != 0) {
+            Log.d("khoi", String.format(format, args));
+        } else {
+            Log.d("khoi", format);
+        }
+    }
+
     /**
      *
      * @param desPath with "/" preceded
      * @param content
      */
-    public static void writeToExternal(String desPath, String content) {
+    public static void copyFile(String desPath, String content) {
         try {
             FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + desPath);
             OutputStreamWriter osw = new OutputStreamWriter(fos);

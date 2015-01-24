@@ -47,6 +47,7 @@ public class UpdateService extends Service {
         webview = new WebView(this);
         webview.getSettings().setJavaScriptEnabled(true);
         webview.getSettings().setLoadsImagesAutomatically(false);
+        webview.getSettings().setDomStorageEnabled(true);
         webview.getSettings().setUserAgentString("Android Chrome"); // this fakes tablet's screen
         webview.addJavascriptInterface(new CrawlerJsInterface(), "jsi");
         webview.setWebViewClient(new WebViewClient() {
@@ -78,9 +79,9 @@ public class UpdateService extends Service {
 
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         EventBus.getDefault().unregister(this);
+
+        super.onDestroy();
     }
 
     @Override
@@ -99,13 +100,13 @@ public class UpdateService extends Service {
     }
 
     private void startPageCrawling(int page) {
+        U.dd("startPageCrawling %d", page);
         crawlingPage = page;
         isWaitingHtml = true;
         webview.loadUrl("http://xkcn.info/page/" + crawlingPage);
     }
 
     public void onEventMainThread(CrawlNextPageEvent e) {
-        U.d("khoi", "onEventMainThread");
         startPageCrawling(e.getPage());
     }
 
@@ -144,9 +145,18 @@ public class UpdateService extends Service {
                 }
             }
 
-//            TagNode gridOverlay = post.findElementByAttValue("class", "gridOverlay", false, true);
-//            if (gridOverlay != null) {
-//            }
+            TagNode gridNotes = post.findElementByAttValue("class", "gridNotes", true, true);
+            if (gridNotes != null) {
+                int notes = 0;
+                try {
+                    notes = Integer.valueOf(gridNotes.getText().toString());
+                } catch (Exception e) {
+
+                }
+
+                U.dd("notes=%d", notes);
+                photo.setNotes(notes);
+            }
         }
 
         return photo;
@@ -176,6 +186,7 @@ public class UpdateService extends Service {
                     e.printStackTrace();
                 }
             }
+            U.dd("crawled list size=%d", photoList.size());
 
             int count = PhotoDao.bulkInsertPhoto(photoList);
             if (count != 0 && count == photoList.size()) {

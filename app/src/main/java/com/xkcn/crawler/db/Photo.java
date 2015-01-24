@@ -19,6 +19,7 @@ public class Photo implements Parcelable {
     int widthHighRes;
     String title;
     String tags;
+    int notes;
 
     public Photo() {
 
@@ -139,6 +140,7 @@ public class Photo implements Parcelable {
         dest.writeInt(widthHighRes);
         dest.writeString(title);
         dest.writeString(tags);
+        dest.writeInt(notes);
     }
 
     public static final Parcelable.Creator<Photo> CREATOR
@@ -165,5 +167,14 @@ public class Photo implements Parcelable {
         widthHighRes = in.readInt();
         title = in.readString();
         tags = in.readString();
+        notes = in.readInt();
+    }
+
+    public int getNotes() {
+        return notes;
+    }
+
+    public void setNotes(int notes) {
+        this.notes = notes;
     }
 }
