@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#000">
 
-    <ImageView
+    <it.sephiroth.android.library.imagezoom.ImageViewTouch
         android:id="@+id/iv_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
