@@ -36,7 +36,7 @@ public class MainActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initViews();
-        checkToUpdate();
+        checkUpdate();
     }
 
     private void initViews() {
@@ -44,8 +44,8 @@ public class MainActivity extends ActionBarActivity {
         pager.setAdapter(adapterPhotoPages = new PhotoPagerAdapter(getSupportFragmentManager()));
     }
 
-    private void checkToUpdate() {
-        if (U.getLastUpdate() < System.currentTimeMillis() - U.MILISEC_A_DAY) {
+    private void checkUpdate() {
+        if (U.getLastUpdate() < System.currentTimeMillis() - U.PERIOD_UPDATE) {
             UpdateService.startActionUpdate(this);
         }
     }

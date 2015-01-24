@@ -20,7 +20,7 @@ import java.io.OutputStreamWriter;
  */
 public final class U {
     public static final String APP_PREF = "APP_PREF";
-    public static final long MILISEC_A_DAY = 86400000;
+    public static final long PERIOD_UPDATE = 86400000;
     private static final String PREF_LAST_UPDATE = "PREF_LAST_UPDATE";
 
     public static void d(String tag, String format, Object... args) {
