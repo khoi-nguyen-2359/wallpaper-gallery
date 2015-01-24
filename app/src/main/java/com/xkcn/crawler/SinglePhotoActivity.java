@@ -21,6 +21,8 @@ import com.xkcn.crawler.util.U;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
+import it.sephiroth.android.library.imagezoom.ImageViewTouch;
+import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 
 /**
  * Created by khoinguyen on 1/21/15.
@@ -36,7 +38,7 @@ public class SinglePhotoActivity extends BaseActivity {
         return i;
     }
 
-    @InjectView(R.id.iv_photo) ImageView ivPhoto;
+    @InjectView(R.id.iv_photo)    ImageViewTouch ivPhoto;
     @InjectView(R.id.content_view) View viewContent;
 
     private View viewDecor;
@@ -91,6 +93,7 @@ public class SinglePhotoActivity extends BaseActivity {
     }
 
     private void initViews() {
+        ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         Picasso.with(this).load(photo.getPhotoHigh()).into(ivPhoto);
 
         viewDecor = getWindow().getDecorView();
