@@ -6,15 +6,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
-import android.os.PersistableBundle;
-import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 
-import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.util.U;
@@ -39,11 +34,9 @@ public class SinglePhotoActivity extends BaseActivity {
     }
 
     @InjectView(R.id.iv_photo)    ImageViewTouch ivPhoto;
-    @InjectView(R.id.content_view) View viewContent;
 
     private View viewDecor;
     private Photo photo;
-    private GestureDetector clickDetector;
 
     private Handler hideSystemUIHandler = new Handler() {
         @Override
@@ -97,26 +90,18 @@ public class SinglePhotoActivity extends BaseActivity {
         Picasso.with(this).load(photo.getPhotoHigh()).into(ivPhoto);
 
         viewDecor = getWindow().getDecorView();
+    }
 
-        clickDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onSingleTapUp(MotionEvent e) {
-                boolean visible = (viewDecor.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
-                if (visible) {
-                    hideSystemUI();
-                }
-
-                return true;
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
+            boolean visible = (viewDecor.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
+            if (visible) {
+                hideSystemUI();
             }
-        });
+        }
 
-        viewContent.setClickable(true);
-        viewContent.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                return clickDetector.onTouchEvent(event);
-            }
-        });
+        return super.dispatchTouchEvent(ev);
     }
 
     private void initData() {
