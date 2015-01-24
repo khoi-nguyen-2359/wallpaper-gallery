@@ -9,7 +9,7 @@ import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.R;
-import com.xkcn.crawler.event.SelectPhotoEvent;
+import com.xkcn.crawler.SinglePhotoActivity;
 import com.xkcn.crawler.imageloader.RoundedTransformation;
 import com.xkcn.crawler.db.Photo;
 
@@ -63,7 +63,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         viewHolder.ivPhoto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventBus.getDefault().post(new SelectPhotoEvent(dataPhotos.get(i)));
+                context.startActivity(SinglePhotoActivity.intentViewSinglePhoto(context, dataPhotos.get(i)));
             }
         });
     }

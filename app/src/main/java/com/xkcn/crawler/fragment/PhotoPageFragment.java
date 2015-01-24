@@ -10,11 +10,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.xkcn.crawler.R;
-import com.xkcn.crawler.util.U;
 import com.xkcn.crawler.adapter.PhotoAdapter;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
+import com.xkcn.crawler.util.U;
 
 import java.util.List;
 
@@ -87,7 +87,7 @@ public class PhotoPageFragment extends Fragment {
 
     @Override
     public void onStop() {
-        super.onStop();
         EventBus.getDefault().unregister(this);
+        super.onStop();
     }
 }
