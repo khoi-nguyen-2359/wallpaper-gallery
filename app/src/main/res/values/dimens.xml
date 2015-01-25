@@ -2,7 +2,7 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
-    <dimen name="item_photo_corner_radius">10dp</dimen>
+    <dimen name="item_photo_corner_radius">5dp</dimen>
     <dimen name="item_photo_content_padding">0dp</dimen>
 
     <integer name="photo_page_col">1</integer>

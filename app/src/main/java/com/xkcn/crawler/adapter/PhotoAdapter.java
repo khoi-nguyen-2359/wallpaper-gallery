@@ -72,7 +72,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
         Picasso.with(context)
                 .load(dataPhotos.get(i).getPhoto500())
-                .transform(new RoundedTransformation(10, 1))
+                .transform(new RoundedTransformation(5, 1))
 //                .transform(new ScaleTransformation(0.8f))
                 .into(viewHolder.ivPhoto);
 
