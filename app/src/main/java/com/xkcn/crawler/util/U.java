@@ -1,8 +1,11 @@
 package com.xkcn.crawler.util;
 
 import android.annotation.TargetApi;
+import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Environment;
 import android.util.Log;
@@ -12,7 +15,13 @@ import android.view.WindowManager;
 
 import com.xkcn.crawler.XkcnApp;
 
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 
 /**
@@ -102,6 +111,116 @@ public final class U {
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_IMMERSIVE
         );
+    }
+
+    public static void savePhoto(InputStream is, String uriString) {
+        try {
+            String fileName = getResourceName(uriString);
+            File photoFile = U.getWritablePhotoFile(fileName);
+
+            OutputStream output = new FileOutputStream(photoFile);
+            int read = 0;
+            final int len = 1024;
+            byte[] buffer = new byte[len];
+            while ((read = is.read(buffer)) != -1) {
+                output.write(buffer, 0, read);
+            }
+            U.dd("saved photo at=%s", photoFile.getAbsolutePath());
+
+            output.flush();
+            output.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void setWallpaper(InputStream is) {
+        WallpaperManager wm = WallpaperManager.getInstance(XkcnApp.instance);
+        try {
+            wm.setStream(is);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     *
+     * @param uriString
+     * @return pair of preffix and suffix of the resource name
+     */
+    public static String[] getResourceNameParts(String uriString) {
+        return Uri.parse(uriString).getLastPathSegment().split("\\.");
+    }
+
+    public static String getResourceName(String uriString) {
+        return Uri.parse(uriString).getLastPathSegment();
+    }
+
+    /* Checks if external storage is available for read and write */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
+
+    /* Checks if external storage is available to at least read */
+    public static boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
+    }
+
+    public static File getExternalPhotoDir() {
+        File photoDir = new File(XkcnApp.instance.getExternalFilesDir(null).getAbsolutePath() + "/photo");
+        if (!photoDir.exists()) {
+            photoDir.mkdirs();
+        }
+
+        return photoDir;
+    }
+
+    public static File getWritablePhotoDir() {
+        if (isExternalStorageWritable()) {
+            File photoDir = getExternalPhotoDir();
+            if (!photoDir.exists()) {
+                photoDir.mkdirs();
+            }
+
+            return photoDir;
+        }
+
+        return getPhotoDir();
+    }
+
+    public static File getPhotoDir() {
+        return XkcnApp.instance.getDir("photo", Context.MODE_PRIVATE);
+    }
+
+    public static File getWritablePhotoFile(String fileName) {
+        // first check app external storage
+        File photoFile = null;
+        if (isExternalStorageWritable()) {
+            return new File(getExternalPhotoDir().getAbsolutePath() + "/" + fileName);
+        }
+
+        // second check app internal storage
+        return new File(getPhotoDir().getAbsolutePath() + "/" + fileName);
+    }
+
+    public static File getReadablePhotoFile(String uriString) {
+        // first check app external storage
+        String fileName = getResourceName(uriString);
+        File photoFile = null;
+        if (isExternalStorageReadable()) {
+            photoFile = new File(getExternalPhotoDir().getAbsolutePath() + "/" + fileName);
+            if (photoFile.exists()) {
+                return photoFile;
+            }
+        }
+
+        // second check app internal storage
+        return new File(getPhotoDir().getAbsolutePath() + "/" + fileName);
     }
 
     public static void saveLastUpdate(long lastUpdate) {

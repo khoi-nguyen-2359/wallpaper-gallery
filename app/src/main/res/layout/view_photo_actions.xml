@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:background="#afff"
+    >
+
+    <ImageButton
+        android:id="@+id/bt_download"
+        android:src="@drawable/ic_file_download_white_36dp"
+        android:layout_width="100dp"
+        android:layout_height="48dp" />
+
+    <ImageButton
+        android:id="@+id/bt_set_wallpaper"
+        android:src="@drawable/ic_now_wallpaper_white_36dp"
+        android:layout_width="100dp"
+        android:layout_height="48dp" />
+
+    <ImageButton
+        android:id="@+id/bt_share"
+        android:src="@drawable/ic_share_white_36dp"
+        android:layout_width="100dp"
+        android:layout_height="48dp" />
+
+</LinearLayout>

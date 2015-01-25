@@ -27,6 +27,7 @@ public final class PhotoDao {
     public static final String COL_TITLE = "TITLE";
     public static final String COL_TAGS = "TAGS";
     public static final String COL_NOTES = "NOTES";
+    public static final String COL_DOWNLOADED_ID = "DOWNLOADED_ID";
 
     public static Photo toPhoto(Cursor cursor) {
         Photo photo = new Photo();
@@ -44,6 +45,7 @@ public final class PhotoDao {
         if ((idx = cursor.getColumnIndex(COL_TITLE)) != -1)             photo.setTitle(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_TAGS)) != -1)              photo.setTags(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_NOTES)) != -1)             photo.setNotes(cursor.getInt(idx));
+        if ((idx = cursor.getColumnIndex(COL_DOWNLOADED_ID)) != -1)     photo.setDownloadedId(cursor.getLong(idx));
 
         return photo;
     }
@@ -63,6 +65,7 @@ public final class PhotoDao {
         cv.put(COL_TITLE, photo.getTitle());
         cv.put(COL_TAGS, photo.getTags());
         cv.put(COL_NOTES, photo.getNotes());
+        cv.put(COL_DOWNLOADED_ID, photo.getDownloadedId());
 
         return cv;
     }
