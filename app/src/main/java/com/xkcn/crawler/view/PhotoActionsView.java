@@ -66,7 +66,7 @@ public class PhotoActionsView extends FrameLayout {
         findViewById(R.id.bt_share).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onShareClicked();
+                presenter.onShareClicked(getContext());
             }
         });
     }

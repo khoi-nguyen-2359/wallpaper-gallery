@@ -1,11 +1,18 @@
 package com.xkcn.crawler.presenter;
 
+import android.content.Context;
+import android.content.Intent;
 import android.graphics.BitmapFactory;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
 
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+import com.xkcn.crawler.R;
+import com.xkcn.crawler.XkcnApp;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.util.U;
 
@@ -110,6 +117,20 @@ public class PhotoActionsPresenter {
         this.photo = photo;
     }
 
-    public void onShareClicked() {
+    public void onShareClicked(Context context) {
+        String sendText = null;
+        if (TextUtils.isEmpty(photo.getPermalinkMeta())) {
+            sendText = XkcnApp.instance.getString(R.string.send_to_trailing_text, photo.getPermalink());
+        } else {
+            Spanned spanned = Html.fromHtml(photo.getPermalinkMeta());
+            sendText = XkcnApp.instance.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());;
+        }
+
+        Intent i = new Intent();
+        i.setAction(Intent.ACTION_SEND);
+        i.putExtra(Intent.EXTRA_TEXT, sendText);
+        i.setType("text/plain");
+
+        context.startActivity(Intent.createChooser(i, XkcnApp.instance.getString(R.string.send_to)));
     }
 }
