@@ -76,12 +76,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 //                .transform(new ScaleTransformation(0.8f))
                 .into(viewHolder.ivPhoto);
 
-//        viewHolder.ivPhoto.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                context.startActivity(SinglePhotoActivity.intentViewSinglePhoto(context, dataPhotos.get(i)));
-//            }
-//        });
+        viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                context.startActivity(SinglePhotoActivity.intentViewSinglePhoto(context, dataPhotos.get(i)));
+            }
+        });
     }
 
     @Override
