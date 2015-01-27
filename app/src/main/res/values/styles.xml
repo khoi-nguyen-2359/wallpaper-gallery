@@ -6,5 +6,6 @@
     </style>
 
     <style name="AppTheme.MainActivity" parent="AppTheme"></style>
+    <style name="AppTheme.SinglePhotoActivity" parent="AppTheme"></style>
 
 </resources>

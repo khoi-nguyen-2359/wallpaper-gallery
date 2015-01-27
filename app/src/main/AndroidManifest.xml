@@ -24,7 +24,9 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".SinglePhotoActivity"/>
+        <activity
+            android:name=".SinglePhotoActivity"
+            android:theme="@style/AppTheme.SinglePhotoActivity"/>
 
         <service
             android:name=".service.UpdateService"
