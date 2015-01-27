@@ -1,5 +1,6 @@
 package com.xkcn.crawler.fragment;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -70,9 +71,11 @@ public class PhotoPageFragment extends Fragment {
         adapterPhotos = new PhotoAdapter(getActivity());
         listPhoto.setAdapter(adapterPhotos);
 
-        int statusBarHeight = U.getStatusBarHeight(getResources());
-        int navBarHeight = U.getNavigationBarHeight(getResources());
-        listPhoto.setPadding(0, statusBarHeight, 0, navBarHeight);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            int statusBarHeight = U.getStatusBarHeight(getResources());
+            int navBarHeight = U.getNavigationBarHeight(getResources());
+            listPhoto.setPadding(0, statusBarHeight, 0, navBarHeight);
+        }
     }
 
     public void onEventMainThread(UpdateFinishedEvent event) {
