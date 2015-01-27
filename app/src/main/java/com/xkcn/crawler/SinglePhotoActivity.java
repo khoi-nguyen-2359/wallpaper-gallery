@@ -6,13 +6,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.WindowManager;
 
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.util.UiUtils;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -37,12 +37,13 @@ public class SinglePhotoActivity extends BaseActivity {
 
     private View viewDecor;
     private Photo photo;
-
+    private GestureDetector toggleStatusBarDetector;
+    
     private Handler hideSystemUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            hideSystemUI();
+            UiUtils.hideStatusBar(null, viewDecor);
         }
     };
 
@@ -76,35 +77,35 @@ public class SinglePhotoActivity extends BaseActivity {
         hideSystemUIHandler.sendEmptyMessageDelayed(0, milis);
     }
 
-    private void hideSystemUI() {
-        if (Build.VERSION.SDK_INT < 16) {
-            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        } else {
-            U.hideSystemUI(viewDecor);
-        }
-    }
-
     private void initViews() {
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         Picasso.with(this).load(photo.getPhotoHigh()).into(ivPhoto);
 
         viewDecor = getWindow().getDecorView();
+        UiUtils.makeStableLayout(viewDecor);
     }
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (ev.getAction() == MotionEvent.ACTION_DOWN) {
-            boolean visible = (viewDecor.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_HIDE_NAVIGATION) == 0;
-            if (visible) {
-                hideSystemUI();
-            }
-        }
-
+        toggleStatusBarDetector.onTouchEvent(ev);
         return super.dispatchTouchEvent(ev);
     }
 
     private void initData() {
         photo = getIntent().getParcelableExtra(EXTRA_PHOTO);
+        toggleStatusBarDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onSingleTapConfirmed(MotionEvent e) {
+                boolean visible = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN || UiUtils.isStatusBarVisible(null, viewDecor);    // wont apply this toggling for pre-jellybean
+                if (visible) {
+                    UiUtils.hideStatusBar(null, viewDecor);
+                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
+                    UiUtils.showStatusBar(null, viewDecor);
+                } else {
+                    return false;
+                }
+                return true;
+            }
+        });
     }
 }

@@ -5,9 +5,6 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="AppTheme.PhotoAction">
-        <item name="android:layout_width">100dp</item>
-        <item name="android:layout_height">50dp</item>
-    </style>
+    <style name="AppTheme.MainActivity" parent="AppTheme"></style>
 
 </resources>

@@ -11,6 +11,7 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.xkcn.crawler.XkcnApp;
@@ -92,27 +93,6 @@ public final class U {
         return size;
     }
 
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static void showSystemUI(View decorView) {
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-        );
-    }
-
-    @TargetApi(Build.VERSION_CODES.KITKAT)
-    public static void hideSystemUI(View decorView) {
-        decorView.setSystemUiVisibility(
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                | View.SYSTEM_UI_FLAG_IMMERSIVE
-        );
-    }
-
     public static void savePhoto(InputStream is, String uriString) {
         try {
             String fileName = getResourceName(uriString);
@@ -143,15 +123,6 @@ public final class U {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    /**
-     *
-     * @param uriString
-     * @return pair of preffix and suffix of the resource name
-     */
-    public static String[] getResourceNameParts(String uriString) {
-        return Uri.parse(uriString).getLastPathSegment().split("\\.");
     }
 
     public static String getResourceName(String uriString) {

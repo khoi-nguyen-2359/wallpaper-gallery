@@ -1,9 +1,12 @@
 package com.xkcn.crawler;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBarActivity;
+import android.view.Window;
+import android.view.WindowManager;
 
 import com.xkcn.crawler.adapter.PhotoPagerAdapter;
 import com.xkcn.crawler.service.UpdateService;
