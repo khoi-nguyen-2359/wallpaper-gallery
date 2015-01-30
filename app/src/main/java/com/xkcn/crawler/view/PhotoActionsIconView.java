@@ -19,23 +19,23 @@ import com.xkcn.crawler.presenter.PhotoActionsPresenter;
 /**
  * Created by khoinguyen on 1/25/15.
  */
-public class PhotoActionsView extends FrameLayout {
+public class PhotoActionsIconView extends FrameLayout {
     private PhotoActionsPresenter presenter = new PhotoActionsPresenter();
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public PhotoActionsView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public PhotoActionsIconView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 
-    public PhotoActionsView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public PhotoActionsIconView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public PhotoActionsView(Context context, AttributeSet attrs) {
+    public PhotoActionsIconView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public PhotoActionsView(Context context) {
+    public PhotoActionsIconView(Context context) {
         super(context);
     }
 

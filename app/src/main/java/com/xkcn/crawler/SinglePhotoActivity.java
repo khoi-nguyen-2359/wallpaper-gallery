@@ -12,7 +12,10 @@ import android.view.View;
 
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.presenter.PhotoActionsPresenter;
+import com.xkcn.crawler.util.U;
 import com.xkcn.crawler.util.UiUtils;
+import com.xkcn.crawler.view.PhotoActionsTextView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -25,6 +28,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 public class SinglePhotoActivity extends BaseActivity {
     public static final String EXTRA_PHOTO = "EXTRA_PHOTO";
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
+    private PhotoActionsTextView viewPhotoActions;
 
     public static Intent intentViewSinglePhoto(Context context, Photo photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
@@ -38,6 +42,7 @@ public class SinglePhotoActivity extends BaseActivity {
     private View viewDecor;
     private Photo photo;
     private GestureDetector toggleStatusBarDetector;
+    private PhotoActionsPresenter photoActionsPresenter;
     
     private Handler hideSystemUIHandler = new Handler() {
         @Override
@@ -81,7 +86,23 @@ public class SinglePhotoActivity extends BaseActivity {
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         Picasso.with(this).load(photo.getPhotoHigh()).into(ivPhoto);
 
+        viewPhotoActions = (PhotoActionsTextView) findViewById(R.id.photo_actions);
+        viewPhotoActions.setPresenter(photoActionsPresenter);
+
         viewDecor = getWindow().getDecorView();
+        viewDecor.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
+            @Override
+            public void onSystemUiVisibilityChange(int visibility) {
+                if (UiUtils.isStatusBarVisible(visibility)) {
+                    U.dd("visible %d", visibility);
+                    viewPhotoActions.setVisibility(View.VISIBLE);
+                } else {
+                    U.dd("invisible");
+                    viewPhotoActions.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
         UiUtils.makeStableLayout(viewDecor);
     }
 
@@ -107,5 +128,8 @@ public class SinglePhotoActivity extends BaseActivity {
                 return true;
             }
         });
+
+        photoActionsPresenter = new PhotoActionsPresenter();
+        photoActionsPresenter.setPhoto(photo);
     }
 }

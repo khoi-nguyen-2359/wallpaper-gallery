@@ -1,11 +1,6 @@
 package com.xkcn.crawler.adapter;
 
-import android.app.DownloadManager;
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.net.Uri;
-import android.os.Environment;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,23 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.SinglePhotoActivity;
 import com.xkcn.crawler.imageloader.RoundedTransformation;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.util.U;
-import com.xkcn.crawler.view.PhotoActionsView;
+import com.xkcn.crawler.view.PhotoActionsIconView;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.nio.Buffer;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by khoinguyen on 12/22/14.
@@ -40,11 +26,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPhoto;
-        PhotoActionsView viewPhotoActions;
+        PhotoActionsIconView viewPhotoActions;
         public ViewHolder(View itemView) {
             super(itemView);
             ivPhoto = (ImageView) itemView.findViewById(R.id.iv_photo);
-            viewPhotoActions = (PhotoActionsView) itemView.findViewById(R.id.view_actions);
+            viewPhotoActions = (PhotoActionsIconView) itemView.findViewById(R.id.view_actions);
         }
     }
 

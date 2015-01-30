@@ -21,6 +21,7 @@ public final class UiUtils {
     }
 
     public static void hideStatusBar(Window window, View decorView) {
+        U.dd("hideStatusBar");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             decorView.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -37,6 +38,7 @@ public final class UiUtils {
     }
 
     public static void showStatusBar(Window window, View decorView) {
+        U.dd("showStatusBar");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
             decorView.setSystemUiVisibility(
                     View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -49,6 +51,13 @@ public final class UiUtils {
             }
         }
     }
+
+    public static boolean isStatusBarVisible(int visibility) {
+        return (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN
+                && (visibility & View.SYSTEM_UI_FLAG_FULLSCREEN) == 0)
+                || (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN
+                && (visibility & View.SYSTEM_UI_FLAG_LOW_PROFILE) == 0);
+        }
 
     public static boolean isStatusBarVisible(Window window, View decorView) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
