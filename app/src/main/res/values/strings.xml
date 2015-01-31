@@ -6,5 +6,6 @@
     <string name="action_settings">Settings</string>
     <string name="send_to">Gửi đến</string>
     <string name="send_to_trailing_text">Ảnh đẹp tuyển chọn:\n%1$s</string>
+    <string name="photo_actions_set_wp_chooser">Set as:</string>
 
 </resources>

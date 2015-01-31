@@ -59,7 +59,7 @@ public class PhotoActionsIconView extends FrameLayout {
         findViewById(R.id.bt_set_wallpaper).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSetWallpaperClicked();
+                presenter.onSetWallpaperClicked((android.app.Activity) getContext());
             }
         });
 

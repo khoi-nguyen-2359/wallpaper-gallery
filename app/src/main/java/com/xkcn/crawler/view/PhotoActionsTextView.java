@@ -47,7 +47,7 @@ public class PhotoActionsTextView extends FrameLayout {
         findViewById(R.id.tv_set_wallpaper).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                presenter.onSetWallpaperClicked();
+                presenter.onSetWallpaperClicked((android.app.Activity) getContext());
             }
         });
 

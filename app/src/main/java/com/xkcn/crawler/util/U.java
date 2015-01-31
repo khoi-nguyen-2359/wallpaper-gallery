@@ -1,8 +1,10 @@
 package com.xkcn.crawler.util;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.app.WallpaperManager;
 import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Point;
 import android.net.Uri;
@@ -14,6 +16,7 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.xkcn.crawler.R;
 import com.xkcn.crawler.XkcnApp;
 
 import java.io.File;
@@ -93,9 +96,9 @@ public final class U {
         return size;
     }
 
-    public static void savePhoto(InputStream is, String uriString) {
+    public static Uri savePhoto(InputStream is, String downloadUri) {
         try {
-            String fileName = getResourceName(uriString);
+            String fileName = getResourceName(downloadUri);
             File photoFile = U.getWritablePhotoFile(fileName);
 
             OutputStream output = new FileOutputStream(photoFile);
@@ -109,20 +112,24 @@ public final class U {
 
             output.flush();
             output.close();
+
+            return Uri.fromFile(photoFile);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 
-    public static void setWallpaper(InputStream is) {
-        WallpaperManager wm = WallpaperManager.getInstance(XkcnApp.instance);
-        try {
-            wm.setStream(is);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    public static void startSetWallpaperChooser(Activity activity, Uri uriImg) {
+        Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
+        intent.addCategory(Intent.CATEGORY_DEFAULT);
+        intent.setDataAndType(uriImg, "image/jpeg");
+        intent.putExtra("mimeType", "image/jpeg");
+
+        activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.photo_actions_set_wp_chooser)));
     }
 
     public static String getResourceName(String uriString) {
