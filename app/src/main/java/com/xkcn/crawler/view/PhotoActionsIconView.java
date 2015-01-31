@@ -49,13 +49,6 @@ public class PhotoActionsIconView extends FrameLayout {
         LayoutInflater inflater = LayoutInflater.from(getContext());
         inflater.inflate(R.layout.view_photo_actions, this, true);
 
-        findViewById(R.id.bt_download).setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                presenter.onDownloadClicked();
-            }
-        });
-
         findViewById(R.id.bt_set_wallpaper).setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

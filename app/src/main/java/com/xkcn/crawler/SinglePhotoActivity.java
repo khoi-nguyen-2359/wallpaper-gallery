@@ -162,6 +162,7 @@ public class SinglePhotoActivity extends BaseActivity {
                 boolean visible = UiUtils.isStatusBarVisible(null, viewDecor);
                 if (visible) {
                     UiUtils.hideStatusBar(null, viewDecor);
+                    hideSystemUIHandler.removeMessages(0);
                 } else {
                     UiUtils.showStatusBar(null, viewDecor);
                 }
