@@ -3,16 +3,17 @@ package com.xkcn.crawler;
 import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
+import android.graphics.Bitmap;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 
 import com.squareup.picasso.Picasso;
+import com.squareup.picasso.Target;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.presenter.PhotoActionsPresenter;
 import com.xkcn.crawler.util.U;
@@ -32,6 +33,8 @@ public class SinglePhotoActivity extends BaseActivity {
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
     private PhotoActionsTextView viewPhotoActions;
     private View viewContent;
+    private Bitmap bm;
+    private Target target;
 
     public static Intent intentViewSinglePhoto(Context context, Photo photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
@@ -46,8 +49,6 @@ public class SinglePhotoActivity extends BaseActivity {
     private Photo photo;
     private GestureDetector toggleStatusBarDetector;
     private PhotoActionsPresenter photoActionsPresenter;
-    private ViewPropertyAnimator animHidePhotoActions;
-    private ViewPropertyAnimator animShowPhotoActions;
 
     private Handler hideSystemUIHandler = new Handler() {
         @Override
@@ -81,11 +82,30 @@ public class SinglePhotoActivity extends BaseActivity {
         hideSystemUIHandler.sendEmptyMessageDelayed(0, milis);
     }
 
+    // must be a strong ref to this target
+    private Target loadPhotoHighTarget = new Target() {
+        @Override
+        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            ivPhoto.setImageBitmap(bitmap);
+        }
+
+        @Override
+        public void onBitmapFailed(Drawable errorDrawable) {
+            U.dd("onBitmapFailed");
+        }
+
+        @Override
+        public void onPrepareLoad(Drawable placeHolderDrawable) {
+            U.dd("onPrepareLoad");
+        }
+    };
+
     private void initViews() {
         viewContent = findViewById(R.id.content_view);
 
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
-        Picasso.with(this).load(photo.getPhotoHigh()).into(ivPhoto);
+        Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
+        Picasso.with(this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
 
         viewPhotoActions = (PhotoActionsTextView) findViewById(R.id.photo_actions);
         viewPhotoActions.setPresenter(photoActionsPresenter);

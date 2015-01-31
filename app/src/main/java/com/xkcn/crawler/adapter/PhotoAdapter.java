@@ -1,6 +1,10 @@
 package com.xkcn.crawler.adapter;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +18,8 @@ import com.xkcn.crawler.imageloader.RoundedTransformation;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.view.PhotoActionsIconView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,7 +71,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                context.startActivity(SinglePhotoActivity.intentViewSinglePhoto(context, dataPhotos.get(i)));
+                Intent intent = SinglePhotoActivity.intentViewSinglePhoto(context, dataPhotos.get(i));
+                context.startActivity(intent);
             }
         });
     }
