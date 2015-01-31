@@ -1,5 +1,6 @@
 package com.xkcn.crawler;
 
+import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
@@ -9,6 +10,7 @@ import android.os.Message;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewPropertyAnimator;
 
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.db.Photo;
@@ -29,6 +31,7 @@ public class SinglePhotoActivity extends BaseActivity {
     public static final String EXTRA_PHOTO = "EXTRA_PHOTO";
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
     private PhotoActionsTextView viewPhotoActions;
+    private View viewContent;
 
     public static Intent intentViewSinglePhoto(Context context, Photo photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
@@ -43,7 +46,9 @@ public class SinglePhotoActivity extends BaseActivity {
     private Photo photo;
     private GestureDetector toggleStatusBarDetector;
     private PhotoActionsPresenter photoActionsPresenter;
-    
+    private ViewPropertyAnimator animHidePhotoActions;
+    private ViewPropertyAnimator animShowPhotoActions;
+
     private Handler hideSystemUIHandler = new Handler() {
         @Override
         public void handleMessage(Message msg) {
@@ -83,6 +88,8 @@ public class SinglePhotoActivity extends BaseActivity {
     }
 
     private void initViews() {
+        viewContent = findViewById(R.id.content_view);
+
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
         Picasso.with(this).load(photo.getPhotoHigh()).into(ivPhoto);
 
@@ -96,9 +103,30 @@ public class SinglePhotoActivity extends BaseActivity {
                 if (UiUtils.isStatusBarVisible(visibility)) {
                     U.dd("visible %d", visibility);
                     viewPhotoActions.setVisibility(View.VISIBLE);
+                    viewPhotoActions.animate().setListener(null).y(viewContent.getHeight()-getResources().getDimension(R.dimen.abc_action_bar_default_height_material)).start();
                 } else {
                     U.dd("invisible");
-                    viewPhotoActions.setVisibility(View.INVISIBLE);
+                    viewPhotoActions.animate().y(viewContent.getHeight()).setListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            viewPhotoActions.setVisibility(View.INVISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animation) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animation) {
+
+                        }
+                    }).start();
                 }
             }
         });

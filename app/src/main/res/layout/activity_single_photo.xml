@@ -13,7 +13,6 @@
         android:layout_height="match_parent" />
 
     <com.xkcn.crawler.view.PhotoActionsTextView
-        android:layout_marginBottom="10dp"
         android:id="@+id/photo_actions"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
