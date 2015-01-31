@@ -67,12 +67,6 @@ public class SinglePhotoActivity extends BaseActivity {
     }
 
     @Override
-    protected void onPostCreate(Bundle savedInstanceState) {
-        super.onPostCreate(savedInstanceState);
-        delayedHide(PERIOD_HIDE_SYSTEMUI);
-    }
-
-    @Override
     public void onWindowFocusChanged(boolean hasFocus) {
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
@@ -145,14 +139,13 @@ public class SinglePhotoActivity extends BaseActivity {
         toggleStatusBarDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
-                boolean visible = Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN || UiUtils.isStatusBarVisible(null, viewDecor);    // wont apply this toggling for pre-jellybean
+                boolean visible = UiUtils.isStatusBarVisible(null, viewDecor);
                 if (visible) {
                     UiUtils.hideStatusBar(null, viewDecor);
-                } else if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-                    UiUtils.showStatusBar(null, viewDecor);
                 } else {
-                    return false;
+                    UiUtils.showStatusBar(null, viewDecor);
                 }
+
                 return true;
             }
         });
