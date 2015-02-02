@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -33,8 +34,6 @@ public class SinglePhotoActivity extends BaseActivity {
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
     private PhotoActionsTextView viewPhotoActions;
     private View viewContent;
-    private Bitmap bm;
-    private Target target;
 
     public static Intent intentViewSinglePhoto(Context context, Photo photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
@@ -104,8 +103,21 @@ public class SinglePhotoActivity extends BaseActivity {
         viewContent = findViewById(R.id.content_view);
 
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
-        Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
-        Picasso.with(this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
+        boolean downloaded = photoActionsPresenter.loadPhoto(new PhotoActionsPresenter.LoadPhotoCallback() {
+            @Override
+            public void onLoaded(final Uri uriLocal) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Picasso.with(SinglePhotoActivity.this).load(uriLocal).into(loadPhotoHighTarget);
+                    }
+                });
+            }
+        });
+        if (!downloaded) {
+            // load low quality photo while downloading high quality
+            Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
+        }
 
         viewPhotoActions = (PhotoActionsTextView) findViewById(R.id.photo_actions);
         viewPhotoActions.setPresenter(photoActionsPresenter);

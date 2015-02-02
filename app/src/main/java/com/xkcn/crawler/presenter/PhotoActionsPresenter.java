@@ -25,8 +25,8 @@ import java.io.InputStream;
  * Created by khoinguyen on 1/25/15.
  */
 public class PhotoActionsPresenter {
-    interface DownloadCallback {
-        void onDownloaded(Uri uriLocal);
+    public interface LoadPhotoCallback {
+        void onLoaded(Uri uriLocal);
     }
 
     private Photo photo;
@@ -50,29 +50,32 @@ public class PhotoActionsPresenter {
     }
 
     public void onSetWallpaperClicked(final Activity activity) {
+        loadPhoto(new LoadPhotoCallback() {
+            @Override
+            public void onLoaded(Uri uriLocal) {
+                U.startSetWallpaperChooser(activity, uriLocal);
+            }
+        });
+    }
+
+    public boolean loadPhoto(final LoadPhotoCallback callback) {
         File fileDownloaded = U.getReadablePhotoFile(photo.getPhotoHigh());
         if (fileDownloaded.exists()) {
             U.dd("file already downloaded");
 
-            U.startSetWallpaperChooser(activity, Uri.fromFile(fileDownloaded));
-        } else {
-            U.dd("file downloading");
+            if (callback != null) {
+                callback.onLoaded(Uri.fromFile(fileDownloaded));
+            }
 
-            doPhotoDownload(new DownloadCallback() {
-                @Override
-                public void onDownloaded(Uri uriLocal) {
-                    U.startSetWallpaperChooser(activity, uriLocal);
-                }
-            });
+            return true;
         }
-    }
 
-    private void doPhotoDownload(final DownloadCallback callback) {
         OkHttpClient client = getHttpClient();
         final Request request = new Request.Builder()
                 .url(photo.getPhotoHigh())
                 .build();
 
+        U.dd("file downloading");
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Request request, IOException e) {
@@ -91,10 +94,12 @@ public class PhotoActionsPresenter {
                 Uri downloadedUri = U.savePhoto(is, photo.getPhotoHigh());
                 is.close();
                 if (callback != null) {
-                    callback.onDownloaded(downloadedUri);
+                    callback.onLoaded(downloadedUri);
                 }
             }
         });
+
+        return false;
     }
 
     public Photo getPhoto() {

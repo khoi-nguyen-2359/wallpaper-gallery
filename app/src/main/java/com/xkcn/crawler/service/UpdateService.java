@@ -59,7 +59,7 @@ public class UpdateService extends Service {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                U.d("khoi", "page %d finished", crawlingPage);
+                U.dd("page %d finished", crawlingPage);
                 if (isWaitingHtml == false)
                     return;
 
@@ -140,7 +140,7 @@ public class UpdateService extends Service {
                 Matcher matcher = pattern.matcher(templateText);
                 if (matcher.find()) {
                     String permalinkMetaValue = matcher.group(1);
-                    U.d("khoi", "url=%s", photo.getPermalink());
+                    U.dd("url=%s", photo.getPermalink());
                     photo.setPermalinkMeta(permalinkMetaValue);
                 }
             }
@@ -165,7 +165,7 @@ public class UpdateService extends Service {
     public class CrawlerJsInterface {
         @JavascriptInterface
         public void processHTML(String html) {
-            U.d("khoi", "processHTML");
+            U.dd("processHTML");
 
             HtmlCleaner htmlCleaner = new HtmlCleaner();
             TagNode root = htmlCleaner.clean(html);
@@ -192,7 +192,7 @@ public class UpdateService extends Service {
             if (count != 0 && count == photoList.size()) {
                 EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));
             } else {
-                U.d("khoi", "processHTML done");
+                U.dd("processHTML done");
                 EventBus.getDefault().post(new UpdateFinishedEvent());
                 U.saveLastUpdate(System.currentTimeMillis());
                 stopSelf();

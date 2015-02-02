@@ -16,9 +16,11 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.xkcn.crawler.BuildConfig;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.XkcnApp;
 
+import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -36,15 +38,10 @@ public final class U {
     public static final long PERIOD_UPDATE = 86400000;
     private static final String PREF_LAST_UPDATE = "PREF_LAST_UPDATE";
 
-    public static void d(String tag, String format, Object... args) {
-        if (args != null && args.length != 0) {
-            Log.d(tag, String.format(format, args));
-        } else {
-            Log.d(tag, format);
-        }
-    }
-
     public static void dd(String format, Object... args) {
+        if (!BuildConfig.LOGGABLE)
+            return;
+
         if (args != null && args.length != 0) {
             Log.d("khoi", String.format(format, args));
         } else {
@@ -101,14 +98,16 @@ public final class U {
             String fileName = getResourceName(downloadUri);
             File photoFile = U.getWritablePhotoFile(fileName);
 
-            OutputStream output = new FileOutputStream(photoFile);
+            BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(photoFile));
             int read = 0;
-            final int len = 1024;
+            final int len = 8192;
             byte[] buffer = new byte[len];
+            long time = System.currentTimeMillis();
+            U.dd("start saving photo");
             while ((read = is.read(buffer)) != -1) {
                 output.write(buffer, 0, read);
             }
-            U.dd("saved photo at=%s", photoFile.getAbsolutePath());
+            U.dd("saved photo at=%s cost %d", photoFile.getAbsolutePath(), System.currentTimeMillis() - time);
 
             output.flush();
             output.close();
