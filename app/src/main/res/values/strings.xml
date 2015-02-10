@@ -7,5 +7,8 @@
     <string name="send_to">Gửi đến</string>
     <string name="send_to_trailing_text">Ảnh đẹp tuyển chọn:\n%1$s</string>
     <string name="photo_actions_set_wp_chooser">Set as:</string>
+    <string name="msg_wait_a_moment">Chờ trong giây lát ...</string>
+    <string name="photo_action_download_failed_retry">Không thể tải ảnh, vui lòng thử lại sau ...</string>
+    <string name="photo_action_download_processing">Đang tải ảnh phân giải cao ...</string>
 
 </resources>

@@ -5,21 +5,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.presenter.PhotoActionsPresenter;
-import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.db.PhotoDao;
+import com.xkcn.crawler.photoactions.PhotoDownloadManager;
 import com.xkcn.crawler.util.UiUtils;
-import com.xkcn.crawler.view.PhotoActionsTextView;
+import com.xkcn.crawler.view.PhotoActionsView;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -32,8 +33,10 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 public class SinglePhotoActivity extends BaseActivity {
     public static final String EXTRA_PHOTO = "EXTRA_PHOTO";
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
-    private PhotoActionsTextView viewPhotoActions;
+    private PhotoActionsView viewPhotoActions;
     private View viewContent;
+    private boolean enabledToggleStatusBar;
+    private PhotoDownloadManager photoDownloadManager;
 
     public static Intent intentViewSinglePhoto(Context context, Photo photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
@@ -42,12 +45,12 @@ public class SinglePhotoActivity extends BaseActivity {
         return i;
     }
 
-    @InjectView(R.id.iv_photo)    ImageViewTouch ivPhoto;
+    @InjectView(R.id.iv_photo)      ImageViewTouch ivPhoto;
+    @InjectView(R.id.progress_bar)  ProgressBar progressBar;
 
     private View viewDecor;
     private Photo photo;
     private GestureDetector toggleStatusBarDetector;
-    private PhotoActionsPresenter photoActionsPresenter;
 
     private Handler hideSystemUIHandler = new Handler() {
         @Override
@@ -85,53 +88,48 @@ public class SinglePhotoActivity extends BaseActivity {
     private Target loadPhotoHighTarget = new Target() {
         @Override
         public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
+            progressBar.setVisibility(View.GONE);
+            enabledToggleStatusBar = true;
+            UiUtils.showStatusBar(getWindow(), viewDecor);
+
             ivPhoto.setImageBitmap(bitmap);
+
+            if (PhotoDao.getDownloadState(photo.getIdentifier()) != PhotoDao.DOWNLOAD_STATE_OK) {
+                photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh(), PhotoDownloadManager.PURPOSE_CACHE_STORAGE);
+            }
         }
 
         @Override
         public void onBitmapFailed(Drawable errorDrawable) {
-            U.dd("onBitmapFailed");
+            progressBar.setVisibility(View.GONE);
+            Toast.makeText(SinglePhotoActivity.this, R.string.photo_action_download_failed_retry, Toast.LENGTH_SHORT).show();
         }
 
         @Override
         public void onPrepareLoad(Drawable placeHolderDrawable) {
-            U.dd("onPrepareLoad");
         }
     };
 
     private void initViews() {
         viewContent = findViewById(R.id.content_view);
+        viewDecor = getWindow().getDecorView();
 
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
-        boolean downloaded = photoActionsPresenter.loadPhoto(new PhotoActionsPresenter.LoadPhotoCallback() {
-            @Override
-            public void onLoaded(final Uri uriLocal) {
-                runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        Picasso.with(SinglePhotoActivity.this).load(uriLocal).into(loadPhotoHighTarget);
-                    }
-                });
-            }
-        });
-        if (!downloaded) {
-            // load low quality photo while downloading high quality
+        if (PhotoDao.getDownloadState(photo.getIdentifier()) != PhotoDao.DOWNLOAD_STATE_OK) {
             Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
         }
+        Picasso.with(SinglePhotoActivity.this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
 
-        viewPhotoActions = (PhotoActionsTextView) findViewById(R.id.photo_actions);
-        viewPhotoActions.setPresenter(photoActionsPresenter);
+        viewPhotoActions = (PhotoActionsView) findViewById(R.id.photo_actions);
+        viewPhotoActions.bind(photo);
 
-        viewDecor = getWindow().getDecorView();
         viewDecor.setOnSystemUiVisibilityChangeListener(new View.OnSystemUiVisibilityChangeListener() {
             @Override
             public void onSystemUiVisibilityChange(int visibility) {
                 if (UiUtils.isStatusBarVisible(visibility)) {
-                    U.dd("visible %d", visibility);
                     viewPhotoActions.setVisibility(View.VISIBLE);
                     viewPhotoActions.animate().setListener(null).y(viewContent.getHeight()-getResources().getDimension(R.dimen.abc_action_bar_default_height_material)).start();
                 } else {
-                    U.dd("invisible");
                     viewPhotoActions.animate().y(viewContent.getHeight()).setListener(new Animator.AnimatorListener() {
                         @Override
                         public void onAnimationStart(Animator animation) {
@@ -168,9 +166,12 @@ public class SinglePhotoActivity extends BaseActivity {
 
     private void initData() {
         photo = getIntent().getParcelableExtra(EXTRA_PHOTO);
+        enabledToggleStatusBar = false;
         toggleStatusBarDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
             @Override
             public boolean onSingleTapConfirmed(MotionEvent e) {
+                if (!enabledToggleStatusBar)   return false;
+
                 boolean visible = UiUtils.isStatusBarVisible(null, viewDecor);
                 if (visible) {
                     UiUtils.hideStatusBar(null, viewDecor);
@@ -183,7 +184,11 @@ public class SinglePhotoActivity extends BaseActivity {
             }
         });
 
-        photoActionsPresenter = new PhotoActionsPresenter();
-        photoActionsPresenter.setPhoto(photo);
+        photoDownloadManager = PhotoDownloadManager.getInstance();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
     }
 }

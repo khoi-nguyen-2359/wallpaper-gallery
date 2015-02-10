@@ -8,7 +8,7 @@
         android:background="#3000">
 
         <TextView
-            android:id="@+id/tv_set_wallpaper"
+            android:id="@+id/bt_set_wallpaper"
             style="@style/AppTheme.PhotoActionText"
             android:text="Set Wallpaper"
             android:layout_width="150dp"
@@ -19,7 +19,7 @@
             android:layout_height="0dp" />
 
         <TextView
-            android:id="@+id/tv_share"
+            android:id="@+id/bt_share"
             style="@style/AppTheme.PhotoActionText"
             android:text="Share"
             android:layout_width="150dp"

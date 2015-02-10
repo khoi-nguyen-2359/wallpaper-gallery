@@ -20,7 +20,7 @@ public class DbHelper extends SQLiteAssetHelper {
 
     public static DbHelper getInstance() {
         if (instance == null) {
-            instance = new DbHelper(XkcnApp.instance);
+            instance = new DbHelper(XkcnApp.app);
             instance.getWritableDatabase();	// copy db from asset for the first time
         }
 

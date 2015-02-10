@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/content_view"
     android:orientation="vertical"
     android:layout_width="match_parent"
@@ -12,8 +12,16 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.xkcn.crawler.view.PhotoActionsTextView
+    <ProgressBar
+        android:layout_gravity="center"
+        android:id="@+id/progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+    <com.xkcn.crawler.view.PhotoActionsView
+        android:visibility="invisible"
         android:id="@+id/photo_actions"
+        app:type="text"
         android:layout_gravity="bottom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"/>

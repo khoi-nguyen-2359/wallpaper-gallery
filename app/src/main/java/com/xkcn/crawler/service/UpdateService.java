@@ -8,6 +8,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.util.U;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.db.PhotoDao;
@@ -35,6 +36,8 @@ public class UpdateService extends Service {
     private WebView webview;
     private int crawlingPage;
 
+    private L logger = L.get(UpdateService.class.getName());
+
     public static void startActionUpdate(Context context) {
         Intent intent = new Intent(context, UpdateService.class);
         intent.setAction(ACTION_UPDATE);
@@ -59,7 +62,7 @@ public class UpdateService extends Service {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
-                U.dd("page %d finished", crawlingPage);
+                logger.d("page %d finished", crawlingPage);
                 if (isWaitingHtml == false)
                     return;
 
@@ -100,7 +103,7 @@ public class UpdateService extends Service {
     }
 
     private void startPageCrawling(int page) {
-        U.dd("startPageCrawling %d", page);
+        logger.d("startPageCrawling %d", page);
         crawlingPage = page;
         isWaitingHtml = true;
         webview.loadUrl("http://xkcn.info/page/" + crawlingPage);
@@ -140,7 +143,7 @@ public class UpdateService extends Service {
                 Matcher matcher = pattern.matcher(templateText);
                 if (matcher.find()) {
                     String permalinkMetaValue = matcher.group(1);
-                    U.dd("url=%s", photo.getPermalink());
+                    logger.d("url=%s", photo.getPermalink());
                     photo.setPermalinkMeta(permalinkMetaValue);
                 }
             }
@@ -154,7 +157,7 @@ public class UpdateService extends Service {
 
                 }
 
-                U.dd("notes=%d", notes);
+                logger.d("notes=%d", notes);
                 photo.setNotes(notes);
             }
         }
@@ -165,7 +168,7 @@ public class UpdateService extends Service {
     public class CrawlerJsInterface {
         @JavascriptInterface
         public void processHTML(String html) {
-            U.dd("processHTML");
+            logger.d("processHTML");
 
             HtmlCleaner htmlCleaner = new HtmlCleaner();
             TagNode root = htmlCleaner.clean(html);
@@ -186,13 +189,13 @@ public class UpdateService extends Service {
                     e.printStackTrace();
                 }
             }
-            U.dd("crawled list size=%d", photoList.size());
+            logger.d("crawled list size=%d", photoList.size());
 
             int count = PhotoDao.bulkInsertPhoto(photoList);
             if (count != 0 && count == photoList.size()) {
                 EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));
             } else {
-                U.dd("processHTML done");
+                logger.d("processHTML done");
                 EventBus.getDefault().post(new UpdateFinishedEvent());
                 U.saveLastUpdate(System.currentTimeMillis());
                 stopSelf();

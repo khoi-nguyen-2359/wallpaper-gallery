@@ -4,7 +4,7 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.util.L;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,11 @@ import java.util.List;
  * Created by khoinguyen on 12/27/14.
  */
 public final class PhotoDao {
+    public static final int DOWNLOAD_STATE_OK = 1;
+    public static final int DOWNLOAD_STATE_NONE = 0;
+
+    private static L logger = L.get(PhotoDao.class.getName());
+
     public static final String TABLE_NAME = "PHOTO";
     public static final String COL_IDENTIFIER = "IDENTIFIER";
     public static final String COL_PHOTO100 = "PHOTO100";
@@ -27,7 +32,7 @@ public final class PhotoDao {
     public static final String COL_TITLE = "TITLE";
     public static final String COL_TAGS = "TAGS";
     public static final String COL_NOTES = "NOTES";
-    public static final String COL_DOWNLOADED_ID = "DOWNLOADED_ID";
+    public static final String COL_DOWNLOAD_STATE = "DOWNLOAD_STATE";
 
     public static Photo toPhoto(Cursor cursor) {
         Photo photo = new Photo();
@@ -45,7 +50,7 @@ public final class PhotoDao {
         if ((idx = cursor.getColumnIndex(COL_TITLE)) != -1)             photo.setTitle(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_TAGS)) != -1)              photo.setTags(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_NOTES)) != -1)             photo.setNotes(cursor.getInt(idx));
-        if ((idx = cursor.getColumnIndex(COL_DOWNLOADED_ID)) != -1)     photo.setDownloadedId(cursor.getLong(idx));
+//        if ((idx = cursor.getColumnIndex(COL_DOWNLOAD_STATE)) != -1)    photo.setDownloadedState(cursor.getInt(idx));
 
         return photo;
     }
@@ -65,9 +70,30 @@ public final class PhotoDao {
         cv.put(COL_TITLE, photo.getTitle());
         cv.put(COL_TAGS, photo.getTags());
         cv.put(COL_NOTES, photo.getNotes());
-        cv.put(COL_DOWNLOADED_ID, photo.getDownloadedId());
+//        cv.put(COL_DOWNLOAD_STATE, photo.getDownloadedState());
 
         return cv;
+    }
+
+    public static int setDownloadState(long photoIdentifier, int state) {
+        SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put(COL_DOWNLOAD_STATE, state);
+
+        return db.update(TABLE_NAME, cv, COL_IDENTIFIER+"=?", new String[]{String.valueOf(photoIdentifier)});
+    }
+
+    public static int getDownloadState(long photoId) {
+        int downloadState = -1;
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER, COL_DOWNLOAD_STATE}, COL_IDENTIFIER + "=?", new String[]{String.valueOf(photoId)}, null, null, null);
+        if (c != null && c.moveToFirst()) {
+            downloadState = c.getInt(1);
+        }
+
+        return downloadState;
     }
 
     public static List<Photo> query(int page) {
@@ -132,8 +158,8 @@ public final class PhotoDao {
             db.endTransaction();
         }
 
-        U.dd("bulkInsert affected=%d", nAffected);
-        U.dd("bulkInsert inserted=%d", nInserted);
+        logger.d("bulkInsert affected=%d", nAffected);
+        logger.d("bulkInsert inserted=%d", nInserted);
 
         return nInserted;
     }

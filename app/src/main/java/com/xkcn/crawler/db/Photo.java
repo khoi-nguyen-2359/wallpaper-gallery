@@ -20,10 +20,8 @@ public class Photo implements Parcelable {
     String title;
     String tags;
     int notes;
-    long downloadedId;
 
     public Photo() {
-
     }
 
     public String getPhoto100() {
@@ -142,7 +140,6 @@ public class Photo implements Parcelable {
         dest.writeString(title);
         dest.writeString(tags);
         dest.writeInt(notes);
-        dest.writeLong(downloadedId);
     }
 
     public static final Parcelable.Creator<Photo> CREATOR
@@ -170,7 +167,6 @@ public class Photo implements Parcelable {
         title = in.readString();
         tags = in.readString();
         notes = in.readInt();
-        downloadedId = in.readLong();
     }
 
     public int getNotes() {
@@ -179,13 +175,5 @@ public class Photo implements Parcelable {
 
     public void setNotes(int notes) {
         this.notes = notes;
-    }
-
-    public long getDownloadedId() {
-        return downloadedId;
-    }
-
-    public void setDownloadedId(long downloadedId) {
-        this.downloadedId = downloadedId;
     }
 }

@@ -1,19 +1,19 @@
 package com.xkcn.crawler;
 
 import android.app.Application;
-import android.os.Environment;
 
-import com.xkcn.crawler.util.U;
+import com.squareup.picasso.Picasso;
 
 /**
  * Created by khoinguyen on 12/25/14.
  */
 public class XkcnApp extends Application {
-    public static XkcnApp instance;
+    public static XkcnApp app;
 
     @Override
     public void onCreate() {
         super.onCreate();
-        instance = this;
+        app = this;
+        Picasso.with(this).setIndicatorsEnabled(BuildConfig.LOGGABLE);
     }
 }

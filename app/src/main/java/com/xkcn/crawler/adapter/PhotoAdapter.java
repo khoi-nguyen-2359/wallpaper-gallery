@@ -2,9 +2,6 @@ package com.xkcn.crawler.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,12 +11,10 @@ import android.widget.ImageView;
 import com.squareup.picasso.Picasso;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.SinglePhotoActivity;
-import com.xkcn.crawler.imageloader.RoundedTransformation;
+import com.xkcn.crawler.photoactions.RoundedTransformation;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.view.PhotoActionsIconView;
+import com.xkcn.crawler.view.PhotoActionsView;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,11 +27,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivPhoto;
-        PhotoActionsIconView viewPhotoActions;
+        PhotoActionsView viewPhotoActions;
         public ViewHolder(View itemView) {
             super(itemView);
             ivPhoto = (ImageView) itemView.findViewById(R.id.iv_photo);
-            viewPhotoActions = (PhotoActionsIconView) itemView.findViewById(R.id.view_actions);
+            viewPhotoActions = (PhotoActionsView) itemView.findViewById(R.id.view_actions);
         }
     }
 
@@ -60,7 +55,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
-        viewHolder.viewPhotoActions.getPresenter().setPhoto(dataPhotos.get(i));
+        viewHolder.viewPhotoActions.bind(dataPhotos.get(i));
 
         Picasso.with(context)
                 .load(dataPhotos.get(i).getPhoto500())

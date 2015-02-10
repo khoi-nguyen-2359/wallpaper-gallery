@@ -36,7 +36,6 @@ public class PhotoPageFragment extends Fragment {
         PhotoPageFragment f = new PhotoPageFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
-        U.dd("page=%d", page);
         f.setArguments(args);
 
         return f;
@@ -56,7 +55,6 @@ public class PhotoPageFragment extends Fragment {
     }
 
     private void populatePhotoList() {
-        U.dd("populatePhotoList");
         List<Photo> photoList = PhotoDao.query(getArguments().getInt(ARG_PAGE));
         adapterPhotos.setDataPhotos(photoList);
         adapterPhotos.notifyDataSetChanged();
