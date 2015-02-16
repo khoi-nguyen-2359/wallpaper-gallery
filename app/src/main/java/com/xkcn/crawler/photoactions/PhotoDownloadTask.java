@@ -18,17 +18,15 @@ import de.greenrobot.event.EventBus;
 public class PhotoDownloadTask implements Runnable {
     private long photoIdentifier;
     private String photoUrl;
-    private int purpose;
 
-    public PhotoDownloadTask(long id, String url, int purpose) {
+    public PhotoDownloadTask(long id, String url) {
         photoIdentifier = id;
         photoUrl = url;
-        this.purpose = purpose;
     }
 
     @Override
     public void run() {
         PhotoDownloadManager downloadManager = PhotoDownloadManager.getInstance();
-        downloadManager.doDownload(photoIdentifier, photoUrl, purpose);
+        downloadManager.doDownload(photoIdentifier, photoUrl);
     }
 }

@@ -9,7 +9,7 @@ import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.PhotoDownloadedEvent;
 import com.xkcn.crawler.event.SetWallpaperClicked;
-import com.xkcn.crawler.photoactions.PhotoDownloadEventSubscriber;
+import com.xkcn.crawler.photoactions.PhotoDownloadSubscriber;
 import com.xkcn.crawler.photoactions.PhotoDownloadManager;
 import com.xkcn.crawler.util.U;
 import com.xkcn.crawler.util.UiUtils;
@@ -23,7 +23,7 @@ public class BaseActivity extends ActionBarActivity {
 
     private Dialog proDlg;
 
-    private PhotoDownloadEventSubscriber setWallpaperEventSubscriber = new PhotoDownloadEventSubscriber() {
+    private PhotoDownloadSubscriber setWallpaperEventSubscriber = new PhotoDownloadSubscriber() {
         @Override
         public void onEventMainThread(PhotoDownloadedEvent e) {
             UiUtils.dismissDlg(proDlg);

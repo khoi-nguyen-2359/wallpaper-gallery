@@ -185,7 +185,7 @@ public class UpdateService extends Service {
                     } else {
                         break;
                     }
-                } catch (XPatherException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }

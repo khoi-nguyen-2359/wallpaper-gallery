@@ -7,13 +7,11 @@ import android.net.Uri;
  */
 public class PhotoDownloadedEvent {
     private long photoIdentifier;
-    private int purpose;
     private Uri uriDownloaded;
 
-    public PhotoDownloadedEvent(long photoId, int purpose, Uri uri) {
+    public PhotoDownloadedEvent(long photoId, Uri uri) {
         uriDownloaded = uri;
         this.photoIdentifier = photoId;
-        this.purpose = purpose;
     }
 
     public Uri getDownloadedUri() {
@@ -30,13 +28,5 @@ public class PhotoDownloadedEvent {
 
     public void setPhotoIdentifier(long photoIdentifier) {
         this.photoIdentifier = photoIdentifier;
-    }
-
-    public int getPurpose() {
-        return purpose;
-    }
-
-    public void setPurpose(int purpose) {
-        this.purpose = purpose;
     }
 }

@@ -26,14 +26,6 @@ import de.greenrobot.event.EventBus;
  * Created by khoinguyen on 2/4/15.
  */
 public final class PhotoDownloadManager {
-    public static class DownloadTask implements Runnable {
-
-        @Override
-        public void run() {
-
-        }
-    }
-
     public static final int PURPOSE_CACHE_STORAGE = 1;
     public static final int PURPOSE_SET_WP = 2;
 
@@ -64,7 +56,7 @@ public final class PhotoDownloadManager {
         downloader = new OkHttpDownloader(XkcnApp.app);
     }
 
-    void doDownload(long photoIdentifier, String photoUrl, int purpose) {
+    void doDownload(long photoIdentifier, String photoUrl) {
         logger.d("start file downloading");
         downloadingUris.add(photoUrl);
         try {
@@ -74,7 +66,7 @@ public final class PhotoDownloadManager {
             responseInputStream.close();
             PhotoDao.setDownloadState(photoIdentifier, PhotoDao.DOWNLOAD_STATE_OK);
 
-            EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, purpose, downloadedUri));
+            EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, downloadedUri));
         } catch (Exception e) {
             e.printStackTrace();
             EventBus.getDefault().post(new PhotoDownloadFailedEvent());
@@ -92,14 +84,14 @@ public final class PhotoDownloadManager {
 
         int downloadState = PhotoDao.getDownloadState(photoIdentifier);
         logger.d("downloadState=%d", downloadState);
-        if (PhotoDao.getDownloadState(photoIdentifier) == PhotoDao.DOWNLOAD_STATE_OK) {
+        if (downloadState == PhotoDao.DOWNLOAD_STATE_OK) {
             logger.d("file already downloaded");
             File downloadedFile = StorageUtils.getReadablePhotoFile(photoUrl);
-            EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, purpose, Uri.fromFile(downloadedFile)));
+            EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, Uri.fromFile(downloadedFile)));
             return true;
         }
 
-        executorService.execute(new PhotoDownloadTask(photoIdentifier, photoUrl, purpose));
+        executorService.execute(new PhotoDownloadTask(photoIdentifier, photoUrl));
 
         return false;
     }
