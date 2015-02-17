@@ -96,6 +96,23 @@ public final class PhotoDao {
         return downloadState;
     }
 
+    public static long getLargestPhotoId() {
+        long largestPhotoId = 0;
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER}, null, null, null, null, COL_IDENTIFIER + " desc", "1");
+        if (c != null) {
+            if (c.moveToNext()) {
+                largestPhotoId = c.getLong(0);
+            }
+
+            c.close();
+        }
+
+        return largestPhotoId;
+    }
+
     public static List<Photo> query(int page) {
         List<Photo> photoList = new ArrayList<>();
 

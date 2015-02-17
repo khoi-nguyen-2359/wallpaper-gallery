@@ -9,7 +9,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.xkcn.crawler.util.L;
-import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.util.P;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
@@ -17,7 +17,6 @@ import com.xkcn.crawler.event.UpdateFinishedEvent;
 
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
-import org.htmlcleaner.XPatherException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +34,7 @@ public class UpdateService extends Service {
     private Pattern pattern;
     private WebView webview;
     private int crawlingPage;
+    private long lastUpdatedPhotoId;
 
     private L logger = L.get(UpdateService.class.getName());
 
@@ -67,7 +67,13 @@ public class UpdateService extends Service {
                     return;
 
                 isWaitingHtml = false;
-                view.loadUrl("javascript:window.jsi.processHTML(document.getElementsByTagName('html')[0].innerHTML);");
+                view.loadUrl("javascript:var x = document.getElementsByTagName('html'); window.jsi.processHTML(x.length > 0 ? x[0].innerHTML : null);");
+            }
+
+            @Override
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                super.onReceivedError(view, errorCode, description, failingUrl);
+                logger.d("page %d error %s", crawlingPage, description);
             }
         });
     }
@@ -96,6 +102,12 @@ public class UpdateService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
         if (ACTION_UPDATE.equals(action)) {
+            lastUpdatedPhotoId = P.getLastUpdatedPhotoId();
+            if (lastUpdatedPhotoId == 0) {
+                lastUpdatedPhotoId = PhotoDao.getLargestPhotoId();
+                P.saveLastUpdatedPhotoId(lastUpdatedPhotoId);
+            }
+
             startPageCrawling(1);
         }
 
@@ -170,35 +182,43 @@ public class UpdateService extends Service {
         public void processHTML(String html) {
             logger.d("processHTML");
 
-            HtmlCleaner htmlCleaner = new HtmlCleaner();
-            TagNode root = htmlCleaner.clean(html);
             List<Photo> photoList = new ArrayList<>();
-            for (int i = 1; ; ++i) {
-                try {
-                    Object[] objs = root.evaluateXPath(String.format(XPATH_POST_ID, i));
-                    if (objs.length > 0) {
-                        TagNode post = (TagNode) objs[0];
-                        Photo photo = parsePhotoNode(post);
-                        if (photo != null) {
-                            photoList.add(photo);
+            if (html != null) {
+                HtmlCleaner htmlCleaner = new HtmlCleaner();
+                TagNode root = htmlCleaner.clean(html);
+                for (int i = 1; ; ++i) {
+                    try {
+                        Object[] objs = root.evaluateXPath(String.format(XPATH_POST_ID, i));
+                        if (objs.length > 0) {
+                            TagNode post = (TagNode) objs[0];
+                            Photo photo = parsePhotoNode(post);
+                            if (photo != null) {
+                                photoList.add(photo);
+                            }
+                        } else {
+                            break;
                         }
-                    } else {
-                        break;
+                    } catch (Exception e) {
+                        e.printStackTrace();
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
+            } else {
+                logger.d("html null");
             }
             logger.d("crawled list size=%d", photoList.size());
 
-            int count = PhotoDao.bulkInsertPhoto(photoList);
-            if (count != 0 && count == photoList.size()) {
-                EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));
-            } else {
+            PhotoDao.bulkInsertPhoto(photoList);
+            long lastPhotoId = 0;
+            if (photoList.size() == 0 || (lastPhotoId = photoList.get(photoList.size() - 1).getIdentifier()) <= lastUpdatedPhotoId) {
                 logger.d("processHTML done");
+                if (lastPhotoId > 0 && lastPhotoId <= lastUpdatedPhotoId) {
+                    P.saveLastUpdatedPhotoId(PhotoDao.getLargestPhotoId());
+                    P.saveLastUpdateTime(System.currentTimeMillis());
+                }
                 EventBus.getDefault().post(new UpdateFinishedEvent());
-                U.saveLastUpdate(System.currentTimeMillis());
                 stopSelf();
+            } else {
+                EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));
             }
         }
     }
