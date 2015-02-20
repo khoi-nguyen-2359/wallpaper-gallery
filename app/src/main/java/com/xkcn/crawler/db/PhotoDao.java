@@ -13,8 +13,8 @@ import java.util.List;
  * Created by khoinguyen on 12/27/14.
  */
 public final class PhotoDao {
-    public static final int DOWNLOAD_STATE_OK = 1;
-    public static final int DOWNLOAD_STATE_NONE = 0;
+//    public static final int DOWNLOAD_STATE_OK = 1;
+//    public static final int DOWNLOAD_STATE_NONE = 0;
 
     private static L logger = L.get(PhotoDao.class.getName());
 
@@ -32,7 +32,7 @@ public final class PhotoDao {
     public static final String COL_TITLE = "TITLE";
     public static final String COL_TAGS = "TAGS";
     public static final String COL_NOTES = "NOTES";
-    public static final String COL_DOWNLOAD_STATE = "DOWNLOAD_STATE";
+//    public static final String COL_DOWNLOAD_STATE = "DOWNLOAD_STATE";
 
     public static Photo toPhoto(Cursor cursor) {
         Photo photo = new Photo();
@@ -75,26 +75,26 @@ public final class PhotoDao {
         return cv;
     }
 
-    public static int setDownloadState(long photoIdentifier, int state) {
-        SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
-        ContentValues cv = new ContentValues();
-        cv.put(COL_DOWNLOAD_STATE, state);
+//    public static int setDownloadState(long photoIdentifier, int state) {
+//        SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
+//        ContentValues cv = new ContentValues();
+//        cv.put(COL_DOWNLOAD_STATE, state);
+//
+//        return db.update(TABLE_NAME, cv, COL_IDENTIFIER+"=?", new String[]{String.valueOf(photoIdentifier)});
+//    }
 
-        return db.update(TABLE_NAME, cv, COL_IDENTIFIER+"=?", new String[]{String.valueOf(photoIdentifier)});
-    }
-
-    public static int getDownloadState(long photoId) {
-        int downloadState = -1;
-
-        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
-
-        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER, COL_DOWNLOAD_STATE}, COL_IDENTIFIER + "=?", new String[]{String.valueOf(photoId)}, null, null, null);
-        if (c != null && c.moveToFirst()) {
-            downloadState = c.getInt(1);
-        }
-
-        return downloadState;
-    }
+//    public static int getDownloadState(long photoId) {
+//        int downloadState = -1;
+//
+//        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+//
+//        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER, COL_DOWNLOAD_STATE}, COL_IDENTIFIER + "=?", new String[]{String.valueOf(photoId)}, null, null, null);
+//        if (c != null && c.moveToFirst()) {
+//            downloadState = c.getInt(1);
+//        }
+//
+//        return downloadState;
+//    }
 
     public static long getLargestPhotoId() {
         long largestPhotoId = 0;

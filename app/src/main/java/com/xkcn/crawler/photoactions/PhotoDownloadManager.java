@@ -45,7 +45,7 @@ public final class PhotoDownloadManager {
 
     private L logger;
 
-    private PhotoDownloadManager(){
+    private PhotoDownloadManager() {
         downloadingUris = new HashSet<>();
 
         logger = L.get(PhotoDownloadManager.class.getName());
@@ -64,11 +64,11 @@ public final class PhotoDownloadManager {
             InputStream responseInputStream = response.getInputStream();
             Uri downloadedUri = StorageUtils.savePhoto(responseInputStream, photoUrl);
             responseInputStream.close();
-            PhotoDao.setDownloadState(photoIdentifier, PhotoDao.DOWNLOAD_STATE_OK);
 
             EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, downloadedUri));
         } catch (Exception e) {
             e.printStackTrace();
+
             EventBus.getDefault().post(new PhotoDownloadFailedEvent());
         } finally {
             downloadingUris.remove(photoUrl);
@@ -76,31 +76,22 @@ public final class PhotoDownloadManager {
         logger.d("end file downloading");
     }
 
-    public boolean asyncDownload(long photoIdentifier, String photoUrl, int purpose) {
+    public boolean asyncDownload(long photoIdentifier, String photoUrl) {
         if (downloadingUris.contains(photoUrl)) {
             logger.d("file is being downloaded");
             return false;
         }
 
-        int downloadState = PhotoDao.getDownloadState(photoIdentifier);
-        logger.d("downloadState=%d", downloadState);
-        if (downloadState == PhotoDao.DOWNLOAD_STATE_OK) {
+        File downloadedFile = StorageUtils.getReadablePhotoFile(photoUrl);
+        if (downloadedFile.exists()) {
             logger.d("file already downloaded");
-            File downloadedFile = StorageUtils.getReadablePhotoFile(photoUrl);
             EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, Uri.fromFile(downloadedFile)));
             return true;
         }
 
+        logger.d("start photo download");
         executorService.execute(new PhotoDownloadTask(photoIdentifier, photoUrl));
 
         return false;
-    }
-
-    private int determineNetworkPolicy(int purpose) {
-        if (purpose == PURPOSE_CACHE_STORAGE) {
-            return 1 << 2;
-        }
-
-        return 0;
     }
 }

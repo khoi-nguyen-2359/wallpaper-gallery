@@ -6,13 +6,17 @@ import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
 import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.PhotoDownloadedEvent;
 import com.xkcn.crawler.event.SetWallpaperClicked;
 import com.xkcn.crawler.photoactions.PhotoDownloadSubscriber;
 import com.xkcn.crawler.photoactions.PhotoDownloadManager;
+import com.xkcn.crawler.util.StorageUtils;
 import com.xkcn.crawler.util.U;
 import com.xkcn.crawler.util.UiUtils;
+
+import java.io.File;
 
 import de.greenrobot.event.EventBus;
 
@@ -59,8 +63,7 @@ public class BaseActivity extends ActionBarActivity {
         if (!EventBus.getDefault().isRegistered(setWallpaperEventSubscriber)) {
             EventBus.getDefault().register(setWallpaperEventSubscriber);
         }
-        boolean photoReady = photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh(), PhotoDownloadManager.PURPOSE_SET_WP);
-        if (!photoReady) {
+        if (!photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh())) {
             proDlg = UiUtils.showSimpleProgressDlg(this, new DialogInterface.OnCancelListener() {
                 @Override
                 public void onCancel(DialogInterface dialog) {

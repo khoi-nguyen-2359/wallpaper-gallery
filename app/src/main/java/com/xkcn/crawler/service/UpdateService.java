@@ -36,7 +36,7 @@ public class UpdateService extends Service {
     private int crawlingPage;
     private long lastUpdatedPhotoId;
 
-    private L logger = L.get(UpdateService.class.getName());
+    private L logger = L.get(UpdateService.class.getSimpleName());
 
     public static void startActionUpdate(Context context) {
         Intent intent = new Intent(context, UpdateService.class);
@@ -107,6 +107,7 @@ public class UpdateService extends Service {
                 lastUpdatedPhotoId = PhotoDao.getLargestPhotoId();
                 P.saveLastUpdatedPhotoId(lastUpdatedPhotoId);
             }
+            logger.d("update started lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
 
             startPageCrawling(1);
         }
@@ -115,10 +116,11 @@ public class UpdateService extends Service {
     }
 
     private void startPageCrawling(int page) {
-        logger.d("startPageCrawling %d", page);
+        String urlToCrawl = "http://xkcn.info/page/" + page;
+        logger.d("startPageCrawling %s", urlToCrawl);
         crawlingPage = page;
         isWaitingHtml = true;
-        webview.loadUrl("http://xkcn.info/page/" + crawlingPage);
+        webview.loadUrl(urlToCrawl);
     }
 
     public void onEventMainThread(CrawlNextPageEvent e) {
@@ -169,7 +171,6 @@ public class UpdateService extends Service {
 
                 }
 
-                logger.d("notes=%d", notes);
                 photo.setNotes(notes);
             }
         }
@@ -208,12 +209,15 @@ public class UpdateService extends Service {
             logger.d("crawled list size=%d", photoList.size());
 
             PhotoDao.bulkInsertPhoto(photoList);
-            long lastPhotoId = 0;
-            if (photoList.size() == 0 || (lastPhotoId = photoList.get(photoList.size() - 1).getIdentifier()) <= lastUpdatedPhotoId) {
+            int listSize = photoList.size();
+            long lastPhotoId = listSize > 0 ? photoList.get(listSize - 1).getIdentifier() : 0;
+            logger.d("lastPhotoId=%d", lastPhotoId);
+            if (listSize == 0 || lastPhotoId <= lastUpdatedPhotoId) {
                 logger.d("processHTML done");
                 if (lastPhotoId > 0 && lastPhotoId <= lastUpdatedPhotoId) {
-                    P.saveLastUpdatedPhotoId(PhotoDao.getLargestPhotoId());
+                    P.saveLastUpdatedPhotoId(lastUpdatedPhotoId = PhotoDao.getLargestPhotoId());
                     P.saveLastUpdateTime(System.currentTimeMillis());
+                    logger.d("update finished lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
                 }
                 EventBus.getDefault().post(new UpdateFinishedEvent());
                 stopSelf();

@@ -19,8 +19,11 @@ import com.squareup.picasso.Target;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.photoactions.PhotoDownloadManager;
+import com.xkcn.crawler.util.StorageUtils;
 import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoActionsView;
+
+import java.io.File;
 
 import butterknife.ButterKnife;
 import butterknife.InjectView;
@@ -67,6 +70,7 @@ public class SinglePhotoActivity extends BaseActivity {
         ButterKnife.inject(this);
         initData();
         initViews();
+        loadPhoto();
     }
 
     @Override
@@ -94,8 +98,8 @@ public class SinglePhotoActivity extends BaseActivity {
 
             ivPhoto.setImageBitmap(bitmap);
 
-            if (PhotoDao.getDownloadState(photo.getIdentifier()) != PhotoDao.DOWNLOAD_STATE_OK) {
-                photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh(), PhotoDownloadManager.PURPOSE_CACHE_STORAGE);
+            if (!StorageUtils.getReadablePhotoFile(photo.getPhotoHigh()).exists()) {
+                photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh());
             }
         }
 
@@ -110,15 +114,21 @@ public class SinglePhotoActivity extends BaseActivity {
         }
     };
 
+    private void loadPhoto() {
+        File downloadPhoto = StorageUtils.getReadablePhotoFile(photo.getPhotoHigh());
+        if (!downloadPhoto.exists()) {
+            Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
+            Picasso.with(SinglePhotoActivity.this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
+        } else {
+            Picasso.with(SinglePhotoActivity.this).load(downloadPhoto).into(loadPhotoHighTarget);
+        }
+    }
+
     private void initViews() {
         viewContent = findViewById(R.id.content_view);
         viewDecor = getWindow().getDecorView();
 
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
-        if (PhotoDao.getDownloadState(photo.getIdentifier()) != PhotoDao.DOWNLOAD_STATE_OK) {
-            Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
-        }
-        Picasso.with(SinglePhotoActivity.this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
 
         viewPhotoActions = (PhotoActionsView) findViewById(R.id.photo_actions);
         viewPhotoActions.bind(photo);
