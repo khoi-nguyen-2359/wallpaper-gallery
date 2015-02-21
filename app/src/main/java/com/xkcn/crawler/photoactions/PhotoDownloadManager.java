@@ -2,18 +2,15 @@ package com.xkcn.crawler.photoactions;
 
 import android.net.Uri;
 
-import com.squareup.okhttp.internal.Util;
 import com.squareup.picasso.Downloader;
 import com.squareup.picasso.OkHttpDownloader;
 import com.xkcn.crawler.XkcnApp;
-import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.PhotoDownloadedEvent;
 import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.util.StorageUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.concurrent.SynchronousQueue;
@@ -82,7 +79,7 @@ public final class PhotoDownloadManager {
             return false;
         }
 
-        File downloadedFile = StorageUtils.getReadablePhotoFile(photoUrl);
+        File downloadedFile = StorageUtils.getDownloadedPhotoFile(photoUrl);
         if (downloadedFile.exists()) {
             logger.d("file already downloaded");
             EventBus.getDefault().post(new PhotoDownloadedEvent(photoIdentifier, Uri.fromFile(downloadedFile)));

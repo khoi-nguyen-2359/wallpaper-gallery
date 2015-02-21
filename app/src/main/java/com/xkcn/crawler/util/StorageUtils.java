@@ -9,7 +9,6 @@ import com.xkcn.crawler.XkcnApp;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Locale;
 
@@ -25,7 +24,7 @@ public final class StorageUtils {
 
     public static Uri savePhoto(InputStream is, String downloadUri) throws Exception {
         String fileName = getResourceName(downloadUri);
-        File tmpFile = createDownloadTempFile(fileName);
+        File tmpFile = getDownloadTempFile(fileName);
 
         BufferedOutputStream output = new BufferedOutputStream(new FileOutputStream(tmpFile));
         int read = 0;
@@ -70,24 +69,11 @@ public final class StorageUtils {
         return photoDir;
     }
 
-    public static File getWritablePhotoDir() {
-        if (isExternalStorageWritable()) {
-            File photoDir = getExternalPhotoDir();
-            if (!photoDir.exists()) {
-                photoDir.mkdirs();
-            }
-
-            return photoDir;
-        }
-
-        return getPhotoDir();
-    }
-
     public static File getPhotoDir() {
         return XkcnApp.app.getDir("photo", Context.MODE_PRIVATE);
     }
 
-    public static File createDownloadTempFile(String fileName) {
+    public static File getDownloadTempFile(String fileName) {
         // first check app external storage
         File photoFile = null;
         if (isExternalStorageWritable()) {
@@ -98,7 +84,7 @@ public final class StorageUtils {
         return new File(String.format(Locale.US, "%s/%s%s", getPhotoDir().getAbsolutePath(), SUFF_DOWNLOAD_TMP_FILE, fileName));
     }
 
-    public static File getReadablePhotoFile(String uriString) {
+    public static File getDownloadedPhotoFile(String uriString) {
         // first check app external storage
         String fileName = getResourceName(uriString);
         File photoFile = null;

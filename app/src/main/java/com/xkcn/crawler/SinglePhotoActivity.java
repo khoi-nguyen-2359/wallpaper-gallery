@@ -17,7 +17,6 @@ import android.widget.Toast;
 import com.squareup.picasso.Picasso;
 import com.squareup.picasso.Target;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.photoactions.PhotoDownloadManager;
 import com.xkcn.crawler.util.StorageUtils;
 import com.xkcn.crawler.util.UiUtils;
@@ -98,7 +97,7 @@ public class SinglePhotoActivity extends BaseActivity {
 
             ivPhoto.setImageBitmap(bitmap);
 
-            if (!StorageUtils.getReadablePhotoFile(photo.getPhotoHigh()).exists()) {
+            if (!StorageUtils.getDownloadedPhotoFile(photo.getPhotoHigh()).exists()) {
                 photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh());
             }
         }
@@ -115,7 +114,7 @@ public class SinglePhotoActivity extends BaseActivity {
     };
 
     private void loadPhoto() {
-        File downloadPhoto = StorageUtils.getReadablePhotoFile(photo.getPhotoHigh());
+        File downloadPhoto = StorageUtils.getDownloadedPhotoFile(photo.getPhotoHigh());
         if (!downloadPhoto.exists()) {
             Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
             Picasso.with(SinglePhotoActivity.this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
