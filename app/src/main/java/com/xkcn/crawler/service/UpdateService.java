@@ -157,7 +157,6 @@ public class UpdateService extends Service {
                 Matcher matcher = pattern.matcher(templateText);
                 if (matcher.find()) {
                     String permalinkMetaValue = matcher.group(1);
-                    logger.d("url=%s", photo.getPermalink());
                     photo.setPermalinkMeta(permalinkMetaValue);
                 }
             }
@@ -181,8 +180,6 @@ public class UpdateService extends Service {
     public class CrawlerJsInterface {
         @JavascriptInterface
         public void processHTML(String html) {
-            logger.d("processHTML");
-
             List<Photo> photoList = new ArrayList<>();
             if (html != null) {
                 HtmlCleaner htmlCleaner = new HtmlCleaner();
