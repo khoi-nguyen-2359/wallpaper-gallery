@@ -11,6 +11,10 @@ import com.xkcn.crawler.fragment.PhotoPageFragment;
  */
 public class PhotoPagerAdapter extends FragmentStatePagerAdapter {
     public static final int MAX_PAGE = 446;
+    public static final int TYPE_HOTEST = 1;
+    public static final int TYPE_LATEST = 2;
+
+    private int type;
 
     public PhotoPagerAdapter(FragmentManager fm) {
         super(fm);
@@ -18,11 +22,19 @@ public class PhotoPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        return PhotoPageFragment.instantiate(position + 1);
+        return PhotoPageFragment.instantiate(position + 1, type);
     }
 
     @Override
     public int getCount() {
         return MAX_PAGE;
+    }
+
+    public int getType() {
+        return type;
+    }
+
+    public void setType(int type) {
+        this.type = type;
     }
 }

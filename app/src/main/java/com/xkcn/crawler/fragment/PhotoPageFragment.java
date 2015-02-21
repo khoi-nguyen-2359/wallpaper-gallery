@@ -12,6 +12,7 @@ import android.view.ViewGroup;
 
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoAdapter;
+import com.xkcn.crawler.adapter.PhotoPagerAdapter;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
@@ -26,16 +27,19 @@ import de.greenrobot.event.EventBus;
  */
 public class PhotoPageFragment extends Fragment {
     private static final String ARG_PAGE = "ARG_PAGE";
+    private static final String ARG_TYPE = "ARG_TYPE";
 
     private RecyclerView listPhoto;
     private PhotoAdapter adapterPhotos;
     private View root;
     private int nPhotoCol;
+    private int type;
 
-    public static PhotoPageFragment instantiate(int page) {
+    public static PhotoPageFragment instantiate(int page, int type) {
         PhotoPageFragment f = new PhotoPageFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
+        args.putInt(ARG_TYPE, type);
         f.setArguments(args);
 
         return f;
@@ -55,7 +59,13 @@ public class PhotoPageFragment extends Fragment {
     }
 
     private void populatePhotoList() {
-        List<Photo> photoList = PhotoDao.query(getArguments().getInt(ARG_PAGE));
+        List<Photo> photoList;
+        if (getArguments().getInt(ARG_TYPE) == PhotoPagerAdapter.TYPE_HOTEST) {
+            photoList = PhotoDao.queryHotest(getArguments().getInt(ARG_PAGE));
+        } else {
+            photoList = PhotoDao.queryLatest(getArguments().getInt(ARG_PAGE));
+        }
+
         adapterPhotos.setDataPhotos(photoList);
         adapterPhotos.notifyDataSetChanged();
     }

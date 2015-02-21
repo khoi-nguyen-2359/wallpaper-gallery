@@ -75,27 +75,6 @@ public final class PhotoDao {
         return cv;
     }
 
-//    public static int setDownloadState(long photoIdentifier, int state) {
-//        SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
-//        ContentValues cv = new ContentValues();
-//        cv.put(COL_DOWNLOAD_STATE, state);
-//
-//        return db.update(TABLE_NAME, cv, COL_IDENTIFIER+"=?", new String[]{String.valueOf(photoIdentifier)});
-//    }
-
-//    public static int getDownloadState(long photoId) {
-//        int downloadState = -1;
-//
-//        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
-//
-//        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER, COL_DOWNLOAD_STATE}, COL_IDENTIFIER + "=?", new String[]{String.valueOf(photoId)}, null, null, null);
-//        if (c != null && c.moveToFirst()) {
-//            downloadState = c.getInt(1);
-//        }
-//
-//        return downloadState;
-//    }
-
     public static long getLargestPhotoId() {
         long largestPhotoId = 0;
 
@@ -113,7 +92,26 @@ public final class PhotoDao {
         return largestPhotoId;
     }
 
-    public static List<Photo> query(int page) {
+    public static List<Photo> queryLatest(int page) {
+        List<Photo> photoList = new ArrayList<>();
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * 15) + ", 15");
+        if (c != null) {
+            Photo photo = null;
+            while (c.moveToNext()) {
+                photo = toPhoto(c);
+                photoList.add(photo);
+            }
+
+            c.close();
+        }
+
+        return photoList;
+    }
+
+    public static List<Photo> queryHotest(int page) {
         List<Photo> photoList = new ArrayList<>();
 
         SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
