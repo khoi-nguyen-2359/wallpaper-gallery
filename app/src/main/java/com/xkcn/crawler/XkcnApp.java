@@ -14,6 +14,6 @@ public class XkcnApp extends Application {
     public void onCreate() {
         super.onCreate();
         app = this;
-        Picasso.with(this).setIndicatorsEnabled(BuildConfig.LOGGABLE);
+//        Picasso.with(this).setIndicatorsEnabled(BuildConfig.LOGGABLE);
     }
 }

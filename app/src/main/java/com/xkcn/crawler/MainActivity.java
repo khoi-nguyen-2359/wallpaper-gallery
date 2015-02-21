@@ -37,7 +37,7 @@ public class MainActivity extends BaseActivity {
         layoutDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         adapterPhotoPages = new PhotoPagerAdapter(getSupportFragmentManager());
-        adapterPhotoPages.setType(PhotoPagerAdapter.TYPE_HOTEST);
+        adapterPhotoPages.setType(PhotoPagerAdapter.TYPE_LATEST);
         pager = (ViewPager) findViewById(R.id.viewpager);
         pager.setAdapter(adapterPhotoPages);
 

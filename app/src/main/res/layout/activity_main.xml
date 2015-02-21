@@ -19,7 +19,8 @@
         android:layout_height="match_parent">
 
         <LinearLayout
-            android:background="@drawable/bg_sidebar_item_container"
+            android:showDividers="middle"
+            android:divider="@drawable/divider_sidebar"
             android:layout_margin="10dp"
             android:padding="10dp"
             android:layout_gravity="center"
@@ -27,18 +28,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <TextView
+            <Button
+                android:background="@drawable/bg_sidebar_item"
                 android:gravity="center"
                 android:id="@+id/tv_latest"
-                android:textSize="26sp"
+                android:textSize="24sp"
+                android:textAllCaps="false"
                 android:text="@string/sidebar_cat_latest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
-            <TextView
+            <Button
+                android:textAllCaps="false"
+                android:background="@drawable/bg_sidebar_item"
                 android:gravity="center"
                 android:id="@+id/tv_hotest"
-                android:textSize="26sp"
+                android:textSize="24sp"
                 android:text="@string/sidebar_cat_hotest"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
