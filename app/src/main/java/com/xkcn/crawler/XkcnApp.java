@@ -2,6 +2,7 @@ package com.xkcn.crawler;
 
 import android.app.Application;
 
+import com.facebook.stetho.Stetho;
 import com.squareup.picasso.Picasso;
 
 /**
@@ -15,5 +16,11 @@ public class XkcnApp extends Application {
         super.onCreate();
         app = this;
 //        Picasso.with(this).setIndicatorsEnabled(BuildConfig.LOGGABLE);
+
+        Stetho.initialize(
+                Stetho.newInitializerBuilder(this)
+                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
+                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
+                        .build());
     }
 }

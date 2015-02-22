@@ -43,6 +43,9 @@ dependencies {
 
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
 
+    compile 'com.facebook.stetho:stetho:1.0.0'
+    compile 'com.facebook.stetho:stetho-okhttp:1.0.0'
+
 //    compile 'de.greenrobot:java-common:2.0.0'
 
 //    compile 'com.github.satyan:sugar:1.3'
