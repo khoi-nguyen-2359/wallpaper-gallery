@@ -48,6 +48,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
 
+            <pl.charmas.android.tagview.TagView
+                android:id="@+id/tag_cloud"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+
         </LinearLayout>
 
     </com.xkcn.crawler.view.SidebarView>

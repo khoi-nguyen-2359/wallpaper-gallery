@@ -1,6 +1,7 @@
 package com.xkcn.crawler.service;
 
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
@@ -8,6 +9,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.xkcn.crawler.db.PhotoTagDao;
 import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.util.P;
 import com.xkcn.crawler.db.Photo;
@@ -19,6 +21,8 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -31,7 +35,8 @@ public class UpdateService extends Service {
     public static final String ACTION_UPDATE = "com.xkcn.crawler.action.UPDATE";
 
     private boolean isWaitingHtml;
-    private Pattern pattern;
+    private Pattern patternPermalinkMeta;
+    private Pattern patternGridBottom;
     private WebView webview;
     private int crawlingPage;
     private long lastUpdatedPhotoId;
@@ -45,7 +50,8 @@ public class UpdateService extends Service {
     }
 
     private void createWebBrowser() {
-        pattern = Pattern.compile("permalinkMeta.*>\\n.*<p>(.*)</p>");
+        patternPermalinkMeta = Pattern.compile("permalinkMeta.*>\\n.*<p>(.*)</p>");
+        patternGridBottom = Pattern.compile("<!--<li class=\"gridTags\"><span>(.*)</span></li>-->(.|\\n)*<li class=\"gridNotes\"><span>(.*)</span></li>");
 
         webview = new WebView(this);
         webview.getSettings().setJavaScriptEnabled(true);
@@ -127,7 +133,7 @@ public class UpdateService extends Service {
         startPageCrawling(e.getPage());
     }
 
-    public Photo parsePhotoNode(TagNode post) {
+    public Photo parsePhotoNode(HtmlCleaner htmlCleaner, TagNode post, HashSet<String> photoTags) {
         Photo photo = null;
 
         String dataType = post.getAttributeByName("data-type");
@@ -154,23 +160,33 @@ public class UpdateService extends Service {
             TagNode template = post.findElementByAttValue("class", "template", false, true);
             if (template != null) {
                 String templateText = template.getText().toString();
-                Matcher matcher = pattern.matcher(templateText);
+                Matcher matcher = patternPermalinkMeta.matcher(templateText);
                 if (matcher.find()) {
                     String permalinkMetaValue = matcher.group(1);
                     photo.setPermalinkMeta(permalinkMetaValue);
                 }
             }
 
-            TagNode gridNotes = post.findElementByAttValue("class", "gridNotes", true, true);
-            if (gridNotes != null) {
-                int notes = 0;
-                try {
-                    notes = Integer.valueOf(gridNotes.getText().toString());
-                } catch (Exception e) {
+            TagNode gridBottom = post.findElementByAttValue("class", "gridBottom", true, true);
+            if (gridBottom != null) {
+                String gridBottomHtml = htmlCleaner.getInnerHtml(gridBottom);
+                Matcher matcher = patternGridBottom.matcher(gridBottomHtml);
+                if (matcher.find()) {
+                    String tags = matcher.group(1);
+                    String notes = matcher.group(3);
+                    logger.d("tags=%s\nnotes=%s", tags, notes);
 
+                    photo.setTags(tags);
+                    photo.setNotes(Integer.valueOf(notes));
+
+                    String[] tagArr = tags.split("#");
+                    if (tagArr != null && tags.length() != 0) {
+                        for (String tag : tagArr) {
+                            tag.trim();
+                            photoTags.add(tag);
+                        }
+                    }
                 }
-
-                photo.setNotes(notes);
             }
         }
 
@@ -181,6 +197,7 @@ public class UpdateService extends Service {
         @JavascriptInterface
         public void processHTML(String html) {
             List<Photo> photoList = new ArrayList<>();
+            HashSet<String> photoTags = new HashSet<>();
             if (html != null) {
                 HtmlCleaner htmlCleaner = new HtmlCleaner();
                 TagNode root = htmlCleaner.clean(html);
@@ -189,7 +206,7 @@ public class UpdateService extends Service {
                         Object[] objs = root.evaluateXPath(String.format(XPATH_POST_ID, i));
                         if (objs.length > 0) {
                             TagNode post = (TagNode) objs[0];
-                            Photo photo = parsePhotoNode(post);
+                            Photo photo = parsePhotoNode(htmlCleaner, post, photoTags);
                             if (photo != null) {
                                 photoList.add(photo);
                             }
@@ -206,6 +223,8 @@ public class UpdateService extends Service {
             logger.d("crawled list size=%d", photoList.size());
 
             PhotoDao.bulkInsertPhoto(photoList);
+            PhotoTagDao.bulkInsert(photoTags);
+
             int listSize = photoList.size();
             long lastPhotoId = listSize > 0 ? photoList.get(listSize - 1).getIdentifier() : 0;
             logger.d("lastPhotoId=%d", lastPhotoId);

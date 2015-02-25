@@ -16,7 +16,7 @@ public final class PhotoDao {
 //    public static final int DOWNLOAD_STATE_OK = 1;
 //    public static final int DOWNLOAD_STATE_NONE = 0;
 
-    private static L logger = L.get(PhotoDao.class.getName());
+    private static L logger = L.get(PhotoDao.class.getSimpleName());
 
     public static final String TABLE_NAME = "PHOTO";
     public static final String COL_IDENTIFIER = "IDENTIFIER";

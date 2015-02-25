@@ -11,6 +11,7 @@ import android.view.WindowManager;
 
 import com.xkcn.crawler.R;
 
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 
@@ -20,17 +21,20 @@ import java.io.OutputStreamWriter;
 public final class U {
     /**
      *
-     * @param desPath with "/" preceded
-     * @param content
      */
-    public static void copyFile(String desPath, String content) {
+    public static void copyFile(String des, String src) {
         try {
-            FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + desPath);
-            OutputStreamWriter osw = new OutputStreamWriter(fos);
-            osw.write(content);
-            osw.flush();
-            osw.close();
+            FileOutputStream fos = new FileOutputStream(Environment.getExternalStorageDirectory() + des);
+            FileInputStream fis = new FileInputStream(src);
+            int read = 0;
+            byte[] buffer = new byte[1024];
+            while ((read = fis.read(buffer))>0){
+                fos.write(buffer, 0, read);
+            }
+            fos.flush();
             fos.close();
+            fis.close();
+
         } catch (java.io.IOException e) {
             e.printStackTrace();
         }

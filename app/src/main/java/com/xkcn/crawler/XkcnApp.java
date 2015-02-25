@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.facebook.stetho.Stetho;
 import com.squareup.picasso.Picasso;
+import com.xkcn.crawler.util.U;
 
 /**
  * Created by khoinguyen on 12/25/14.

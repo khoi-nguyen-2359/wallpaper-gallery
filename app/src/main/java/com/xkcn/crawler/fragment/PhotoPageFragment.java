@@ -1,5 +1,6 @@
 package com.xkcn.crawler.fragment;
 
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -59,15 +60,27 @@ public class PhotoPageFragment extends Fragment {
     }
 
     private void populatePhotoList() {
-        List<Photo> photoList;
-        if (getArguments().getInt(ARG_TYPE) == PhotoPagerAdapter.TYPE_HOTEST) {
-            photoList = PhotoDao.queryHotest(getArguments().getInt(ARG_PAGE));
-        } else {
-            photoList = PhotoDao.queryLatest(getArguments().getInt(ARG_PAGE));
-        }
+        new AsyncTask<Void, Void, List<Photo>>() {
+            @Override
+            protected List<Photo> doInBackground(Void... params) {
+                List<Photo> photoList;
+                if (getArguments().getInt(ARG_TYPE) == PhotoPagerAdapter.TYPE_HOTEST) {
+                    photoList = PhotoDao.queryHotest(getArguments().getInt(ARG_PAGE));
+                } else {
+                    photoList = PhotoDao.queryLatest(getArguments().getInt(ARG_PAGE));
+                }
 
-        adapterPhotos.setDataPhotos(photoList);
-        adapterPhotos.notifyDataSetChanged();
+                return photoList;
+            }
+
+            @Override
+            protected void onPostExecute(List<Photo> photos) {
+                super.onPostExecute(photos);
+
+                adapterPhotos.setDataPhotos(photos);
+                adapterPhotos.notifyDataSetChanged();
+            }
+        }.execute();
     }
 
     public void initPhotoList() {
