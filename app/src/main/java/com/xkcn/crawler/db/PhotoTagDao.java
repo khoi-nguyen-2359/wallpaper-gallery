@@ -1,6 +1,7 @@
 package com.xkcn.crawler.db;
 
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.xkcn.crawler.util.L;
@@ -17,6 +18,7 @@ public final class PhotoTagDao {
 
     public static final String TABLE_NAME = "PHOTO_TAG";
     public static final String COL_TAG = "TAG";
+    private static final String COL_MARK = "MARK";
 
     public static int bulkInsert(HashSet<String> photoTags) {
         if (photoTags == null || photoTags.size() == 0)
@@ -66,5 +68,20 @@ public final class PhotoTagDao {
         logger.d("bulkInsert inserted=%d", nInserted);
 
         return nInserted;
+    }
+
+    public static HashSet<String> queryTagsGroupByMark() {
+        HashSet<String> result = new HashSet<>();
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+        Cursor c = db.query(TABLE_NAME, null, null, null, COL_MARK, null, COL_MARK + " asc");
+        if (c != null) {
+            while (c.moveToNext()) {
+                result.add(c.getString(0));
+            }
+            c.close();
+        }
+
+        return result;
     }
 }

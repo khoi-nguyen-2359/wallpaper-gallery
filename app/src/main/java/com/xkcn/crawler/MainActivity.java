@@ -1,6 +1,7 @@
 package com.xkcn.crawler;
 
 import android.app.Dialog;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -8,10 +9,17 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 
 import com.xkcn.crawler.adapter.PhotoPagerAdapter;
+import com.xkcn.crawler.db.PhotoDao;
+import com.xkcn.crawler.db.PhotoTagDao;
+import com.xkcn.crawler.event.UpdateFinishedEvent;
 import com.xkcn.crawler.photoactions.PhotoDownloadManager;
 import com.xkcn.crawler.service.UpdateService;
 import com.xkcn.crawler.util.P;
 import com.xkcn.crawler.view.SidebarView;
+
+import java.util.HashSet;
+
+import de.greenrobot.event.EventBus;
 
 
 public class MainActivity extends BaseActivity {
@@ -27,6 +35,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         initData();
         initViews();
+        updateTagCloud();
         checkUpdate();
     }
 
@@ -77,4 +86,23 @@ public class MainActivity extends BaseActivity {
             layoutDrawer.closeDrawers();
         }
     };
+
+    public void onEventMainThread(UpdateFinishedEvent event) {
+        updateTagCloud();
+    }
+
+    private void updateTagCloud() {
+        new AsyncTask<Void, Void, HashSet<String>>() {
+            @Override
+            protected HashSet<String> doInBackground(Void... params) {
+                return PhotoTagDao.queryTagsGroupByMark();
+            }
+
+            @Override
+            protected void onPostExecute(HashSet<String> strings) {
+                super.onPostExecute(strings);
+                sidebar.setTags(strings);
+            }
+        }.execute();
+    }
 }

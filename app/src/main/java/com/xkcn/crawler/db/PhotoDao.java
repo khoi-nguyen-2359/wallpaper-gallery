@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import com.xkcn.crawler.util.L;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 /**

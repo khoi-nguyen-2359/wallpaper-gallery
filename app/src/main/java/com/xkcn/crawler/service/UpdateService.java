@@ -5,6 +5,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.text.Html;
+import android.text.TextUtils;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -174,7 +176,6 @@ public class UpdateService extends Service {
                 if (matcher.find()) {
                     String tags = matcher.group(1);
                     String notes = matcher.group(3);
-                    logger.d("tags=%s\nnotes=%s", tags, notes);
 
                     photo.setTags(tags);
                     photo.setNotes(Integer.valueOf(notes));
@@ -182,7 +183,11 @@ public class UpdateService extends Service {
                     String[] tagArr = tags.split("#");
                     if (tagArr != null && tags.length() != 0) {
                         for (String tag : tagArr) {
-                            tag.trim();
+                            tag = Html.fromHtml(tag.trim()).toString();
+                            if (TextUtils.isEmpty(tag)) {
+                                continue;
+                            }
+                            logger.d("tag=%s", tag);
                             photoTags.add(tag);
                         }
                     }

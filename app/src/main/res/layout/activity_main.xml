@@ -1,6 +1,6 @@
-<android.support.v4.widget.DrawerLayout
-    xmlns:tools="http://schemas.android.com/tools"
+<android.support.v4.widget.DrawerLayout xmlns:tools="http://schemas.android.com/tools"
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".MainActivity"
     android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
@@ -17,43 +17,58 @@
         android:onClick="emptyOnClick"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-
-        <LinearLayout
-            android:showDividers="middle"
-            android:divider="@drawable/divider_sidebar"
-            android:layout_margin="10dp"
-            android:padding="10dp"
-            android:layout_gravity="center"
-            android:orientation="vertical"
+        
+        <ScrollView
+            android:scrollbars="none"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="match_parent">
 
-            <Button
-                android:background="@drawable/bg_sidebar_item"
-                android:gravity="center"
-                android:id="@+id/tv_latest"
-                android:textSize="24sp"
-                android:textAllCaps="false"
-                android:text="@string/sidebar_cat_latest"
+            <LinearLayout
+                android:id="@+id/layout_sidebar_items"
+                android:showDividers="middle"
+                android:divider="@drawable/divider_sidebar"
+                android:paddingTop="100dp"
+                android:paddingLeft="20dp"
+                android:paddingRight="20dp"
+                android:paddingBottom="10dp"
+                android:orientation="vertical"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content">
 
-            <Button
-                android:textAllCaps="false"
-                android:background="@drawable/bg_sidebar_item"
-                android:gravity="center"
-                android:id="@+id/tv_hotest"
-                android:textSize="24sp"
-                android:text="@string/sidebar_cat_hotest"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <CheckBox
+                    android:padding="10dp"
+                    android:button="@null"
+                    android:background="@drawable/bg_tagcloud_item"
+                    android:gravity="center"
+                    android:id="@+id/tv_latest"
+                    android:textSize="24sp"
+                    android:textAllCaps="false"
+                    android:text="@string/sidebar_cat_latest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-            <pl.charmas.android.tagview.TagView
-                android:id="@+id/tag_cloud"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                <CheckBox
+                    android:padding="10dp"
+                    android:button="@null"
+                    android:textAllCaps="false"
+                    android:background="@drawable/bg_tagcloud_item"
+                    android:gravity="center"
+                    android:id="@+id/tv_hotest"
+                    android:textSize="24sp"
+                    android:text="@string/sidebar_cat_hotest"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
 
-        </LinearLayout>
+                <com.xkcn.crawler.view.SelectableTagCloud
+                    android:id="@+id/tag_cloud"
+                    android:orientation="vertical"
+                    android:divider="@drawable/divider_vert_tag_cloud"
+                    android:showDividers="middle"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"/>
+
+            </LinearLayout>
+        </ScrollView>
 
     </com.xkcn.crawler.view.SidebarView>
 

@@ -5,7 +5,7 @@
             <item>
                 <shape>
                     <solid android:color="#40000000"/>
-                    <corners android:radius="10dp"/>
+                    <corners android:radius="@dimen/tagcloud_corner"/>
                 </shape>
             </item>
             <item android:drawable="@drawable/shape_sidebar_item_normal"/>
