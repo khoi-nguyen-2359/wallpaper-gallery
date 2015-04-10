@@ -1,12 +1,9 @@
 package com.xkcn.crawler.view;
 
 import android.annotation.TargetApi;
-import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.TypedArray;
-import android.net.Uri;
 import android.os.Build;
 import android.text.Html;
 import android.text.Spanned;
@@ -15,18 +12,11 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
-import android.widget.Toast;
 
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.XkcnApp;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.db.PhotoDao;
-import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
-import com.xkcn.crawler.event.PhotoDownloadedEvent;
 import com.xkcn.crawler.event.SetWallpaperClicked;
-import com.xkcn.crawler.photoactions.PhotoDownloadManager;
-import com.xkcn.crawler.util.U;
-import com.xkcn.crawler.util.UiUtils;
 
 import de.greenrobot.event.EventBus;
 
@@ -108,10 +98,10 @@ public class PhotoActionsView extends FrameLayout {
     private void onShareClicked() {
         String sendText = null;
         if (TextUtils.isEmpty(photo.getPermalinkMeta())) {
-            sendText = XkcnApp.app.getString(R.string.send_to_trailing_text, photo.getPermalink());
+            sendText = XkcnApp.app().getString(R.string.send_to_trailing_text, photo.getPermalink());
         } else {
             Spanned spanned = Html.fromHtml(photo.getPermalinkMeta());
-            sendText = XkcnApp.app.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());;
+            sendText = XkcnApp.app().getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());;
         }
 
         Intent i = new Intent();
@@ -119,7 +109,7 @@ public class PhotoActionsView extends FrameLayout {
         i.putExtra(Intent.EXTRA_TEXT, sendText);
         i.setType("text/plain");
 
-        getContext().startActivity(Intent.createChooser(i, XkcnApp.app.getString(R.string.send_to)));
+        getContext().startActivity(Intent.createChooser(i, XkcnApp.app().getString(R.string.send_to)));
     }
 
     private void onSetWallpaperClicked() {

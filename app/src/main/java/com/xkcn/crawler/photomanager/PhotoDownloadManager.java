@@ -1,4 +1,4 @@
-package com.xkcn.crawler.photoactions;
+package com.xkcn.crawler.photomanager;
 
 import android.net.Uri;
 
@@ -50,7 +50,7 @@ public final class PhotoDownloadManager {
         executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
                 new SynchronousQueue<Runnable>());
 
-        downloader = new OkHttpDownloader(XkcnApp.app);
+        downloader = new OkHttpDownloader(XkcnApp.app());
     }
 
     void doDownload(long photoIdentifier, String photoUrl) {

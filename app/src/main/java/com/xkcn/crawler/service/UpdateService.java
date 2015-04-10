@@ -120,7 +120,7 @@ public class UpdateService extends Service {
             startPageCrawling(1);
         }
 
-        return super.onStartCommand(intent, flags, startId);
+        return START_STICKY;
     }
 
     private void startPageCrawling(int page) {

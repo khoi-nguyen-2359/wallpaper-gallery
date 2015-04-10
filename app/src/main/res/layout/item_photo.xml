@@ -14,12 +14,12 @@
     android:clickable="true"
     app:cardBackgroundColor="#fff">
 
-    <ImageView
+    <com.facebook.drawee.view.SimpleDraweeView
         android:id="@+id/iv_photo"
-        android:scaleType="fitCenter"
-        android:adjustViewBounds="true"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        app:actualImageScaleType="centerCrop"
+        />
 
     <com.xkcn.crawler.view.PhotoActionsView
         android:id="@+id/view_actions"

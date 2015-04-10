@@ -61,7 +61,7 @@ public final class StorageUtils {
     }
 
     public static File getExternalPhotoDir() {
-        File photoDir = new File(XkcnApp.app.getExternalFilesDir(null).getAbsolutePath() + "/photo");
+        File photoDir = new File(XkcnApp.app().getExternalFilesDir(null).getAbsolutePath() + "/photo");
         if (!photoDir.exists()) {
             photoDir.mkdirs();
         }
@@ -70,7 +70,7 @@ public final class StorageUtils {
     }
 
     public static File getPhotoDir() {
-        return XkcnApp.app.getDir("photo", Context.MODE_PRIVATE);
+        return XkcnApp.app().getDir("photo", Context.MODE_PRIVATE);
     }
 
     public static File getDownloadTempFile(String fileName) {

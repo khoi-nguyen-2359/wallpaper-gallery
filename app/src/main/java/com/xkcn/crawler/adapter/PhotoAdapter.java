@@ -2,16 +2,17 @@ package com.xkcn.crawler.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PointF;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.squareup.picasso.Picasso;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.SinglePhotoActivity;
-import com.xkcn.crawler.photoactions.RoundedTransformation;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.view.PhotoActionsView;
 
@@ -26,11 +27,11 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     public static final float RATIO_SCALE = 1.0f;
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivPhoto;
+        SimpleDraweeView ivPhoto;
         PhotoActionsView viewPhotoActions;
         public ViewHolder(View itemView) {
             super(itemView);
-            ivPhoto = (ImageView) itemView.findViewById(R.id.iv_photo);
+            ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
             viewPhotoActions = (PhotoActionsView) itemView.findViewById(R.id.view_actions);
         }
     }
@@ -57,11 +58,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
         viewHolder.viewPhotoActions.bind(dataPhotos.get(i));
 
-        Picasso.with(context)
-                .load(dataPhotos.get(i).getPhoto500())
-                .transform(new RoundedTransformation(5, 1))
-//                .transform(new ScaleTransformation(0.8f))
-                .into(viewHolder.ivPhoto);
+        viewHolder.ivPhoto.setAspectRatio(0.75f);
+        viewHolder.ivPhoto.setImageURI(Uri.parse(dataPhotos.get(i).getPhotoHigh()));
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

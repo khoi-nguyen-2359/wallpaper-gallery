@@ -4,7 +4,7 @@ import android.animation.Animator;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -14,10 +14,22 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.squareup.picasso.Picasso;
-import com.squareup.picasso.Target;
+import com.facebook.common.references.CloseableReference;
+import com.facebook.datasource.BaseDataSubscriber;
+import com.facebook.datasource.DataSource;
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.facebook.imagepipeline.core.ImagePipeline;
+import com.facebook.imagepipeline.image.CloseableImage;
+import com.facebook.imagepipeline.image.CloseableStaticBitmap;
+import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.photoactions.PhotoDownloadManager;
+import com.xkcn.crawler.imageloader.DraweeImageViewTouch;
+import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
+import com.xkcn.crawler.imageloader.XkcnImageLoader;
+import com.xkcn.crawler.imageloader.XkcnImageLoaderFactory;
+import com.xkcn.crawler.photomanager.PhotoDownloadManager;
 import com.xkcn.crawler.util.StorageUtils;
 import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoActionsView;
@@ -39,6 +51,7 @@ public class SinglePhotoActivity extends BaseActivity {
     private View viewContent;
     private boolean enabledToggleStatusBar;
     private PhotoDownloadManager photoDownloadManager;
+    private XkcnFrescoImageLoader frescoImageLoader;
 
     public static Intent intentViewSinglePhoto(Context context, Photo photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
@@ -82,45 +95,42 @@ public class SinglePhotoActivity extends BaseActivity {
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        XkcnFrescoImageLoader.release(this, ivPhoto);
+    }
+
     private void delayedHide(long milis) {
         hideSystemUIHandler.removeMessages(0);
         hideSystemUIHandler.sendEmptyMessageDelayed(0, milis);
     }
 
-    // must be a strong ref to this target
-    private Target loadPhotoHighTarget = new Target() {
+    private XkcnImageLoader.Callback loadSingleHighPhotoCallback = new XkcnImageLoader.Callback() {
         @Override
-        public void onBitmapLoaded(Bitmap bitmap, Picasso.LoadedFrom from) {
-            progressBar.setVisibility(View.GONE);
-            enabledToggleStatusBar = true;
-            UiUtils.showStatusBar(getWindow(), viewDecor);
-
-            ivPhoto.setImageBitmap(bitmap);
-
-            if (!StorageUtils.getDownloadedPhotoFile(photo.getPhotoHigh()).exists()) {
-                photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh());
-            }
+        public void onLoaded(Bitmap bitmap) {
         }
 
         @Override
-        public void onBitmapFailed(Drawable errorDrawable) {
+        public void onFailed() {
             progressBar.setVisibility(View.GONE);
             Toast.makeText(SinglePhotoActivity.this, R.string.photo_action_download_failed_retry, Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public void onPrepareLoad(Drawable placeHolderDrawable) {
+        public void onCompleted() {
+            progressBar.setVisibility(View.GONE);
+            enabledToggleStatusBar = true;
+            UiUtils.showStatusBar(getWindow(), viewDecor);
+
+            if (!StorageUtils.getDownloadedPhotoFile(photo.getPhotoHigh()).exists()) {
+                photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh());
+            }
         }
     };
 
     private void loadPhoto() {
-        File downloadPhoto = StorageUtils.getDownloadedPhotoFile(photo.getPhotoHigh());
-        if (!downloadPhoto.exists()) {
-            Picasso.with(this).load(photo.getPhoto500()).into(ivPhoto);
-            Picasso.with(SinglePhotoActivity.this).load(photo.getPhotoHigh()).into(loadPhotoHighTarget);
-        } else {
-            Picasso.with(SinglePhotoActivity.this).load(downloadPhoto).into(loadPhotoHighTarget);
-        }
+        XkcnImageLoaderFactory.getInstance(this).load(photo.getPhotoHigh(), ivPhoto, loadSingleHighPhotoCallback);
     }
 
     private void initViews() {

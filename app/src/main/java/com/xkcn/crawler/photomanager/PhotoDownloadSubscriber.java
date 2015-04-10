@@ -1,4 +1,4 @@
-package com.xkcn.crawler.photoactions;
+package com.xkcn.crawler.photomanager;
 
 import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.PhotoDownloadedEvent;

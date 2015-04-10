@@ -3,4 +3,8 @@
     <color name="photo_action_bg_stroke">#fff</color>
     <color name="bg_photo_action_text_normal">#0000</color>
     <color name="bg_photo_action_text_pressed">#3fff</color>
+    <color name="tagcloud_item_text_unchecked">#FF0084</color>
+    <color name="tagcloud_item_text_checked">#fff</color>
+    <color name="tagcloud_item_text_checked_disabled">#800041</color>
+    <color name="tagcloud_item_text_unchecked_disabled">#808080</color>
 </resources>

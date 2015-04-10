@@ -2,26 +2,23 @@ package com.xkcn.crawler;
 
 import android.app.Application;
 
-import com.facebook.stetho.Stetho;
-import com.squareup.picasso.Picasso;
-import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
 
 /**
  * Created by khoinguyen on 12/25/14.
  */
 public class XkcnApp extends Application {
-    public static XkcnApp app;
+    private static XkcnApp app;
+
+    public static XkcnApp app() {
+        return app;
+    }
 
     @Override
     public void onCreate() {
         super.onCreate();
         app = this;
-//        Picasso.with(this).setIndicatorsEnabled(BuildConfig.LOGGABLE);
 
-        Stetho.initialize(
-                Stetho.newInitializerBuilder(this)
-                        .enableDumpapp(Stetho.defaultDumperPluginsProvider(this))
-                        .enableWebKitInspector(Stetho.defaultInspectorModulesProvider(this))
-                        .build());
+        XkcnFrescoImageLoader.init(this);
     }
 }

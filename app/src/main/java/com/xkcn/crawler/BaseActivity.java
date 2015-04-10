@@ -6,17 +6,13 @@ import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
 import com.xkcn.crawler.db.Photo;
-import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.PhotoDownloadedEvent;
 import com.xkcn.crawler.event.SetWallpaperClicked;
-import com.xkcn.crawler.photoactions.PhotoDownloadSubscriber;
-import com.xkcn.crawler.photoactions.PhotoDownloadManager;
-import com.xkcn.crawler.util.StorageUtils;
+import com.xkcn.crawler.photomanager.PhotoDownloadSubscriber;
+import com.xkcn.crawler.photomanager.PhotoDownloadManager;
 import com.xkcn.crawler.util.U;
 import com.xkcn.crawler.util.UiUtils;
-
-import java.io.File;
 
 import de.greenrobot.event.EventBus;
 

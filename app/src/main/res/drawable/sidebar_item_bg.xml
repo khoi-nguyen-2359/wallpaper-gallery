@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_checked="true">
+    <item android:state_activated="true">
         <shape>
             <corners android:radius="@dimen/tagcloud_corner"/>
-            <solid android:color="#000"/>
+            <solid android:color="@color/tagcloud_item_text_unchecked"/>
         </shape>
     </item>
-    <item android:state_checked="false">
+    <item android:state_activated="false">
         <shape>
             <corners android:radius="@dimen/tagcloud_corner"/>
-            <solid android:color="#fff"/>
+            <solid android:color="@color/tagcloud_item_text_checked"/>
         </shape>
     </item>
 </selector>

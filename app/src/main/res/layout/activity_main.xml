@@ -35,10 +35,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <CheckBox
+                <Button
+                    android:textColor="@color/sidebar_item_text"
                     android:padding="10dp"
                     android:button="@null"
-                    android:background="@drawable/bg_tagcloud_item"
+                    android:background="@drawable/sidebar_item_bg"
                     android:gravity="center"
                     android:id="@+id/tv_latest"
                     android:textSize="24sp"
@@ -47,11 +48,12 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <CheckBox
+                <Button
+                    android:textColor="@color/sidebar_item_text"
                     android:padding="10dp"
                     android:button="@null"
                     android:textAllCaps="false"
-                    android:background="@drawable/bg_tagcloud_item"
+                    android:background="@drawable/sidebar_item_bg"
                     android:gravity="center"
                     android:id="@+id/tv_hotest"
                     android:textSize="24sp"

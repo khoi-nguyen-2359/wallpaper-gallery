@@ -14,7 +14,7 @@ public final class P {
     public static final String PREF_LAST_UPDATED_PHOTO_ID = "PREF_LAST_UPDATED_PHOTO_ID";
 
     public static SharedPreferences get() {
-        return XkcnApp.app.getSharedPreferences(APP_PREF, 0);
+        return XkcnApp.app().getSharedPreferences(APP_PREF, 0);
     }
 
     public static void saveLastUpdateTime(long lastUpdate) {
