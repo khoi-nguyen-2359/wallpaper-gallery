@@ -1,4 +1,4 @@
-package com.xkcn.crawler.util;
+package com.xkcn.crawler.photomanager;
 
 import android.content.Context;
 import android.net.Uri;
