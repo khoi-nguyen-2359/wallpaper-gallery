@@ -29,7 +29,7 @@ public class MainActivity extends BaseActivity {
         setContentView(R.layout.activity_main);
         initData();
         initViews();
-        updateTagCloud();
+//        updateTagCloud();
         checkUpdate();
     }
 
@@ -82,7 +82,7 @@ public class MainActivity extends BaseActivity {
     };
 
     public void onEventMainThread(UpdateFinishedEvent event) {
-        updateTagCloud();
+//        updateTagCloud();
     }
 
     private void updateTagCloud() {

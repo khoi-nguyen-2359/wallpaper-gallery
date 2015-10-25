@@ -3,7 +3,6 @@ package com.xkcn.crawler.imageloader;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.util.LruCache;
 import android.widget.ImageView;
 
 import com.facebook.common.references.CloseableReference;
@@ -13,9 +12,10 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.backends.okhttp.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.image.CloseableAnimatedImage;
+import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
+import com.facebook.imagepipeline.producers.NetworkFetcher;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.squareup.okhttp.OkHttpClient;
@@ -33,6 +33,7 @@ import java.util.concurrent.TimeUnit;
  * Created by khoinguyen on 4/4/15.
  */
 public class XkcnFrescoImageLoader implements XkcnImageLoader {
+
     public static void release(Context context, Object key) {
         XkcnImageLoader instance = XkcnImageLoaderFactory.getInstance(context);
         if (instance instanceof XkcnFrescoImageLoader) {
@@ -45,12 +46,11 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
         final int DEFAULT_READ_TIMEOUT_MILLIS = 20 * 1000; // 20s
         final int DEFAULT_WRITE_TIMEOUT_MILLIS = 20 * 1000; // 20s
         final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 15 * 1000; // 15s
-        OkHttpClient client = new OkHttpClient();
-        client.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        client.setReadTimeout(DEFAULT_READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        client.setWriteTimeout(DEFAULT_WRITE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
-        ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
-                .newBuilder(context, client)
+        OkHttpClient okHttpClient = new OkHttpClient();
+        okHttpClient.setConnectTimeout(DEFAULT_CONNECT_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        okHttpClient.setReadTimeout(DEFAULT_READ_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        okHttpClient.setWriteTimeout(DEFAULT_WRITE_TIMEOUT_MILLIS, TimeUnit.MILLISECONDS);
+        ImagePipelineConfig config = OkHttpImagePipelineConfigFactory.newBuilder(context, okHttpClient)
                 .build();
         Fresco.initialize(context, config);
     }
@@ -62,19 +62,17 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
         callbackExecutor = new MainThreadExecutor();
     }
 
-    private void track(ImageView key, CloseableReference<CloseableImage> ref) {
-        if (key == null || ref == null) {
+    private void track(ImageView key, CloseableReference<CloseableImage> refToTrack) {
+        if (key == null || refToTrack == null) {
             return;
         }
+
+        release(key);
 
         if (holdingReferences == null) {
             holdingReferences = new HashMap<>();
         }
-
-        CloseableReference<CloseableImage> reference = holdingReferences.get(key);
-        CloseableReference.closeSafely(reference);
-
-        holdingReferences.put(key, reference);
+        holdingReferences.put(key, refToTrack);
     }
 
     /**
@@ -121,6 +119,9 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
+                        if (reqInfo.callbackRef.get() != null) {
+                            reqInfo.callbackRef.get().onFailed();
+                        }
                     } finally {
                         if (reqInfo.targetRef.get() != null) {
                             track(reqInfo.targetRef.get(), imageReference);

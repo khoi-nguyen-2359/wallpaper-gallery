@@ -1,0 +1,7 @@
+ext {
+    androidCompileSdk = 23
+    androidMinSdk = 16
+    androidMaxSdk = 23
+    androidBuildToolVersion = "23.0.1"
+    androidSupportLibVersion = "23.1.0"
+}

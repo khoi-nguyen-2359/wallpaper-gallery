@@ -109,6 +109,10 @@ public class SelectableTagCloud extends LinearLayout implements CompoundButton.O
     }
 
     public void setItemsEnabled(boolean val) {
+        if (arrTagViewItems == null) {
+            return;
+        }
+
         for (CheckBox cb : arrTagViewItems) {
             cb.setEnabled(val);
         }
