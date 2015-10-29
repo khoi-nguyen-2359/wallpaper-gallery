@@ -7,7 +7,7 @@ android {
     buildToolsVersion configs.androidBuildToolVersion
 
     defaultConfig {
-        applicationId "com.xkcn.crawler"
+        applicationId "com.fantageek.xkcn"
         minSdkVersion configs.androidMinSdk
         targetSdkVersion configs.androidMaxSdk
         versionCode 1
@@ -40,22 +40,10 @@ dependencies {
     compile 'com.facebook.fresco:fresco:0.8.0+'
     compile "com.facebook.fresco:imagepipeline-okhttp:0.8.0+"
 
-//    compile 'com.squareup.okhttp:okhttp-urlconnection:2.5.0'
-//    compile 'com.squareup.okhttp:okhttp:2.5.0'
-
-//    compile 'com.squareup.picasso:picasso:2.5.2'
-
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
 
     compile 'de.greenrobot:eventbus:2.4.0'
     compile 'com.jakewharton:butterknife:6.0.0'
 
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
-
-//    compile 'com.facebook.stetho:stetho:1.0.0'
-//    compile 'com.facebook.stetho:stetho-okhttp:1.0.0'
-
-//    compile 'de.greenrobot:java-common:2.0.0'
-//    compile 'com.github.satyan:sugar:1.3'
-
 }
