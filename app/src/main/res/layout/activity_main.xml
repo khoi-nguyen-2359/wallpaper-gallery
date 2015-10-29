@@ -15,7 +15,7 @@
         android:id="@+id/sidebar"
         android:layout_gravity="start"
         android:onClick="emptyOnClick"
-        android:layout_width="match_parent"
+        android:layout_width="300dp"
         android:layout_height="match_parent">
         
         <ScrollView
@@ -26,8 +26,8 @@
             <LinearLayout
                 android:id="@+id/layout_sidebar_items"
                 android:showDividers="middle"
-                android:divider="@drawable/divider_sidebar"
-                android:paddingTop="100dp"
+                android:divider="@drawable/sidebar_divider"
+                android:paddingTop="20dp"
                 android:paddingLeft="20dp"
                 android:paddingRight="20dp"
                 android:paddingBottom="10dp"
@@ -35,39 +35,33 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <Button
-                    android:textColor="@color/sidebar_item_text"
-                    android:padding="10dp"
-                    android:button="@null"
-                    android:background="@drawable/sidebar_item_bg"
+                <com.fantageek.toolkit.view.typeface.TypefaceTextView
+                    app:font="@string/font_noto_r"
                     android:gravity="center"
+                    android:textColor="@color/sidebar_last_update_text"
+                    android:textSize="18sp"
+                    android:id="@+id/tv_last_update_time"
+                    tools:text="Cập nhật lần cuối 12:00PM 29/10/2015"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+
+                <com.fantageek.toolkit.view.typeface.TypefaceButton
+                    style="@style/CategorySideBarButton"
+                    android:background="@drawable/sidebar_latest_btn_bg"
+                    android:textColor="@color/sidebar_latest_btn_text"
                     android:id="@+id/tv_latest"
-                    android:textSize="24sp"
-                    android:textAllCaps="false"
                     android:text="@string/sidebar_cat_latest"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
 
-                <Button
-                    android:textColor="@color/sidebar_item_text"
-                    android:padding="10dp"
-                    android:button="@null"
-                    android:textAllCaps="false"
-                    android:background="@drawable/sidebar_item_bg"
-                    android:gravity="center"
+                <com.fantageek.toolkit.view.typeface.TypefaceButton
+                    style="@style/CategorySideBarButton"
+                    android:background="@drawable/sidebar_hotest_btn_bg"
+                    android:textColor="@color/sidebar_hotest_btn_text"
                     android:id="@+id/tv_hotest"
-                    android:textSize="24sp"
                     android:text="@string/sidebar_cat_hotest"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content" />
-
-                <com.xkcn.crawler.view.SelectableTagCloud
-                    android:id="@+id/tag_cloud"
-                    android:orientation="vertical"
-                    android:divider="@drawable/divider_vert_tag_cloud"
-                    android:showDividers="middle"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
 
             </LinearLayout>
         </ScrollView>

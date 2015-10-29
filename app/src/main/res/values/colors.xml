@@ -7,4 +7,10 @@
     <color name="tagcloud_item_text_checked">#fff</color>
     <color name="tagcloud_item_text_checked_disabled">#800041</color>
     <color name="tagcloud_item_text_unchecked_disabled">#808080</color>
+    <color name="sidebar_tagcloud_item_bg_activated">#fff</color>
+    <color name="sidebar_latest_btn_bg_normal">#c6cf00</color>
+    <color name="sidebar_tagcloud_stroke">#fff</color>
+    <color name="sidebar_hotest_btn_bg_normal">#ff7500</color>
+    <color name="sidebar_last_update_text">#acacac</color>
+    <color name="sidebar_tagcloud_text_normal">#fff</color>
 </resources>

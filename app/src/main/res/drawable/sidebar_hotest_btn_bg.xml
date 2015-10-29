@@ -1,21 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:state_pressed="true">
-        <shape>
-            <corners android:radius="@dimen/sidebar_tagcloud_corner"/>
-            <solid android:color="@color/tagcloud_item_text_unchecked"/>
-        </shape>
-    </item>
     <item android:state_activated="true">
         <shape>
             <corners android:radius="@dimen/sidebar_tagcloud_corner"/>
-            <solid android:color="@color/tagcloud_item_text_unchecked"/>
+            <solid android:color="@color/sidebar_tagcloud_item_bg_activated"/>
         </shape>
     </item>
+
     <item android:state_activated="false">
         <shape>
+            <stroke android:color="@color/sidebar_tagcloud_stroke" android:width="4dp" />
             <corners android:radius="@dimen/sidebar_tagcloud_corner"/>
-            <solid android:color="@color/tagcloud_item_text_checked"/>
+            <solid android:color="@color/sidebar_hotest_btn_bg_normal"/>
         </shape>
     </item>
 </selector>

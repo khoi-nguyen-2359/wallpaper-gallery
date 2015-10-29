@@ -2,6 +2,12 @@ apply plugin: 'com.android.application'
 
 def configs = rootProject.extensions.getByName("ext")
 
+repositories {
+    flatDir {
+        dirs 'aars' //this way we can find the .aar file in libs folder
+    }
+}
+
 android {
     compileSdkVersion configs.androidCompileSdk
     buildToolsVersion configs.androidBuildToolVersion
@@ -46,4 +52,8 @@ dependencies {
     compile 'com.jakewharton:butterknife:6.0.0'
 
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
+
+    compile 'joda-time:joda-time:2.9'
+
+    compile(name:'toolkit', ext:'aar')
 }

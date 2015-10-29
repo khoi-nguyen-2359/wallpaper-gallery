@@ -13,4 +13,10 @@
     <string name="sidebar_cat_latest">Ảnh mới</string>
     <string name="sidebar_cat_hotest">Ảnh hot</string>
 
+    <string name="font_noto_r">NotoSans-Regular.ttf</string>
+    <string name="font_noto_b">NotoSans-Bold.ttf</string>
+    <string name="font_noto_bi">NotoSans-BoldItalic.ttf</string>
+    <string name="font_noto_i">NotoSans-Italic.ttf</string>
+    <string name="sidebar_latest_update_at">Cập nhật lần cuối</string>
+
 </resources>

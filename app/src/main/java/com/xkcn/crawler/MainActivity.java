@@ -15,6 +15,8 @@ import com.xkcn.crawler.view.SidebarView;
 
 import java.util.HashSet;
 
+import de.greenrobot.event.EventBus;
+
 
 public class MainActivity extends BaseActivity {
 
@@ -31,6 +33,28 @@ public class MainActivity extends BaseActivity {
         initViews();
 //        updateTagCloud();
         checkUpdate();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        regEventBus();
+    }
+
+    @Override
+    protected void onStop() {
+        unregEventBus();
+
+        super.onStop();
+    }
+
+    private void unregEventBus() {
+        EventBus.getDefault().unregister(sidebar);
+    }
+
+    private void regEventBus() {
+        EventBus.getDefault().register(sidebar);
     }
 
     private void initData() {
@@ -95,7 +119,7 @@ public class MainActivity extends BaseActivity {
             @Override
             protected void onPostExecute(HashSet<String> strings) {
                 super.onPostExecute(strings);
-                sidebar.setTags(strings);
+//                sidebar.setTags(strings);
             }
         }.execute();
     }
