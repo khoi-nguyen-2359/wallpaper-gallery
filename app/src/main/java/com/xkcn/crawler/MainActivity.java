@@ -7,10 +7,11 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 
 import com.xkcn.crawler.adapter.PhotoPagerAdapter;
+import com.xkcn.crawler.data.PreferenceDataStore;
+import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.db.PhotoTagDao;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
 import com.xkcn.crawler.service.UpdateService;
-import com.xkcn.crawler.util.P;
 import com.xkcn.crawler.view.SidebarView;
 
 import java.util.HashSet;
@@ -24,6 +25,7 @@ public class MainActivity extends BaseActivity {
     private ViewPager pager;
     private SidebarView sidebar;
     private DrawerLayout layoutDrawer;
+    private PreferenceDataStore prefDataStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,10 +72,12 @@ public class MainActivity extends BaseActivity {
 
         sidebar = (SidebarView) findViewById(R.id.sidebar);
         sidebar.setOnSidebarItemActivated(onSidebarItemClick);
+
+        prefDataStore = new PreferenceDataStoreImpl();
     }
 
     private void checkUpdate() {
-        if (P.getLastUpdateTime() < System.currentTimeMillis() - P.PERIOD_UPDATE) {
+        if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - PreferenceDataStoreImpl.PERIOD_UPDATE) {
             UpdateService.startActionUpdate(this);
         }
     }

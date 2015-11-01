@@ -11,14 +11,12 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.xkcn.crawler.R;
+import com.xkcn.crawler.data.PreferenceDataStore;
+import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
-import com.xkcn.crawler.util.P;
 import com.xkcn.crawler.util.U;
 
 import org.joda.time.DateTime;
-import org.w3c.dom.Text;
-
-import java.util.HashSet;
 
 /**
  * Created by khoinguyen on 2/21/15.
@@ -134,8 +132,14 @@ public class SidebarView extends FrameLayout implements View.OnClickListener {
     }
 
     private void updateLatestUpdateText() {
-        long lastUpdateTime = P.getLastUpdateTime();
-        DateTime lastUpdateDateTime = new DateTime(lastUpdateTime);
-        tvLastUpdateTime.setText(String.format("%s\n%s", getResources().getString(R.string.sidebar_latest_update_at), lastUpdateDateTime.toString(FORMAT_LATEST_UPDATE)));
+        PreferenceDataStore prefDataStore = new PreferenceDataStoreImpl();
+        if (prefDataStore.hasPhotoCrawled()) {
+            long lastUpdateTime = prefDataStore.getLastPhotoCrawlTime();
+            DateTime lastUpdateDateTime = new DateTime(lastUpdateTime);
+            tvLastUpdateTime.setVisibility(VISIBLE);
+            tvLastUpdateTime.setText(String.format("%s\n%s", getResources().getString(R.string.sidebar_latest_update_at), lastUpdateDateTime.toString(FORMAT_LATEST_UPDATE)));
+        } else {
+            tvLastUpdateTime.setVisibility(INVISIBLE);
+        }
     }
 }

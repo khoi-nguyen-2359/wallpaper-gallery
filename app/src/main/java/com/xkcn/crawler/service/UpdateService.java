@@ -1,7 +1,6 @@
 package com.xkcn.crawler.service;
 
 import android.app.Service;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
@@ -11,9 +10,10 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.xkcn.crawler.data.PreferenceDataStore;
+import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.db.PhotoTagDao;
 import com.xkcn.crawler.util.L;
-import com.xkcn.crawler.util.P;
 import com.xkcn.crawler.db.Photo;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
@@ -23,7 +23,6 @@ import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -44,6 +43,7 @@ public class UpdateService extends Service {
     private long lastUpdatedPhotoId;
 
     private L logger = L.get(UpdateService.class.getSimpleName());
+    private PreferenceDataStore prefDataStore;
 
     public static void startActionUpdate(Context context) {
         Intent intent = new Intent(context, UpdateService.class);
@@ -89,6 +89,7 @@ public class UpdateService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        prefDataStore = new PreferenceDataStoreImpl();
         createWebBrowser();
 
         EventBus.getDefault().register(this);
@@ -110,10 +111,10 @@ public class UpdateService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
         if (ACTION_UPDATE.equals(action)) {
-            lastUpdatedPhotoId = P.getLastUpdatedPhotoId();
-            if (lastUpdatedPhotoId == 0) {
+            lastUpdatedPhotoId = prefDataStore.getLastCrawledPhotoId();
+            if (!prefDataStore.hasPhotoCrawled()) {
                 lastUpdatedPhotoId = PhotoDao.getLargestPhotoId();
-                P.saveLastUpdatedPhotoId(lastUpdatedPhotoId);
+                prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId);
             }
             logger.d("update started lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
 
@@ -236,8 +237,8 @@ public class UpdateService extends Service {
             if (listSize == 0 || lastPhotoId <= lastUpdatedPhotoId) {
                 logger.d("processHTML done");
                 if (lastPhotoId > 0 && lastPhotoId <= lastUpdatedPhotoId) {
-                    P.saveLastUpdatedPhotoId(lastUpdatedPhotoId = PhotoDao.getLargestPhotoId());
-                    P.saveLastUpdateTime(System.currentTimeMillis());
+                    prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId = PhotoDao.getLargestPhotoId());
+                    prefDataStore.setLastPhotoCrawlTime(System.currentTimeMillis());
                     logger.d("update finished lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
                 }
                 EventBus.getDefault().post(new UpdateFinishedEvent());
