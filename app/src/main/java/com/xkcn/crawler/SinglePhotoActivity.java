@@ -13,7 +13,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
 import com.xkcn.crawler.imageloader.XkcnImageLoader;
 import com.xkcn.crawler.imageloader.XkcnImageLoaderFactory;
@@ -41,7 +41,7 @@ public class SinglePhotoActivity extends BaseActivity {
     private PhotoDownloadManager photoDownloadManager;
     private XkcnImageLoader xkcnImageLoader;
 
-    public static Intent intentViewSinglePhoto(Context context, Photo photo) {
+    public static Intent intentViewSinglePhoto(Context context, PhotoDetails photo) {
         Intent i = new Intent(context, SinglePhotoActivity.class);
         i.putExtra(EXTRA_PHOTO, photo);
 
@@ -52,7 +52,7 @@ public class SinglePhotoActivity extends BaseActivity {
     @InjectView(R.id.progress_bar)  ProgressBar progressBar;
 
     private View viewDecor;
-    private Photo photo;
+    private PhotoDetails photo;
     private GestureDetector toggleStatusBarDetector;
 
     private Handler hideSystemUIHandler = new Handler() {

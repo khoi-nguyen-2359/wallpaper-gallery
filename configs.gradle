@@ -4,4 +4,5 @@ ext {
     androidMaxSdk = 23
     androidBuildToolVersion = "23.0.1"
     androidSupportLibVersion = "23.1.0"
+    gmsVersion = "8.3.0"
 }

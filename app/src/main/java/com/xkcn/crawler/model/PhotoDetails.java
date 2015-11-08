@@ -1,4 +1,4 @@
-package com.xkcn.crawler.db;
+package com.xkcn.crawler.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -6,7 +6,7 @@ import android.os.Parcelable;
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public class Photo implements Parcelable {
+public class PhotoDetails implements Parcelable {
     String photo100;
     String photo250;
     String photo500;
@@ -21,7 +21,7 @@ public class Photo implements Parcelable {
     String tags;
     int notes;
 
-    public Photo() {
+    public PhotoDetails() {
     }
 
     public String getPhoto100() {
@@ -142,18 +142,18 @@ public class Photo implements Parcelable {
         dest.writeInt(notes);
     }
 
-    public static final Parcelable.Creator<Photo> CREATOR
-            = new Parcelable.Creator<Photo>() {
-        public Photo createFromParcel(Parcel in) {
-            return new Photo(in);
+    public static final Parcelable.Creator<PhotoDetails> CREATOR
+            = new Parcelable.Creator<PhotoDetails>() {
+        public PhotoDetails createFromParcel(Parcel in) {
+            return new PhotoDetails(in);
         }
 
-        public Photo[] newArray(int size) {
-            return new Photo[size];
+        public PhotoDetails[] newArray(int size) {
+            return new PhotoDetails[size];
         }
     };
 
-    private Photo(Parcel in) {
+    private PhotoDetails(Parcel in) {
         photo100 = in.readString();
         photo250 = in.readString();
         photo500 = in.readString();

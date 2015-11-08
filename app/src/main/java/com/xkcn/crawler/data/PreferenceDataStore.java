@@ -9,4 +9,7 @@ public interface PreferenceDataStore {
     long getLastPhotoCrawlTime();
     long getLastCrawledPhotoId();
     boolean hasPhotoCrawled();
+    boolean hasOpenedLeftDrawer();
+
+    void setLeftDrawerOpened(boolean b);
 }

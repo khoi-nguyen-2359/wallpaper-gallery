@@ -15,7 +15,7 @@ import android.widget.FrameLayout;
 
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.XkcnApp;
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.event.SetWallpaperClicked;
 
 import de.greenrobot.event.EventBus;
@@ -28,7 +28,7 @@ public class PhotoActionsView extends FrameLayout {
     public static final int TYPE_TEXT = 1;
 
     private int type;
-    private Photo photo;
+    private PhotoDetails photo;
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     public PhotoActionsView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
@@ -56,7 +56,7 @@ public class PhotoActionsView extends FrameLayout {
         a.recycle();
     }
 
-    public void bind(Photo photo) {
+    public void bind(PhotoDetails photo) {
         this.photo = photo;
     }
 

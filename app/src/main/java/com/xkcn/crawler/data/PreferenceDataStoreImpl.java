@@ -14,6 +14,7 @@ public class PreferenceDataStoreImpl implements PreferenceDataStore {
     private static final String PREF_LAST_UPDATED_PHOTO_ID = "PREF_LAST_UPDATED_PHOTO_ID";
     private static final long INVALID_TIME = 1;
     private static final long INVALID_PHOTO_ID = -1;
+    private static final String PREF_HAS_OPENED_LEFT_DRAWER = "PREF_HAS_OPENED_LEFT_DRAWER";
 
     public static SharedPreferences getPref() {
         return XkcnApp.app().getSharedPreferences(APP_PREF, 0);
@@ -42,5 +43,15 @@ public class PreferenceDataStoreImpl implements PreferenceDataStore {
     @Override
     public boolean hasPhotoCrawled() {
         return getLastPhotoCrawlTime() != INVALID_TIME && getLastCrawledPhotoId() != INVALID_PHOTO_ID;
+    }
+
+    @Override
+    public boolean hasOpenedLeftDrawer() {
+        return getPref().getBoolean(PREF_HAS_OPENED_LEFT_DRAWER, false);
+    }
+
+    @Override
+    public void setLeftDrawerOpened(boolean b) {
+        getPref().edit().putBoolean(PREF_HAS_OPENED_LEFT_DRAWER, b).apply();
     }
 }

@@ -1,21 +1,21 @@
 package com.xkcn.crawler.event;
 
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 
 /**
  * Created by khoinguyen on 2/11/15.
  */
 public class SetWallpaperClicked {
-    private Photo photo;
-    public SetWallpaperClicked(Photo p) {
+    private PhotoDetails photo;
+    public SetWallpaperClicked(PhotoDetails p) {
         photo = p;
     }
 
-    public Photo getPhoto() {
+    public PhotoDetails getPhoto() {
         return photo;
     }
 
-    public void setPhoto(Photo photo) {
+    public void setPhoto(PhotoDetails photo) {
         this.photo = photo;
     }
 }

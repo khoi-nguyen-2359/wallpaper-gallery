@@ -78,6 +78,10 @@ public final class PhotoDownloadManager {
         dataSource.subscribe(new BaseDataSubscriber<CloseableReference<PooledByteBuffer>>() {
             @Override
             protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
+                if (!dataSource.isFinished()) {
+                    return;
+                }
+
                 CloseableReference<PooledByteBuffer> cf = null;
                 try {
                     cf = dataSource.getResult();

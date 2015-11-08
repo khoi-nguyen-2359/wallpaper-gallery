@@ -5,7 +5,7 @@ import android.content.DialogInterface;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.Toast;
 
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.PhotoDownloadedEvent;
 import com.xkcn.crawler.event.SetWallpaperClicked;
@@ -54,7 +54,7 @@ public class BaseActivity extends ActionBarActivity {
     }
 
     public void onEventMainThread(SetWallpaperClicked e) {
-        final Photo photo = e.getPhoto();
+        final PhotoDetails photo = e.getPhoto();
         final PhotoDownloadManager photoDownloadManager = PhotoDownloadManager.getInstance();
         if (!EventBus.getDefault().isRegistered(setWallpaperEventSubscriber)) {
             EventBus.getDefault().register(setWallpaperEventSubscriber);

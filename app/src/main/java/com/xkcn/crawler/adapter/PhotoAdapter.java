@@ -2,18 +2,16 @@ package com.xkcn.crawler.adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.PointF;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.SinglePhotoActivity;
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.view.PhotoActionsView;
 
 import java.util.ArrayList;
@@ -38,14 +36,14 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
 
     private final LayoutInflater inflater;
     private final Context context;
-    private List<Photo> dataPhotos;
+    private List<PhotoDetails> dataPhotos;
     public PhotoAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         this.context = context;
         dataPhotos = new ArrayList<>();
     }
 
-    public void setDataPhotos(List<Photo> dataPhotos) {
+    public void setDataPhotos(List<PhotoDetails> dataPhotos) {
         this.dataPhotos = dataPhotos;
     }
 

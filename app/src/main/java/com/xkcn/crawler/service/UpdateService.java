@@ -14,7 +14,7 @@ import com.xkcn.crawler.data.PreferenceDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.db.PhotoTagDao;
 import com.xkcn.crawler.util.L;
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
@@ -136,12 +136,12 @@ public class UpdateService extends Service {
         startPageCrawling(e.getPage());
     }
 
-    public Photo parsePhotoNode(HtmlCleaner htmlCleaner, TagNode post, HashSet<String> photoTags) {
-        Photo photo = null;
+    public PhotoDetails parsePhotoNode(HtmlCleaner htmlCleaner, TagNode post, HashSet<String> photoTags) {
+        PhotoDetails photo = null;
 
         String dataType = post.getAttributeByName("data-type");
         if ("photo".equals(dataType)) {
-            photo = new Photo();
+            photo = new PhotoDetails();
 
             String photoHigh = post.getAttributeByName("data-photo-high");
             String photo500 = photoHigh.replace("_1280.", "_500.");
@@ -202,7 +202,7 @@ public class UpdateService extends Service {
     public class CrawlerJsInterface {
         @JavascriptInterface
         public void processHTML(String html) {
-            List<Photo> photoList = new ArrayList<>();
+            List<PhotoDetails> photoList = new ArrayList<>();
             HashSet<String> photoTags = new HashSet<>();
             if (html != null) {
                 HtmlCleaner htmlCleaner = new HtmlCleaner();
@@ -212,7 +212,7 @@ public class UpdateService extends Service {
                         Object[] objs = root.evaluateXPath(String.format(XPATH_POST_ID, i));
                         if (objs.length > 0) {
                             TagNode post = (TagNode) objs[0];
-                            Photo photo = parsePhotoNode(htmlCleaner, post, photoTags);
+                            PhotoDetails photo = parsePhotoNode(htmlCleaner, post, photoTags);
                             if (photo != null) {
                                 photoList.add(photo);
                             }

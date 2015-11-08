@@ -4,10 +4,10 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.util.L;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -35,8 +35,8 @@ public final class PhotoDao {
     public static final String COL_NOTES = "NOTES";
 //    public static final String COL_DOWNLOAD_STATE = "DOWNLOAD_STATE";
 
-    public static Photo toPhoto(Cursor cursor) {
-        Photo photo = new Photo();
+    public static PhotoDetails toPhoto(Cursor cursor) {
+        PhotoDetails photo = new PhotoDetails();
         int idx;
         if ((idx = cursor.getColumnIndex(COL_IDENTIFIER)) != -1)        photo.setIdentifier(cursor.getLong(idx));
         if ((idx = cursor.getColumnIndex(COL_PHOTO100)) != -1)          photo.setPhoto100(cursor.getString(idx));
@@ -56,7 +56,7 @@ public final class PhotoDao {
         return photo;
     }
 
-    public static ContentValues toContentValues(Photo photo) {
+    public static ContentValues toContentValues(PhotoDetails photo) {
         ContentValues cv = new ContentValues();
         cv.put(COL_IDENTIFIER, photo.getIdentifier());
         cv.put(COL_PHOTO100, photo.getPhoto100());
@@ -93,14 +93,14 @@ public final class PhotoDao {
         return largestPhotoId;
     }
 
-    public static List<Photo> queryLatest(int page) {
-        List<Photo> photoList = new ArrayList<>();
+    public static List<PhotoDetails> queryLatest(int page) {
+        List<PhotoDetails> photoList = new ArrayList<>();
 
         SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
 
         Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * 15) + ", 15");
         if (c != null) {
-            Photo photo = null;
+            PhotoDetails photo = null;
             while (c.moveToNext()) {
                 photo = toPhoto(c);
                 photoList.add(photo);
@@ -112,14 +112,14 @@ public final class PhotoDao {
         return photoList;
     }
 
-    public static List<Photo> queryHotest(int page) {
-        List<Photo> photoList = new ArrayList<>();
+    public static List<PhotoDetails> queryHotest(int page) {
+        List<PhotoDetails> photoList = new ArrayList<>();
 
         SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
 
         Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * 15) + ",15");
         if (c != null) {
-            Photo photo = null;
+            PhotoDetails photo = null;
             while (c.moveToNext()) {
                 photo = toPhoto(c);
                 photoList.add(photo);
@@ -131,13 +131,13 @@ public final class PhotoDao {
         return photoList;
     }
 
-    public static int bulkInsertPhoto(List<Photo> photoList) {
+    public static int bulkInsertPhoto(List<PhotoDetails> photoList) {
         if (photoList == null || photoList.size() == 0)
             return 0;
 
         List<ContentValues> listCv = new ArrayList<>();
         ContentValues cv = null;
-        for (Photo photo : photoList) {
+        for (PhotoDetails photo : photoList) {
             cv = toContentValues(photo);
             listCv.add(cv);
         }

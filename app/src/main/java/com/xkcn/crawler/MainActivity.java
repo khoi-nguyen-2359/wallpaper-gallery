@@ -4,6 +4,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
+import android.view.Gravity;
 import android.view.View;
 
 import com.xkcn.crawler.adapter.PhotoPagerAdapter;
@@ -30,7 +31,6 @@ public class MainActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         initData();
         initViews();
 //        updateTagCloud();
@@ -63,6 +63,7 @@ public class MainActivity extends BaseActivity {
     }
 
     private void initViews() {
+        setContentView(R.layout.activity_main);
         layoutDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
 
         adapterPhotoPages = new PhotoPagerAdapter(getSupportFragmentManager());
@@ -74,6 +75,11 @@ public class MainActivity extends BaseActivity {
         sidebar.setOnSidebarItemActivated(onSidebarItemClick);
 
         prefDataStore = new PreferenceDataStoreImpl();
+
+        if (!prefDataStore.hasOpenedLeftDrawer()) {
+            layoutDrawer.openDrawer(Gravity.LEFT);
+            prefDataStore.setLeftDrawerOpened(true);
+        }
     }
 
     private void checkUpdate() {

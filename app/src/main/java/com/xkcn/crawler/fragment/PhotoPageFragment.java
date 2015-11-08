@@ -14,7 +14,7 @@ import android.view.ViewGroup;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoAdapter;
 import com.xkcn.crawler.adapter.PhotoPagerAdapter;
-import com.xkcn.crawler.db.Photo;
+import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.UpdateFinishedEvent;
 import com.xkcn.crawler.util.U;
@@ -60,10 +60,10 @@ public class PhotoPageFragment extends Fragment {
     }
 
     private void populatePhotoList() {
-        new AsyncTask<Void, Void, List<Photo>>() {
+        new AsyncTask<Void, Void, List<PhotoDetails>>() {
             @Override
-            protected List<Photo> doInBackground(Void... params) {
-                List<Photo> photoList;
+            protected List<PhotoDetails> doInBackground(Void... params) {
+                List<PhotoDetails> photoList;
                 if (getArguments().getInt(ARG_TYPE) == PhotoPagerAdapter.TYPE_HOTEST) {
                     photoList = PhotoDao.queryHotest(getArguments().getInt(ARG_PAGE));
                 } else {
@@ -74,7 +74,7 @@ public class PhotoPageFragment extends Fragment {
             }
 
             @Override
-            protected void onPostExecute(List<Photo> photos) {
+            protected void onPostExecute(List<PhotoDetails> photos) {
                 super.onPostExecute(photos);
 
                 adapterPhotos.setDataPhotos(photos);

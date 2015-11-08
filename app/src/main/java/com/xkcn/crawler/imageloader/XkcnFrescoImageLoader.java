@@ -10,6 +10,7 @@ import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.backends.okhttp.OkHttpImagePipelineConfigFactory;
+import com.facebook.imagepipeline.core.DefaultExecutorSupplier;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
 import com.facebook.imagepipeline.core.ImagePipelineFactory;

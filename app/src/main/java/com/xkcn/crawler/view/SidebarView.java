@@ -59,6 +59,7 @@ public class SidebarView extends FrameLayout implements View.OnClickListener {
     private void initViews() {
         tvCatHotest = (Button) findViewById(R.id.tv_hotest);
         tvCatLatest = (Button) findViewById(R.id.tv_latest);
+        tvCatLatest.setActivated(true);
         tvLastUpdateTime = (TextView) findViewById(R.id.tv_last_update_time);
         updateLatestUpdateText();
 //        tagCloud = (SelectableTagCloud) findViewById(R.id.tag_cloud);
@@ -127,7 +128,7 @@ public class SidebarView extends FrameLayout implements View.OnClickListener {
         }
     }
 
-    public void onEvent(UpdateFinishedEvent event) {
+    public void onEventMainThread(UpdateFinishedEvent event) {
         updateLatestUpdateText();
     }
 
