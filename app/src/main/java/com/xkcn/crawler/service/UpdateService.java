@@ -17,7 +17,7 @@ import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
-import com.xkcn.crawler.event.UpdateFinishedEvent;
+import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
@@ -121,7 +121,7 @@ public class UpdateService extends Service {
             startPageCrawling(1);
         }
 
-        return START_STICKY;
+        return START_NOT_STICKY;
     }
 
     private void startPageCrawling(int page) {
@@ -241,7 +241,7 @@ public class UpdateService extends Service {
                     prefDataStore.setLastPhotoCrawlTime(System.currentTimeMillis());
                     logger.d("update finished lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
                 }
-                EventBus.getDefault().post(new UpdateFinishedEvent());
+                EventBus.getDefault().post(new PhotoCrawlingFinishedEvent());
                 stopSelf();
             } else {
                 EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));

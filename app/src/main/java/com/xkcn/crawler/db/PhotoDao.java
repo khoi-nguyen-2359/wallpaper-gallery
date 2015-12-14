@@ -3,6 +3,7 @@ package com.xkcn.crawler.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.util.L;
@@ -18,6 +19,8 @@ public final class PhotoDao {
 //    public static final int DOWNLOAD_STATE_NONE = 0;
 
     private static L logger = L.get(PhotoDao.class.getSimpleName());
+
+    private static final int PHOTO_PER_PAGE = 15;
 
     public static final String TABLE_NAME = "PHOTO";
     public static final String COL_IDENTIFIER = "IDENTIFIER";
@@ -93,12 +96,12 @@ public final class PhotoDao {
         return largestPhotoId;
     }
 
-    public static List<PhotoDetails> queryLatest(int page) {
+    public static List<PhotoDetails> queryLatest(int page, int perPage) {
         List<PhotoDetails> photoList = new ArrayList<>();
 
         SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
 
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * 15) + ", 15");
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * perPage) + "," + perPage);
         if (c != null) {
             PhotoDetails photo = null;
             while (c.moveToNext()) {
@@ -112,12 +115,12 @@ public final class PhotoDao {
         return photoList;
     }
 
-    public static List<PhotoDetails> queryHotest(int page) {
+    public static List<PhotoDetails> queryHotest(int page, int perPage) {
         List<PhotoDetails> photoList = new ArrayList<>();
 
         SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
 
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * 15) + ",15");
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * perPage) + "," + perPage);
         if (c != null) {
             PhotoDetails photo = null;
             while (c.moveToNext()) {
@@ -178,5 +181,22 @@ public final class PhotoDao {
         logger.d("bulkInsert inserted=%d", nInserted);
 
         return nInserted;
+    }
+
+    public static PhotoDetails queryPhoto(long photoIdentifier) {
+        PhotoDetails photoDetails = null;
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, null, COL_IDENTIFIER+"=?", new String[]{photoIdentifier+""}, null, null, null);
+        if (c != null) {
+            if (c.moveToNext()) {
+                photoDetails = toPhoto(c);
+            }
+
+            c.close();
+        }
+
+        return photoDetails;
     }
 }

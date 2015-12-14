@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.xkcn.crawler" >
+    package="com.xkcn.crawler">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -11,12 +11,22 @@
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
+        <activity
+            android:name=".SinglePhotoActivity"
+            android:theme="@style/AppTheme.SinglePhotoActivity" />
+
+        <service
+            android:name=".service.UpdateService"
+            android:exported="false"></service>
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="ba28252cfec95a41ed62cffffcb9ccc9572db2b0" />
 
         <activity
-            android:theme="@style/AppTheme.MainActivity"
-            android:name=".MainActivity"
-            android:label="@string/app_name" >
+            android:name=".SplashActivity"
+            android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -25,13 +35,10 @@
         </activity>
 
         <activity
-            android:name=".SinglePhotoActivity"
-            android:theme="@style/AppTheme.SinglePhotoActivity"/>
-
-        <service
-            android:name=".service.UpdateService"
-            android:exported="false" >
-        </service>
+            android:name=".PhotoListPagerActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme">
+        </activity>
     </application>
 
 </manifest>

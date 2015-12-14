@@ -2,6 +2,7 @@ package com.xkcn.crawler.adapter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.PointF;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -27,9 +28,12 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView ivPhoto;
         PhotoActionsView viewPhotoActions;
+
         public ViewHolder(View itemView) {
             super(itemView);
             ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
+            PointF focusPoint = new PointF(0.5f, 0.4f);
+            ivPhoto.getHierarchy().setActualImageFocusPoint(focusPoint);
             viewPhotoActions = (PhotoActionsView) itemView.findViewById(R.id.view_actions);
         }
     }
@@ -56,8 +60,8 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
         viewHolder.viewPhotoActions.bind(dataPhotos.get(i));
 
-        viewHolder.ivPhoto.setAspectRatio(0.75f);
-        viewHolder.ivPhoto.setImageURI(Uri.parse(dataPhotos.get(i).getPhotoHigh()));
+        viewHolder.ivPhoto.setAspectRatio(1.5f);
+        viewHolder.ivPhoto.setImageURI(Uri.parse(dataPhotos.get(i).getPhoto500()));
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override

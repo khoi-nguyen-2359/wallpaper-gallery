@@ -18,5 +18,9 @@
     <string name="font_noto_bi">NotoSans-BoldItalic.ttf</string>
     <string name="font_noto_i">NotoSans-Italic.ttf</string>
     <string name="sidebar_latest_update_at">Cập nhật lần cuối</string>
+    <string name="title_activity_main">MainActivity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 
 </resources>

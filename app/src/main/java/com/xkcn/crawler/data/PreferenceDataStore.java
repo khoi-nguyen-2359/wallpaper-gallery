@@ -12,4 +12,7 @@ public interface PreferenceDataStore {
     boolean hasOpenedLeftDrawer();
 
     void setLeftDrawerOpened(boolean b);
+    int getListPagerPhotoPerPage();
+
+    long getUpdatePeriod();
 }

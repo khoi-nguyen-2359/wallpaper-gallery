@@ -18,7 +18,6 @@ import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
 import com.xkcn.crawler.imageloader.XkcnImageLoader;
 import com.xkcn.crawler.imageloader.XkcnImageLoaderFactory;
 import com.xkcn.crawler.photomanager.PhotoDownloadManager;
-import com.xkcn.crawler.photomanager.StorageUtils;
 import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoActionsView;
 
@@ -32,7 +31,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 /**
  * Created by khoinguyen on 1/21/15.
  */
-public class SinglePhotoActivity extends BaseActivity {
+public class SinglePhotoActivity extends PhotoPagerActivity {
     public static final String EXTRA_PHOTO = "EXTRA_PHOTO";
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
     private PhotoActionsView viewPhotoActions;
@@ -111,12 +110,12 @@ public class SinglePhotoActivity extends BaseActivity {
             enabledToggleStatusBar = true;
             UiUtils.showStatusBar(getWindow(), viewDecor);
 
-            photoDownloadManager.asyncDownload(photo.getIdentifier(), photo.getPhotoHigh());
+            photoDownloadManager.createPhotoDownloadObservable(photo);
         }
     };
 
     private void loadPhoto() {
-        File downloadedPhoto = StorageUtils.getDownloadedPhotoFile(photo.getPhotoHigh());
+        File downloadedPhoto = PhotoDownloadManager.getDownloadFile(photo.getDefaultDownloadUrl());
         if (downloadedPhoto.exists()) {
             xkcnImageLoader.load(downloadedPhoto, ivPhoto, loadSingleHighPhotoCallback);
         } else {
@@ -201,5 +200,10 @@ public class SinglePhotoActivity extends BaseActivity {
     @Override
     protected void onStop() {
         super.onStop();
+    }
+
+    @Override
+    public void initPager(Integer pageCount) {
+
     }
 }

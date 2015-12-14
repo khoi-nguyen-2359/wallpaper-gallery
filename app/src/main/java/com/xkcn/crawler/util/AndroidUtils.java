@@ -18,7 +18,7 @@ import java.io.OutputStreamWriter;
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public final class U {
+public final class AndroidUtils {
     /**
      *
      */
@@ -40,32 +40,6 @@ public final class U {
         }
     }
 
-    public static int getNavigationBarHeight(Resources resources) {
-        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            return resources.getDimensionPixelSize(resourceId);
-        }
-
-        return 0;
-    }
-
-    public static int getStatusBarHeight(Resources resources) {
-        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
-        if (resourceId > 0) {
-            return resources.getDimensionPixelSize(resourceId);
-        }
-
-        return 0;
-    }
-
-    public static Point getDisplaySize(WindowManager winMan) {
-        Display display = winMan.getDefaultDisplay();
-        Point size = new Point();
-        display.getSize(size);
-
-        return size;
-    }
-
     public static void startSetWallpaperChooser(Activity activity, Uri uriImg) {
         Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
         intent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -73,5 +47,22 @@ public final class U {
         intent.putExtra("mimeType", "image/jpeg");
 
         activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.photo_actions_set_wp_chooser)));
+    }
+
+    public static String getResourceName(String uriString) {
+        return Uri.parse(uriString).getLastPathSegment();
+    }
+
+    /* Checks if external storage is available for read and write */
+    public static boolean isExternalStorageWritable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state);
+    }
+
+    /* Checks if external storage is available to at least read */
+    public static boolean isExternalStorageReadable() {
+        String state = Environment.getExternalStorageState();
+        return Environment.MEDIA_MOUNTED.equals(state) ||
+                Environment.MEDIA_MOUNTED_READ_ONLY.equals(state);
     }
 }

@@ -17,6 +17,7 @@ import com.xkcn.crawler.R;
 import com.xkcn.crawler.XkcnApp;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.event.SetWallpaperClicked;
+import com.xkcn.crawler.photomanager.PhotoDownloadManager;
 
 import de.greenrobot.event.EventBus;
 

@@ -18,4 +18,10 @@ public class SetWallpaperClicked {
     public void setPhoto(PhotoDetails photo) {
         this.photo = photo;
     }
+
+    public static class EventHandler {
+        public void onEventMainThead(SetWallpaperClicked event) {
+
+        }
+    }
 }

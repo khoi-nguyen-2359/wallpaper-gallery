@@ -12,4 +12,8 @@ public interface PhotoDetailsDataStore {
     List<PhotoDetails> getLatestPhotos();
     List<PhotoDetails> getHotestPhotos();
     int addPhotos(List<PhotoDetails> photos);
+
+    PhotoDetails getPhotoDetails(long photoId);
+
+    int getPageCount(int perPage);
 }

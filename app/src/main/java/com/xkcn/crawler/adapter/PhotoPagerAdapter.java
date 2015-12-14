@@ -10,14 +10,15 @@ import com.xkcn.crawler.fragment.PhotoPageFragment;
  * Created by khoinguyen on 12/23/14.
  */
 public class PhotoPagerAdapter extends FragmentStatePagerAdapter {
-    public static final int MAX_PAGE = 446;
     public static final int TYPE_HOTEST = 1;
     public static final int TYPE_LATEST = 2;
 
     private int type;
+    private int pageCount;
 
-    public PhotoPagerAdapter(FragmentManager fm) {
+    public PhotoPagerAdapter(FragmentManager fm, int pageCount) {
         super(fm);
+        this.pageCount = pageCount;
     }
 
     @Override
@@ -27,7 +28,7 @@ public class PhotoPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return MAX_PAGE;
+        return pageCount;
     }
 
     public int getType() {

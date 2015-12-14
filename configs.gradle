@@ -3,6 +3,6 @@ ext {
     androidMinSdk = 16
     androidMaxSdk = 23
     androidBuildToolVersion = "23.0.1"
-    androidSupportLibVersion = "23.1.0"
+    androidSupportLibVersion = "23.1.1"
     gmsVersion = "8.3.0"
 }

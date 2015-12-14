@@ -4,7 +4,10 @@ import android.annotation.TargetApi;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.os.Build;
+import android.view.Display;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -85,5 +88,31 @@ public final class UiUtils {
         } else {
             return window != null && (decorView.getSystemUiVisibility() & View.SYSTEM_UI_FLAG_LOW_PROFILE) == 0;
         }
+    }
+
+    public static int getNavigationBarHeight(Resources resources) {
+        int resourceId = resources.getIdentifier("navigation_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+
+        return 0;
+    }
+
+    public static int getStatusBarHeight(Resources resources) {
+        int resourceId = resources.getIdentifier("status_bar_height", "dimen", "android");
+        if (resourceId > 0) {
+            return resources.getDimensionPixelSize(resourceId);
+        }
+
+        return 0;
+    }
+
+    public static Point getDisplaySize(WindowManager winMan) {
+        Display display = winMan.getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+
+        return size;
     }
 }

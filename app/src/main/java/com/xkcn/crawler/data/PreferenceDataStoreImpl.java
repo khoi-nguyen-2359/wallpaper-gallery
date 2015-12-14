@@ -9,7 +9,7 @@ import com.xkcn.crawler.XkcnApp;
  */
 public class PreferenceDataStoreImpl implements PreferenceDataStore {
     private static final String APP_PREF = "APP_PREF";
-    public static final long PERIOD_UPDATE = 86400000;
+    private static final long PERIOD_UPDATE = 86400000;
     private static final String PREF_LAST_UPDATE = "PREF_LAST_UPDATE";
     private static final String PREF_LAST_UPDATED_PHOTO_ID = "PREF_LAST_UPDATED_PHOTO_ID";
     private static final long INVALID_TIME = 1;
@@ -53,5 +53,15 @@ public class PreferenceDataStoreImpl implements PreferenceDataStore {
     @Override
     public void setLeftDrawerOpened(boolean b) {
         getPref().edit().putBoolean(PREF_HAS_OPENED_LEFT_DRAWER, b).apply();
+    }
+
+    @Override
+    public int getListPagerPhotoPerPage() {
+        return 100;
+    }
+
+    @Override
+    public long getUpdatePeriod() {
+        return PERIOD_UPDATE;
     }
 }

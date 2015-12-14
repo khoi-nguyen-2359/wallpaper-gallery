@@ -13,8 +13,8 @@ import android.widget.TextView;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.data.PreferenceDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
-import com.xkcn.crawler.event.UpdateFinishedEvent;
-import com.xkcn.crawler.util.U;
+import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
+import com.xkcn.crawler.util.UiUtils;
 
 import org.joda.time.DateTime;
 
@@ -74,8 +74,8 @@ public class SidebarView extends FrameLayout implements View.OnClickListener {
 //        tagCloud.setTags(Arrays.asList("1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555","1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555","1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555","1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555","1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555","1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555","1", "22", "333", "4444", "55555", "111", "22", "333", "4444", "55555"));
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             View layoutSidebarItems = findViewById(R.id.layout_sidebar_items);
-            int paddingTop = U.getStatusBarHeight(getResources()) + layoutSidebarItems.getPaddingTop();
-            int paddingBottom = U.getNavigationBarHeight(getResources()) + layoutSidebarItems.getPaddingBottom();
+            int paddingTop = UiUtils.getStatusBarHeight(getResources()) + layoutSidebarItems.getPaddingTop();
+            int paddingBottom = UiUtils.getNavigationBarHeight(getResources()) + layoutSidebarItems.getPaddingBottom();
             layoutSidebarItems.setPadding(layoutSidebarItems.getPaddingLeft(), paddingTop, layoutSidebarItems.getPaddingRight(), paddingBottom);
         }
 
@@ -128,7 +128,7 @@ public class SidebarView extends FrameLayout implements View.OnClickListener {
         }
     }
 
-    public void onEventMainThread(UpdateFinishedEvent event) {
+    public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
         updateLatestUpdateText();
     }
 

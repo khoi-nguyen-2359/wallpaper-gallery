@@ -1,7 +1,6 @@
 package com.xkcn.crawler.fragment;
 
 import android.os.AsyncTask;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -11,13 +10,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fantageek.toolkit.view.typeface.recyclerview.SimpleDividerItemDec;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoAdapter;
 import com.xkcn.crawler.adapter.PhotoPagerAdapter;
+import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.db.PhotoDao;
-import com.xkcn.crawler.event.UpdateFinishedEvent;
-import com.xkcn.crawler.util.U;
 
 import java.util.List;
 
@@ -35,6 +34,7 @@ public class PhotoPageFragment extends Fragment {
     private View root;
     private int nPhotoCol;
     private int type;
+    private PreferenceDataStoreImpl prefDataStore;
 
     public static PhotoPageFragment instantiate(int page, int type) {
         PhotoPageFragment f = new PhotoPageFragment();
@@ -57,6 +57,7 @@ public class PhotoPageFragment extends Fragment {
 
     private void initData() {
         nPhotoCol = getResources().getInteger(R.integer.photo_page_col);
+        prefDataStore = new PreferenceDataStoreImpl();
     }
 
     private void populatePhotoList() {
@@ -65,9 +66,9 @@ public class PhotoPageFragment extends Fragment {
             protected List<PhotoDetails> doInBackground(Void... params) {
                 List<PhotoDetails> photoList;
                 if (getArguments().getInt(ARG_TYPE) == PhotoPagerAdapter.TYPE_HOTEST) {
-                    photoList = PhotoDao.queryHotest(getArguments().getInt(ARG_PAGE));
+                    photoList = PhotoDao.queryHotest(getArguments().getInt(ARG_PAGE), prefDataStore.getListPagerPhotoPerPage());
                 } else {
-                    photoList = PhotoDao.queryLatest(getArguments().getInt(ARG_PAGE));
+                    photoList = PhotoDao.queryLatest(getArguments().getInt(ARG_PAGE), prefDataStore.getListPagerPhotoPerPage());
                 }
 
                 return photoList;
@@ -86,32 +87,11 @@ public class PhotoPageFragment extends Fragment {
     public void initPhotoList() {
         listPhoto = (RecyclerView) root.findViewById(R.id.photo_list);
         listPhoto.setHasFixedSize(true);
+        listPhoto.addItemDecoration(new SimpleDividerItemDec(null, RecyclerView.VERTICAL, getResources().getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
         StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(nPhotoCol, StaggeredGridLayoutManager.VERTICAL);
         listPhoto.setLayoutManager(rcvLayoutMan);
         adapterPhotos = new PhotoAdapter(getActivity());
         listPhoto.setAdapter(adapterPhotos);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            int statusBarHeight = U.getStatusBarHeight(getResources());
-            int navBarHeight = U.getNavigationBarHeight(getResources());
-            listPhoto.setPadding(0, statusBarHeight, 0, navBarHeight);
-        }
-    }
-
-    public void onEventMainThread(UpdateFinishedEvent event) {
-        populatePhotoList();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
     }
 }
