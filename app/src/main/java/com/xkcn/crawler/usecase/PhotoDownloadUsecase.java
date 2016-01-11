@@ -12,11 +12,11 @@ import com.facebook.imagepipeline.memory.PooledByteBuffer;
 import com.facebook.imagepipeline.memory.PooledByteBufferInputStream;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.XkcnApp;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.usecase.error.PhotoDownloadFailedError;
 import com.xkcn.crawler.usecase.error.PhotoDownloadInProgressError;
-import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.util.AndroidUtils;
 
 import java.io.BufferedOutputStream;

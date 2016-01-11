@@ -3,10 +3,9 @@ package com.xkcn.crawler.db;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 
+import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.util.L;
 
 import java.util.ArrayList;
 import java.util.List;

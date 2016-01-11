@@ -2,6 +2,7 @@ package com.xkcn.crawler;
 
 import android.app.Application;
 
+import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.data.PreferenceDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
@@ -27,5 +28,6 @@ public class XkcnApp extends Application {
         app = this;
 
         XkcnFrescoImageLoader.init(this);
+        L.setLoggable(BuildConfig.LOGGABLE);
     }
 }

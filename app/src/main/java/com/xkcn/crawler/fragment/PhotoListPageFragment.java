@@ -10,7 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fantageek.toolkit.view.typeface.recyclerview.SimpleDividerItemDec;
+import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
 import com.xkcn.crawler.PhotoSinglePagerActivity;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListItemAdapter;

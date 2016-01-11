@@ -10,10 +10,10 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.data.PreferenceDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.db.PhotoTagDao;
-import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.db.PhotoDao;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
