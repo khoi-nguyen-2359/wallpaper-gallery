@@ -13,7 +13,8 @@
         android:label="@string/app_name"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".SinglePhotoActivity"
+            android:screenOrientation="portrait"
+            android:name=".PhotoSinglePagerActivity"
             android:theme="@style/AppTheme.SinglePhotoActivity" />
 
         <service
@@ -25,6 +26,7 @@
             android:value="ba28252cfec95a41ed62cffffcb9ccc9572db2b0" />
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".SplashActivity"
             android:label="@string/app_name">
             <intent-filter>
@@ -35,6 +37,7 @@
         </activity>
 
         <activity
+            android:screenOrientation="portrait"
             android:name=".PhotoListPagerActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme">

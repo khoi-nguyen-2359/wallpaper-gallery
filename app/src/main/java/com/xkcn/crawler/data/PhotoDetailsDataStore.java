@@ -9,8 +9,8 @@ import java.util.List;
  */
 public interface PhotoDetailsDataStore {
     long getLargestPhotoId();
-    List<PhotoDetails> getLatestPhotos();
-    List<PhotoDetails> getHotestPhotos();
+    List<PhotoDetails> getLatestPhotos(int page, int perPage);
+    List<PhotoDetails> getHotestPhotos(int page, int perPage);
     int addPhotos(List<PhotoDetails> photos);
 
     PhotoDetails getPhotoDetails(long photoId);

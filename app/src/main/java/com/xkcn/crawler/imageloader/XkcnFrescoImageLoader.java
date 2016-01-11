@@ -99,49 +99,8 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
                 .build();
         DataSource<CloseableReference<CloseableImage>>
                 dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
-        final RequestInfo reqInfo = new RequestInfo(imageView, callback);
-        dataSource.subscribe(new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
-            @Override
-            protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                if (!dataSource.isFinished()) {
-                    return;
-                }
-
-                CloseableReference<CloseableImage> imageReference = dataSource.getResult();
-                if (imageReference != null) {
-                    try {
-                        CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
-                        Bitmap bm = imgBm.getUnderlyingBitmap();
-                        if (reqInfo.targetRef.get() != null) {
-                            reqInfo.targetRef.get().setImageBitmap(bm);
-                        }
-                        if (reqInfo.callbackRef.get() != null) {
-                            reqInfo.callbackRef.get().onCompleted();
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        if (reqInfo.callbackRef.get() != null) {
-                            reqInfo.callbackRef.get().onFailed();
-                        }
-                    } finally {
-                        if (reqInfo.targetRef.get() != null) {
-                            track(reqInfo.targetRef.get(), imageReference);
-                        }
-                    }
-                }
-
-                reqInfo.clear();
-            }
-
-            @Override
-            protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                if (reqInfo.callbackRef.get() != null) {
-                    reqInfo.callbackRef.get().onFailed();
-                }
-
-                reqInfo.clear();
-            }
-        }, callbackExecutor);
+        RequestInfo reqInfo = new RequestInfo(imageView, callback);
+        dataSource.subscribe(new ImageListener(reqInfo), callbackExecutor);
     }
 
     @Override
@@ -161,14 +120,53 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
             targetRef = new WeakReference<>(imageViewTarget);
             callbackRef = new WeakReference<>(callback);
         }
+    }
 
-        void clear() {
-            if (targetRef != null) {
-                targetRef.clear();
+    class ImageListener extends BaseDataSubscriber<CloseableReference<CloseableImage>> {
+        private RequestInfo reqInfo;
+
+        ImageListener(RequestInfo reqInfo) {
+            this.reqInfo = reqInfo;
+        }
+
+        @Override
+        protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+            if (!dataSource.isFinished() || reqInfo == null || reqInfo.targetRef.get() == null) {
+                return;
             }
-            if (callbackRef != null) {
-                callbackRef.clear();
+
+            CloseableReference<CloseableImage> imageReference = dataSource.getResult();
+            if (imageReference == null) {
+                return;
+            }
+
+            ImageView ivTarget = reqInfo.targetRef.get();
+            Callback cbLoading = reqInfo.callbackRef.get();
+            try {
+                CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
+                Bitmap bm = imgBm.getUnderlyingBitmap();
+                ivTarget.setImageBitmap(bm);
+                if (cbLoading != null) {
+                    cbLoading.onCompleted();
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+                if (cbLoading != null) {
+                    cbLoading.onFailed();
+                }
+                CloseableReference.closeSafely(imageReference);
+            } finally {
+                track(ivTarget, imageReference);
+            }
+        }
+
+        @Override
+        protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+            Callback cbLoading = reqInfo.callbackRef.get();
+            if (cbLoading != null) {
+                cbLoading.onFailed();
             }
         }
     }
+
 }

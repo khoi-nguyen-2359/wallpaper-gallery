@@ -1,10 +1,6 @@
 package com.xkcn.crawler.presenter;
 
-import android.support.v4.view.ViewPager;
-
-import com.xkcn.crawler.PhotoListPagerActivity;
-import com.xkcn.crawler.R;
-import com.xkcn.crawler.adapter.PhotoPagerAdapter;
+import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
 import com.xkcn.crawler.data.PhotoDetailsDataStore;
 import com.xkcn.crawler.data.PreferenceDataStore;
 import com.xkcn.crawler.view.PhotoListPagerView;
@@ -41,17 +37,15 @@ public class PhotoListPagerViewPresenter {
         .subscribe(new Subscriber<Integer>() {
             @Override
             public void onCompleted() {
-
             }
 
             @Override
             public void onError(Throwable e) {
-
             }
 
             @Override
             public void onNext(Integer pageCount) {
-                view.initPager(pageCount);
+                view.initPager(pageCount, PhotoListPagerAdapter.TYPE_LATEST);
             }
         });;
     }

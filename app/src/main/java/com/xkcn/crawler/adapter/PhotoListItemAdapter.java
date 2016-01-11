@@ -1,7 +1,6 @@
 package com.xkcn.crawler.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.PointF;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
@@ -11,19 +10,25 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.xkcn.crawler.R;
-import com.xkcn.crawler.SinglePhotoActivity;
+import com.xkcn.crawler.event.OnPhotoListItemClicked;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.view.PhotoActionsView;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
+
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> {
+public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdapter.ViewHolder> {
 
     public static final float RATIO_SCALE = 1.0f;
+
+    public List<PhotoDetails> getDataPhotos() {
+        return dataPhotos;
+    }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView ivPhoto;
@@ -39,11 +44,9 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
     }
 
     private final LayoutInflater inflater;
-    private final Context context;
     private List<PhotoDetails> dataPhotos;
-    public PhotoAdapter(Context context) {
+    public PhotoListItemAdapter(Context context) {
         inflater = LayoutInflater.from(context);
-        this.context = context;
         dataPhotos = new ArrayList<>();
     }
 
@@ -66,8 +69,7 @@ public class PhotoAdapter extends RecyclerView.Adapter<PhotoAdapter.ViewHolder> 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = SinglePhotoActivity.intentViewSinglePhoto(context, dataPhotos.get(i));
-                context.startActivity(intent);
+                EventBus.getDefault().post(new OnPhotoListItemClicked(i));
             }
         });
     }

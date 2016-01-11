@@ -3,11 +3,6 @@ package com.xkcn.crawler.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import com.xkcn.crawler.photomanager.PhotoDownloadManager;
-import com.xkcn.crawler.util.AndroidUtils;
-
-import java.io.File;
-
 /**
  * Created by khoinguyen on 12/22/14.
  */

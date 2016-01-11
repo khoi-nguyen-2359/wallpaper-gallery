@@ -70,7 +70,7 @@ dependencies {
     compile 'com.facebook.fresco:imagepipeline-okhttp:0.8.0'
     compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
     compile 'de.greenrobot:eventbus:2.4.0'
-    compile 'com.jakewharton:butterknife:6.0.0'
+    compile 'com.jakewharton:butterknife:7.0.1'
     compile 'it.sephiroth.android.library.imagezoom:imagezoom:+'
     compile 'joda-time:joda-time:2.9'
     compile 'io.reactivex:rxandroid:1.0.1'

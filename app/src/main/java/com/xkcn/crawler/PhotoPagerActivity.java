@@ -8,19 +8,15 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
-import com.xkcn.crawler.event.PhotoDownloadFailedEvent;
 import com.xkcn.crawler.event.SetWallpaperClicked;
 import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.photomanager.PhotoDownloadManager;
+import com.xkcn.crawler.usecase.PhotoDownloadUsecase;
 import com.xkcn.crawler.presenter.PhotoListingViewPresenter;
 import com.xkcn.crawler.util.AndroidUtils;
 import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoListingView;
 
 import de.greenrobot.event.EventBus;
-import rx.Observer;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 1/21/15.
@@ -72,11 +68,8 @@ public abstract class PhotoPagerActivity extends AppCompatActivity implements Ph
 
     @Override
     public void showWallpaperChooser(PhotoDetails photoDetails) {
-        Uri uri = Uri.fromFile(PhotoDownloadManager.getDownloadFile(photoDetails.getDefaultDownloadUrl()));
+        Uri uri = Uri.fromFile(PhotoDownloadUsecase.getDownloadFile(photoDetails.getDefaultDownloadUrl()));
         AndroidUtils.startSetWallpaperChooser(this, uri);
     }
-
-    @Override
-    public abstract void initPager(Integer pageCount);
     /*=====*/
 }

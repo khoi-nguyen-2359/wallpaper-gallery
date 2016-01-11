@@ -1,13 +1,7 @@
 package com.xkcn.crawler.presenter;
 
-import android.net.Uri;
-import android.widget.Toast;
-
-import com.xkcn.crawler.PhotoPagerActivity;
 import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.photomanager.PhotoDownloadManager;
-import com.xkcn.crawler.util.AndroidUtils;
-import com.xkcn.crawler.util.UiUtils;
+import com.xkcn.crawler.usecase.PhotoDownloadUsecase;
 import com.xkcn.crawler.view.PhotoListingView;
 
 import rx.Observer;
@@ -26,8 +20,8 @@ public class PhotoListingViewPresenter {
 
     public void loadWallpaperSetting(PhotoDetails photoDetails) {
         view.showLoading();
-        PhotoDownloadManager photoDownloadManager = PhotoDownloadManager.getInstance();
-        photoDownloadManager.createPhotoDownloadObservable(photoDetails)
+        PhotoDownloadUsecase photoDownloadUsecase = PhotoDownloadUsecase.getInstance();
+        photoDownloadUsecase.createPhotoDownloadObservable(photoDetails)
                 .observeOn(Schedulers.newThread())
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<PhotoDetails>() {

@@ -1,4 +1,4 @@
-package com.xkcn.crawler.photomanager.error;
+package com.xkcn.crawler.usecase.error;
 
 /**
  * Created by khoinguyen on 12/13/15.

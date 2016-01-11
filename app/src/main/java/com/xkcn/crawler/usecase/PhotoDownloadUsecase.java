@@ -1,4 +1,4 @@
-package com.xkcn.crawler.photomanager;
+package com.xkcn.crawler.usecase;
 
 import android.content.Context;
 import android.net.Uri;
@@ -14,8 +14,8 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.xkcn.crawler.XkcnApp;
 import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.photomanager.error.PhotoDownloadFailedError;
-import com.xkcn.crawler.photomanager.error.PhotoDownloadInProgressError;
+import com.xkcn.crawler.usecase.error.PhotoDownloadFailedError;
+import com.xkcn.crawler.usecase.error.PhotoDownloadInProgressError;
 import com.xkcn.crawler.util.L;
 import com.xkcn.crawler.util.AndroidUtils;
 
@@ -35,14 +35,14 @@ import rx.Subscriber;
 /**
  * Created by khoinguyen on 2/4/15.
  */
-public final class PhotoDownloadManager {
+public final class PhotoDownloadUsecase {
     public static final String SUFF_DOWNLOAD_TMP_FILE = "downloading.";
 
-    private static PhotoDownloadManager instance;
+    private static PhotoDownloadUsecase instance;
 
-    public static PhotoDownloadManager getInstance() {
+    public static PhotoDownloadUsecase getInstance() {
         if (instance == null) {
-            instance = new PhotoDownloadManager();
+            instance = new PhotoDownloadUsecase();
         }
 
         return instance;
@@ -51,7 +51,7 @@ public final class PhotoDownloadManager {
     private HashSet<String> downloadingUris;
     private ThreadPoolExecutor executorService;
 
-    private PhotoDownloadManager() {
+    private PhotoDownloadUsecase() {
         downloadingUris = new HashSet<>();
 
         executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
@@ -180,13 +180,13 @@ public final class PhotoDownloadManager {
         String fileName = AndroidUtils.getResourceName(downloadUrl);
         File photoFile = null;
         if (AndroidUtils.isExternalStorageReadable()) {
-            photoFile = new File(PhotoDownloadManager.getExternalPhotoDir().getAbsolutePath() + "/" + fileName);
+            photoFile = new File(PhotoDownloadUsecase.getExternalPhotoDir().getAbsolutePath() + "/" + fileName);
             if (photoFile.exists()) {
                 return photoFile;
             }
         }
 
         // second check app internal storage
-        return new File(PhotoDownloadManager.getPhotoDir().getAbsolutePath() + "/" + fileName);
+        return new File(PhotoDownloadUsecase.getPhotoDir().getAbsolutePath() + "/" + fileName);
     }
 }

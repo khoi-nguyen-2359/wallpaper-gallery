@@ -19,12 +19,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 
-    <com.xkcn.crawler.view.PhotoActionsView
-        android:visibility="invisible"
-        android:id="@+id/photo_actions"
-        app:type="text"
-        android:layout_gravity="bottom"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
+
 
 </FrameLayout>

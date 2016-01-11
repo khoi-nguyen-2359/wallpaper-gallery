@@ -7,6 +7,7 @@ import com.xkcn.crawler.db.DbHelper;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.util.L;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -59,13 +60,42 @@ public class PhotoDetailsSqliteDataStore implements PhotoDetailsDataStore {
     }
 
     @Override
-    public List<PhotoDetails> getLatestPhotos() {
-        return null;
-    }
+    public List<PhotoDetails> getLatestPhotos(int page, int perPage) {
+        List<PhotoDetails> photoList = new ArrayList<>();
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * perPage) + "," + perPage);
+        if (c != null) {
+            PhotoDetails photo = null;
+            while (c.moveToNext()) {
+                photo = toPhoto(c);
+                photoList.add(photo);
+            }
+
+            c.close();
+        }
+
+        return photoList;    }
 
     @Override
-    public List<PhotoDetails> getHotestPhotos() {
-        return null;
+    public List<PhotoDetails> getHotestPhotos(int page, int perPage) {
+        List<PhotoDetails> photoList = new ArrayList<>();
+
+        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * perPage) + "," + perPage);
+        if (c != null) {
+            PhotoDetails photo = null;
+            while (c.moveToNext()) {
+                photo = toPhoto(c);
+                photoList.add(photo);
+            }
+
+            c.close();
+        }
+
+        return photoList;
     }
 
     @Override

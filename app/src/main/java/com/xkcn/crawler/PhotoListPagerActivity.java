@@ -12,7 +12,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.xkcn.crawler.adapter.PhotoPagerAdapter;
+import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
 import com.xkcn.crawler.data.PhotoDetailsDataStore;
 import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
 import com.xkcn.crawler.data.PreferenceDataStore;
@@ -21,10 +21,12 @@ import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.crawler.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.crawler.view.PhotoListPagerView;
 
+import de.greenrobot.event.EventBus;
+
 public class PhotoListPagerActivity extends PhotoPagerActivity
         implements NavigationView.OnNavigationItemSelectedListener, PhotoListPagerView {
 
-    private PhotoPagerAdapter adapterPhotoPages;
+    private PhotoListPagerAdapter adapterPhotoPages;
     private ViewPager pagerPhotoPage;
     private PhotoDetailsDataStore photoDetailsDataStore;
     private PreferenceDataStore prefDataStore;
@@ -46,14 +48,9 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void initPager(Integer pageCount) {
-        adapterPhotoPages = new PhotoPagerAdapter(getSupportFragmentManager(), pageCount);
-        adapterPhotoPages.setType(PhotoPagerAdapter.TYPE_LATEST);
+    public void initPager(Integer pageCount, int type) {
+        adapterPhotoPages = new PhotoListPagerAdapter(getSupportFragmentManager(), pageCount);
+        adapterPhotoPages.setType(type);
 
         pagerPhotoPage = (ViewPager) findViewById(R.id.pager_photo_page);
         pagerPhotoPage.setOffscreenPageLimit(5);
@@ -65,15 +62,6 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -102,9 +90,9 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_hotest) {
-            changePhotoListingType(PhotoPagerAdapter.TYPE_HOTEST);
+            changePhotoListingType(PhotoListPagerAdapter.TYPE_HOTEST);
         } else if (id == R.id.nav_latest) {
-            changePhotoListingType(PhotoPagerAdapter.TYPE_LATEST);
+            changePhotoListingType(PhotoListPagerAdapter.TYPE_LATEST);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
