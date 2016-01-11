@@ -118,6 +118,10 @@ public class PhotoListPageFragment extends Fragment implements PhotoListPageView
     }
 
     public void onEvent(OnPhotoListItemClicked event) {
+        if (!getUserVisibleHint()) {
+            return;
+        }
+
         Intent intent = PhotoSinglePagerActivity.intentViewSinglePhoto(getContext(), getListingType(), getPage(), event.getClickedPosition());
         startActivity(intent);
     }
