@@ -1,6 +1,8 @@
 package com.xkcn.crawler.fragment;
 
+import android.app.Dialog;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.view.LayoutInflater;
@@ -35,5 +37,14 @@ public class DebugOptionsDialog extends DialogFragment {
             }
         });
         return root;
+    }
+
+    @NonNull
+    @Override
+    public Dialog onCreateDialog(Bundle savedInstanceState) {
+        Dialog dialog = super.onCreateDialog(savedInstanceState);
+        dialog.setTitle("Debug Options");
+
+        return dialog;
     }
 }

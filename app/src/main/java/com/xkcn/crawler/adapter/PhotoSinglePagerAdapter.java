@@ -16,9 +16,8 @@ import java.util.List;
 public class PhotoSinglePagerAdapter extends FragmentStatePagerAdapter {
     private List<PhotoDetails> photoListPage;
 
-    public PhotoSinglePagerAdapter(FragmentManager fm, List<PhotoDetails> photoListPage) {
+    public PhotoSinglePagerAdapter(FragmentManager fm) {
         super(fm);
-        this.photoListPage = photoListPage;
     }
 
     @Override
@@ -29,5 +28,9 @@ public class PhotoSinglePagerAdapter extends FragmentStatePagerAdapter {
     @Override
     public int getCount() {
         return photoListPage==null?0:photoListPage.size();
+    }
+
+    public void setPhotoDatas(List<PhotoDetails> photoListPage) {
+        this.photoListPage = photoListPage;
     }
 }

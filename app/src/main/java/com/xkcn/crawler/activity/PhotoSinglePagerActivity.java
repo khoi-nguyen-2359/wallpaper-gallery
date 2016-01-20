@@ -11,6 +11,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
 import com.xkcn.crawler.adapter.PhotoSinglePagerAdapter;
@@ -28,7 +29,6 @@ import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Subscriber;
 
 /**
  * Created by khoinguyen on 1/21/15.
@@ -40,6 +40,7 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
     public static final long PERIOD_HIDE_SYSTEMUI = 3000;
 
     private boolean enabledToggleStatusBar;
+    private L logger;
 
     public static Intent intentViewSinglePhoto(Context context, int listingType, int page, int selectedPosition) {
         Intent i = new Intent(context, PhotoSinglePagerActivityImpl.class);
@@ -68,7 +69,7 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         initData();
         initViews();
 
-        loadPhotoList();
+        presenter.loadPhotoListPage();
     }
 
     private void initViews() {
@@ -134,25 +135,6 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         }
     };
 
-    private void loadPhotoList() {
-        presenter.createPhotoQueryObservable().subscribe(new Subscriber<List<PhotoDetails>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(List<PhotoDetails> photoDetailses) {
-                initPager(photoDetailses, getSelectedPosition());
-            }
-        });
-    }
-
     private void initData() {
         int page = getIntent().getIntExtra(EXTRA_PHOTO_LIST_PAGE, 0);
         int listingType = getCurrentType();
@@ -161,9 +143,12 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         int perPage = prefDataStore.getListPagerPhotoPerPage();
         PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(new PhotoDetailsSqliteDataStore(), perPage);
         presenter = new PhotoSinglePagerViewPresenter(photoListingUsecase, listingType, page);
+        presenter.setView(this);
 
         enabledToggleStatusBar = false;
         toggleStatusBarDetector = new StatusBarToggler(this);
+
+        logger = L.get(getClass().getSimpleName());
     }
 
     @Override
@@ -171,10 +156,19 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         super.onStop();
     }
 
-    public void initPager(List<PhotoDetails> photoListPage, int selectedPosition) {
-        adapterPhotoSingles = new PhotoSinglePagerAdapter(getSupportFragmentManager(), photoListPage);
-        pagerPhotoSingle.setAdapter(adapterPhotoSingles);
+    @Override
+    public void setupPagerAdapter(List<PhotoDetails> photoListPage) {
+        if (adapterPhotoSingles == null) {
+            adapterPhotoSingles = new PhotoSinglePagerAdapter(getSupportFragmentManager());
+            pagerPhotoSingle.setAdapter(adapterPhotoSingles);
+        }
+
+        adapterPhotoSingles.setPhotoDatas(photoListPage);
+        int selectedPosition = getSelectedPosition();
+        adapterPhotoSingles.notifyDataSetChanged();
         pagerPhotoSingle.setCurrentItem(selectedPosition);
+
+        logger.d("setupPagerAdapter %d, select %d", photoListPage != null ? photoListPage.size() : 0, selectedPosition);
     }
 
     public int getSelectedPosition() {

@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.event.OnPhotoListItemClicked;
 import com.xkcn.crawler.model.PhotoDetails;
@@ -25,6 +26,7 @@ import de.greenrobot.event.EventBus;
 public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdapter.ViewHolder> {
 
     public static final float RATIO_SCALE = 1.0f;
+    private L logger;
 
     public List<PhotoDetails> getDataPhotos() {
         return dataPhotos;
@@ -45,9 +47,11 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
 
     private final LayoutInflater inflater;
     private List<PhotoDetails> dataPhotos;
+
     public PhotoListItemAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         dataPhotos = new ArrayList<>();
+        logger = L.get(getClass().getSimpleName());
     }
 
     public void setDataPhotos(List<PhotoDetails> dataPhotos) {
@@ -70,6 +74,7 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
             @Override
             public void onClick(View v) {
                 EventBus.getDefault().post(new OnPhotoListItemClicked(i));
+                logger.d("OnPhotoListItemClicked %d", i);
             }
         });
     }

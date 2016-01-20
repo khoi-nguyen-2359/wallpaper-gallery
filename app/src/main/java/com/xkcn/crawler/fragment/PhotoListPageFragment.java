@@ -1,6 +1,5 @@
 package com.xkcn.crawler.fragment;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,12 +11,10 @@ import android.view.ViewGroup;
 
 import com.fantageek.toolkit.util.L;
 import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
-import com.xkcn.crawler.activity.PhotoSinglePagerActivity;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListItemAdapter;
 import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
-import com.xkcn.crawler.event.OnPhotoListItemClicked;
 import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.presenter.PhotoListPageViewPresenter;
@@ -27,10 +24,6 @@ import com.xkcn.crawler.view.PhotoListPageView;
 import java.util.List;
 
 import de.greenrobot.event.EventBus;
-import rx.Observable;
-import rx.Subscriber;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 12/22/14.
@@ -45,6 +38,7 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
     protected int nPhotoCol;
     protected int type;
     protected PhotoListPageViewPresenter presenter;
+    private L logger;
 
     public static PhotoListPageFragment instantiate(int page, int type) {
         PhotoListPageFragment f = new PhotoListPageFragmentImpl();
@@ -61,7 +55,7 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
         root = inflater.inflate(R.layout.fragment_photo_page, container, false);
         initData();
         initPhotoList();
-        loadPhotoListing();
+        presenter.loadPhotoListPage();
         return root;
     }
 
@@ -83,28 +77,13 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
         PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(new PhotoDetailsSqliteDataStore(), prefDataStore.getListPagerPhotoPerPage());
 
         presenter = new PhotoListPageViewPresenter(photoListingUsecase, getListingType(), getPage());
+        presenter.setView(this);
+
+        logger = L.get(getClass().getSimpleName());
     }
 
-    private void loadPhotoListing() {
-        presenter.createPhotoQueryObservable()
-                .subscribe(new Subscriber<List<PhotoDetails>>() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-            }
-
-            @Override
-            public void onNext(List<PhotoDetails> photos) {
-                setupAdapter(photos);
-            }
-        });
-    }
-
-    private void setupAdapter(List<PhotoDetails> photos) {
+    @Override
+    public void setupPagerAdapter(List<PhotoDetails> photos) {
         if (adapterPhotos == null) {
             adapterPhotos = new PhotoListItemAdapter(getActivity());
             listPhoto.setAdapter(adapterPhotos);
@@ -112,6 +91,8 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
 
         adapterPhotos.setDataPhotos(photos);
         adapterPhotos.notifyDataSetChanged();
+
+        logger.d("setupPagerAdapter %d", photos != null ? photos.size() : 0);
     }
 
     public void initPhotoList() {
@@ -135,7 +116,7 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
      * event bus
      **/
     public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
-        loadPhotoListing();
+        presenter.loadPhotoListPage();
     }
 
 

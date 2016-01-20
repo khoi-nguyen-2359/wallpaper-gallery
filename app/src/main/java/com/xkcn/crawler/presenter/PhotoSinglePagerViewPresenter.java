@@ -8,6 +8,7 @@ import com.xkcn.crawler.view.PhotoSinglePagerView;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -26,7 +27,7 @@ public class PhotoSinglePagerViewPresenter {
         this.photoPage = page;
     }
 
-    public Observable<List<PhotoDetails>> createPhotoQueryObservable() {
+    public void loadPhotoListPage() {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
             case PhotoListPagerAdapter.TYPE_HOTEST: {
@@ -38,11 +39,26 @@ public class PhotoSinglePagerViewPresenter {
                 break;
             }
             default:
-                return Observable.empty();
+                photoQueryObservable = Observable.empty();
         }
 
-        return photoQueryObservable.observeOn(Schedulers.newThread())
-                .subscribeOn(AndroidSchedulers.mainThread());
+        photoQueryObservable.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<List<PhotoDetails>>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(List<PhotoDetails> photoDetailses) {
+                        view.setupPagerAdapter(photoDetailses);
+                    }
+                });
     }
 
     public void setView(PhotoSinglePagerView view) {

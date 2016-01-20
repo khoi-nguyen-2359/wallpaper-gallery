@@ -67,11 +67,9 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
             pagerPhotoPage.setAdapter(adapterPhotoPages);
         }
 
-        if (pageCount != adapterPhotoPages.getCount() || type != adapterPhotoPages.getType()) {
-            adapterPhotoPages.setPageCount(pageCount);
-            adapterPhotoPages.setType(type);
-            adapterPhotoPages.notifyDataSetChanged();
-        }
+        adapterPhotoPages.setPageCount(pageCount);
+        adapterPhotoPages.setType(type);
+        adapterPhotoPages.notifyDataSetChanged();
     }
 
     protected PhotoListPagerAdapter createPhotoListPagerAdapter() {

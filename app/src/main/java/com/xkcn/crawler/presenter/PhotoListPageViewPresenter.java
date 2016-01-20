@@ -9,6 +9,7 @@ import com.xkcn.crawler.view.PhotoListPagerView;
 import java.util.List;
 
 import rx.Observable;
+import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -31,7 +32,7 @@ public class PhotoListPageViewPresenter {
         this.view = view;
     }
 
-    public Observable<List<PhotoDetails>> createPhotoQueryObservable() {
+    public void loadPhotoListPage() {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
             case PhotoListPagerAdapter.TYPE_HOTEST: {
@@ -43,10 +44,24 @@ public class PhotoListPageViewPresenter {
                 break;
             }
             default:
-                return Observable.empty();
+                photoQueryObservable = Observable.empty();
         }
 
-        return photoQueryObservable.observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.newThread());
+        photoQueryObservable.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread()).subscribe(new Subscriber<List<PhotoDetails>>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+            }
+
+            @Override
+            public void onNext(List<PhotoDetails> photos) {
+                view.setupPagerAdapter(photos);
+            }
+        });
     }
 }
