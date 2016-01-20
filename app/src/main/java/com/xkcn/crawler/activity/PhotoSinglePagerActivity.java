@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.activity;
 
 import android.animation.Animator;
 import android.content.Context;
@@ -11,6 +11,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
+import com.xkcn.crawler.R;
+import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
 import com.xkcn.crawler.adapter.PhotoSinglePagerAdapter;
 import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
 import com.xkcn.crawler.data.PreferenceDataStore;
@@ -22,7 +24,6 @@ import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoActionsView;
 import com.xkcn.crawler.view.PhotoSinglePagerView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.Bind;
@@ -32,7 +33,7 @@ import rx.Subscriber;
 /**
  * Created by khoinguyen on 1/21/15.
  */
-public class PhotoSinglePagerActivity extends PhotoPagerActivity implements PhotoSinglePagerView {
+public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implements PhotoSinglePagerView {
     public static final String EXTRA_PHOTO_LIST_PAGE = "EXTRA_PHOTO_LIST_PAGE";
     private static final String EXTRA_SELECTED_POSITION = "EXTRA_SELECTED_POSITION";
     private static final String EXTRA_LISTING_TYPE = "EXTRA_LISTING_TYPE";
@@ -41,7 +42,7 @@ public class PhotoSinglePagerActivity extends PhotoPagerActivity implements Phot
     private boolean enabledToggleStatusBar;
 
     public static Intent intentViewSinglePhoto(Context context, int listingType, int page, int selectedPosition) {
-        Intent i = new Intent(context, PhotoSinglePagerActivity.class);
+        Intent i = new Intent(context, PhotoSinglePagerActivityImpl.class);
         i.putExtra(EXTRA_PHOTO_LIST_PAGE, page);
         i.putExtra(EXTRA_SELECTED_POSITION, selectedPosition);
         i.putExtra(EXTRA_LISTING_TYPE, listingType);
@@ -154,7 +155,7 @@ public class PhotoSinglePagerActivity extends PhotoPagerActivity implements Phot
 
     private void initData() {
         int page = getIntent().getIntExtra(EXTRA_PHOTO_LIST_PAGE, 0);
-        int listingType = getIntent().getIntExtra(EXTRA_LISTING_TYPE, 0);
+        int listingType = getCurrentType();
 
         PreferenceDataStore prefDataStore = new PreferenceDataStoreImpl();
         int perPage = prefDataStore.getListPagerPhotoPerPage();
@@ -178,6 +179,12 @@ public class PhotoSinglePagerActivity extends PhotoPagerActivity implements Phot
 
     public int getSelectedPosition() {
         return getIntent().getIntExtra(EXTRA_SELECTED_POSITION, 0);
+    }
+
+    @Override
+    public int getCurrentType() {
+        Intent intent = getIntent();
+        return intent != null ? intent.getIntExtra(EXTRA_LISTING_TYPE, 0) : PhotoListPagerAdapter.TYPE_INVALID;
     }
 
     class StatusBarToggler extends GestureDetector {

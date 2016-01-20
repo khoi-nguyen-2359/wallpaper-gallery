@@ -8,12 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.xkcn.crawler.R;
+import com.xkcn.crawler.event.RefreshPhotoListingPager;
 import com.xkcn.crawler.service.UpdateService;
+
+import de.greenrobot.event.EventBus;
 
 /**
  * Created by khoinguyen on 1/14/16.
  */
-public class DebugDialog extends DialogFragment {
+public class DebugOptionsDialog extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -22,6 +25,13 @@ public class DebugDialog extends DialogFragment {
             @Override
             public void onClick(View view) {
                 UpdateService.startActionUpdate(getContext());
+            }
+        });
+
+        root.findViewById(R.id.bt_refresh_photo_listing_pager).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EventBus.getDefault().post(new RefreshPhotoListingPager());
             }
         });
         return root;

@@ -1,5 +1,6 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.activity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
@@ -9,12 +10,13 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 
-import com.fantageek.toolkit.util.L;
+import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
 import com.xkcn.crawler.data.PhotoDetailsDataStore;
 import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
 import com.xkcn.crawler.data.PreferenceDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
+import com.xkcn.crawler.event.OnPhotoListItemClicked;
 import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.crawler.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.crawler.view.PhotoListPagerView;
@@ -22,15 +24,17 @@ import com.xkcn.crawler.view.PhotoListPagerView;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
-public class PhotoListPagerActivity extends PhotoPagerActivity
+public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         implements NavigationView.OnNavigationItemSelectedListener, PhotoListPagerView {
 
-    private PhotoListPagerAdapter adapterPhotoPages;
-    private PhotoDetailsDataStore photoDetailsDataStore;
-    private PreferenceDataStore prefDataStore;
-    private PhotoListPagerViewPresenter presenter;
+    protected static final int PHOTO_TYPE_DEFAULT = PhotoListPagerAdapter.TYPE_LATEST;
+    protected PhotoListPagerAdapter adapterPhotoPages;
+    protected PhotoDetailsDataStore photoDetailsDataStore;
+    protected PreferenceDataStore prefDataStore;
+    protected PhotoListPagerViewPresenter presenter;
 
     @Bind(R.id.pager_photo_page) ViewPager pagerPhotoPage;
+    @Bind(R.id.nav_view) NavigationView viewNavigation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +47,8 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
 
     private void initViews() {
         pagerPhotoPage.addOnPageChangeListener(onPhotoListPageChanged);
+        pagerPhotoPage.setAdapter(adapterPhotoPages);
+        pagerPhotoPage.setOffscreenPageLimit(5);
     }
 
     private void initData() {
@@ -53,23 +59,30 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
     }
 
     @Override
-    public void initPager(Integer pageCount, int type) {
-        adapterPhotoPages = new PhotoListPagerAdapter(getSupportFragmentManager(), pageCount);
-        adapterPhotoPages.setType(type);
+    public void setupPagerAdapter(int pageCount, int type) {
+        if (adapterPhotoPages == null) {
+            adapterPhotoPages = createPhotoListPagerAdapter();
+            pagerPhotoPage.setAdapter(adapterPhotoPages);
+        }
 
-        pagerPhotoPage.setOffscreenPageLimit(5);
-        pagerPhotoPage.setAdapter(adapterPhotoPages);
+        if (pageCount != adapterPhotoPages.getCount() || type != adapterPhotoPages.getType()) {
+            adapterPhotoPages.setPageCount(pageCount);
+            adapterPhotoPages.setType(type);
+            adapterPhotoPages.notifyDataSetChanged();
+        }
+    }
+
+    protected PhotoListPagerAdapter createPhotoListPagerAdapter() {
+        return new PhotoListPagerAdapter(getSupportFragmentManager());
     }
 
     private ViewPager.OnPageChangeListener onPhotoListPageChanged = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            L.get().d("onPageScrolled %d", position);
         }
 
         @Override
         public void onPageSelected(int position) {
-            L.get().d("onPageSelected %d", position);
         }
 
         @Override
@@ -78,7 +91,7 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
         }
     };
 
-    private void initTemplateViews() {
+    protected void initTemplateViews() {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -91,8 +104,7 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        viewNavigation.setNavigationItemSelectedListener(this);
     }
 
     @Override
@@ -128,7 +140,21 @@ public class PhotoListPagerActivity extends PhotoPagerActivity
         pagerPhotoPage.setAdapter(adapterPhotoPages);
     }
 
-    public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
-        changePhotoListingType(adapterPhotoPages.getType());
+    @Override
+    public int getCurrentType() {
+        return adapterPhotoPages != null ? adapterPhotoPages.getType() : PHOTO_TYPE_DEFAULT;
     }
+
+    /*** event bus ***/
+
+    public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
+        presenter.loadPageCount();
+    }
+
+    public void onEventMainThread(OnPhotoListItemClicked event) {
+        Intent intent = PhotoSinglePagerActivity.intentViewSinglePhoto(this, adapterPhotoPages.getType(), pagerPhotoPage.getCurrentItem()+1, event.getClickedPosition());
+        startActivity(intent);
+    }
+
+    /*** end - event bus ***/
 }

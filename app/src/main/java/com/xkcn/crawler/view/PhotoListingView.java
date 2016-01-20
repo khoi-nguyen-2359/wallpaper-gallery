@@ -12,4 +12,5 @@ public interface PhotoListingView {
     void hideLoading();
 
     void showWallpaperChooser(PhotoDetails photoDetails);
+    int getCurrentType();
 }

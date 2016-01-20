@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -25,7 +25,7 @@ public class SplashActivity extends AppCompatActivity implements SplashView {
         presenter = new SplashViewPresenter(this, prefDataStore);
         presenter.checkToCrawlPhoto();
         finish();
-        startActivity(new Intent(this, PhotoListPagerActivity.class));
+        startActivity(new Intent(this, PhotoListPagerActivityImpl.class));
     }
 
     @Override

@@ -45,7 +45,7 @@ public class PhotoListPagerViewPresenter {
 
             @Override
             public void onNext(Integer pageCount) {
-                view.initPager(pageCount, PhotoListPagerAdapter.TYPE_LATEST);
+                view.setupPagerAdapter(pageCount, view.getCurrentType());
             }
         });;
     }

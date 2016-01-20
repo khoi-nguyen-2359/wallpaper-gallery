@@ -1,29 +1,21 @@
 package com.xkcn.crawler.fragment;
 
-import android.animation.Animator;
 import android.graphics.Bitmap;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.xkcn.crawler.PhotoSinglePagerActivity;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
 import com.xkcn.crawler.imageloader.XkcnImageLoader;
 import com.xkcn.crawler.imageloader.XkcnImageLoaderFactory;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.usecase.PhotoDownloadUsecase;
-import com.xkcn.crawler.util.UiUtils;
-import com.xkcn.crawler.view.PhotoActionsView;
 import com.xkcn.crawler.view.PhotoSinglePageView;
 
 import java.io.File;

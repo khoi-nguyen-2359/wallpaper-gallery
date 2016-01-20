@@ -23,6 +23,7 @@
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_item_debug">Debug Options</string>
-    <string name="force_crawling">Force Crawling</string>
+    <string name="debug_force_crawling">Force Crawling</string>
+    <string name="debug_refresh_photo_list">Refresh photo listing pager</string>
 
 </resources>

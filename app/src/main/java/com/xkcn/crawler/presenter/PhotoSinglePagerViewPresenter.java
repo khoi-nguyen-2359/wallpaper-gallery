@@ -1,8 +1,6 @@
 package com.xkcn.crawler.presenter;
 
-import com.xkcn.crawler.PhotoSinglePagerActivity;
 import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
-import com.xkcn.crawler.data.PhotoDetailsDataStore;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.usecase.PhotoListingUsecase;
 import com.xkcn.crawler.view.PhotoSinglePagerView;
@@ -10,7 +8,6 @@ import com.xkcn.crawler.view.PhotoSinglePagerView;
 import java.util.List;
 
 import rx.Observable;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 

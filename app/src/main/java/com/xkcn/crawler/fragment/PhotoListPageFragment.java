@@ -11,12 +11,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
-import com.xkcn.crawler.PhotoSinglePagerActivity;
+import com.xkcn.crawler.activity.PhotoSinglePagerActivity;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListItemAdapter;
 import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
 import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.event.OnPhotoListItemClicked;
+import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.presenter.PhotoListPageViewPresenter;
 import com.xkcn.crawler.usecase.PhotoListingUsecase;
@@ -31,19 +32,19 @@ import rx.Subscriber;
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public class PhotoListPageFragment extends Fragment implements PhotoListPageView {
-    private static final String ARG_PAGE = "ARG_PAGE";
-    private static final String ARG_TYPE = "ARG_TYPE";
+public abstract class PhotoListPageFragment extends Fragment implements PhotoListPageView {
+    protected static final String ARG_PAGE = "ARG_PAGE";
+    protected static final String ARG_TYPE = "ARG_TYPE";
 
-    private RecyclerView listPhoto;
-    private PhotoListItemAdapter adapterPhotos;
-    private View root;
-    private int nPhotoCol;
-    private int type;
-    private PhotoListPageViewPresenter presenter;
+    protected RecyclerView listPhoto;
+    protected PhotoListItemAdapter adapterPhotos;
+    protected View root;
+    protected int nPhotoCol;
+    protected int type;
+    protected PhotoListPageViewPresenter presenter;
 
     public static PhotoListPageFragment instantiate(int page, int type) {
-        PhotoListPageFragment f = new PhotoListPageFragment();
+        PhotoListPageFragment f = new PhotoListPageFragmentImpl();
         Bundle args = new Bundle();
         args.putInt(ARG_PAGE, page);
         args.putInt(ARG_TYPE, type);
@@ -96,14 +97,17 @@ public class PhotoListPageFragment extends Fragment implements PhotoListPageView
 
             @Override
             public void onNext(List<PhotoDetails> photos) {
-                initAdapter(photos);
+                setupAdapter(photos);
             }
         });
     }
 
-    private void initAdapter(List<PhotoDetails> photos) {
-        adapterPhotos = new PhotoListItemAdapter(getActivity());
-        listPhoto.setAdapter(adapterPhotos);
+    private void setupAdapter(List<PhotoDetails> photos) {
+        if (adapterPhotos == null) {
+            adapterPhotos = new PhotoListItemAdapter(getActivity());
+            listPhoto.setAdapter(adapterPhotos);
+        }
+
         adapterPhotos.setDataPhotos(photos);
         adapterPhotos.notifyDataSetChanged();
     }
@@ -117,15 +121,6 @@ public class PhotoListPageFragment extends Fragment implements PhotoListPageView
         listPhoto.setLayoutManager(rcvLayoutMan);
     }
 
-    public void onEvent(OnPhotoListItemClicked event) {
-        if (!getUserVisibleHint()) {
-            return;
-        }
-
-        Intent intent = PhotoSinglePagerActivity.intentViewSinglePhoto(getContext(), getListingType(), getPage(), event.getClickedPosition());
-        startActivity(intent);
-    }
-
     public int getPage() {
         return getArguments().getInt(ARG_PAGE);
     }
@@ -134,4 +129,13 @@ public class PhotoListPageFragment extends Fragment implements PhotoListPageView
         return getArguments().getInt(ARG_TYPE);
     }
 
+    /**
+     * event bus
+     **/
+    public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
+        loadPhotoListing();
+    }
+
+
+    /** END - event bus **/
 }

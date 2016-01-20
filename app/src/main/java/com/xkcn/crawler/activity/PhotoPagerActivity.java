@@ -1,4 +1,4 @@
-package com.xkcn.crawler;
+package com.xkcn.crawler.activity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -8,6 +8,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.xkcn.crawler.R;
 import com.xkcn.crawler.event.SetWallpaperClicked;
 import com.xkcn.crawler.model.PhotoDetails;
 import com.xkcn.crawler.usecase.PhotoDownloadUsecase;

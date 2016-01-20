@@ -12,13 +12,13 @@ import com.xkcn.crawler.fragment.PhotoListPageFragment;
 public class PhotoListPagerAdapter extends FragmentStatePagerAdapter {
     public static final int TYPE_HOTEST = 1;
     public static final int TYPE_LATEST = 2;
+    public static final int TYPE_INVALID = -1;
 
-    private int type;
-    private int pageCount;
+    protected int type;
+    protected int pageCount;
 
-    public PhotoListPagerAdapter(FragmentManager fm, int pageCount) {
+    public PhotoListPagerAdapter(FragmentManager fm) {
         super(fm);
-        this.pageCount = pageCount;
     }
 
     @Override
@@ -37,5 +37,9 @@ public class PhotoListPagerAdapter extends FragmentStatePagerAdapter {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public void setPageCount(int pageCount) {
+        this.pageCount = pageCount;
     }
 }
