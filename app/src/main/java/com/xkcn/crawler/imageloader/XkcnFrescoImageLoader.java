@@ -19,6 +19,7 @@ import com.facebook.imagepipeline.image.CloseableStaticBitmap;
 import com.facebook.imagepipeline.producers.NetworkFetcher;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
+import com.fantageek.toolkit.util.L;
 import com.squareup.okhttp.OkHttpClient;
 
 import java.io.File;
@@ -35,11 +36,14 @@ import java.util.concurrent.TimeUnit;
  */
 public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
+    private final L logger;
+
     public static void release(Context context, Object key) {
         XkcnImageLoader instance = XkcnImageLoaderFactory.getInstance(context);
         if (instance instanceof XkcnFrescoImageLoader) {
             XkcnFrescoImageLoader frescoInstance = (XkcnFrescoImageLoader) instance;
             frescoInstance.release(key);
+            frescoInstance.logger.d("release %s", key);
         }
     }
 
@@ -61,6 +65,7 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
     XkcnFrescoImageLoader() {
         callbackExecutor = new MainThreadExecutor();
+        logger = L.get("XkcnFrescoImageLoader");
     }
 
     private void track(ImageView key, CloseableReference<CloseableImage> refToTrack) {
@@ -142,6 +147,7 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
             ImageView ivTarget = reqInfo.targetRef.get();
             Callback cbLoading = reqInfo.callbackRef.get();
+
             try {
                 CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
                 Bitmap bm = imgBm.getUnderlyingBitmap();
@@ -149,14 +155,13 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
                 if (cbLoading != null) {
                     cbLoading.onCompleted();
                 }
+                track(ivTarget, imageReference);
             } catch (Exception e) {
                 e.printStackTrace();
                 if (cbLoading != null) {
                     cbLoading.onFailed();
                 }
                 CloseableReference.closeSafely(imageReference);
-            } finally {
-                track(ivTarget, imageReference);
             }
         }
 

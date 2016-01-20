@@ -28,7 +28,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         implements NavigationView.OnNavigationItemSelectedListener, PhotoListPagerView {
 
     protected static final int PHOTO_TYPE_DEFAULT = PhotoListPagerAdapter.TYPE_LATEST;
-    private static final int DEF_OFFSCREEN_PAGE = 3;
+    private static final int DEF_OFFSCREEN_PAGE = 4;
 
     protected PhotoListPagerAdapter adapterPhotoPages;
     protected PhotoDetailsDataStore photoDetailsDataStore;

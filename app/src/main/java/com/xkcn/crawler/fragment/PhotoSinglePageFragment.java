@@ -64,13 +64,15 @@ public class PhotoSinglePageFragment extends Fragment implements PhotoSinglePage
     @Override
     public void onDestroyView() {
         super.onDestroyView();
+
+        XkcnFrescoImageLoader.release(getContext(), ivPhoto);
+
         ButterKnife.unbind(this);
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        XkcnFrescoImageLoader.release(getContext(), ivPhoto);
     }
 
     private void initData() {
