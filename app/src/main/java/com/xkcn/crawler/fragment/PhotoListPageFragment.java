@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.fantageek.toolkit.util.L;
 import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
 import com.xkcn.crawler.activity.PhotoSinglePagerActivity;
 import com.xkcn.crawler.R;
@@ -28,6 +29,8 @@ import java.util.List;
 import de.greenrobot.event.EventBus;
 import rx.Observable;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 12/22/14.
@@ -83,8 +86,8 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
     }
 
     private void loadPhotoListing() {
-        Observable<List<PhotoDetails>> photoQueryObservable = presenter.createPhotoQueryObservable();
-        photoQueryObservable.subscribe(new Subscriber<List<PhotoDetails>>() {
+        presenter.createPhotoQueryObservable()
+                .subscribe(new Subscriber<List<PhotoDetails>>() {
             @Override
             public void onCompleted() {
 
@@ -92,7 +95,6 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
 
             @Override
             public void onError(Throwable e) {
-
             }
 
             @Override

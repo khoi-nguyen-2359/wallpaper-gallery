@@ -28,6 +28,8 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         implements NavigationView.OnNavigationItemSelectedListener, PhotoListPagerView {
 
     protected static final int PHOTO_TYPE_DEFAULT = PhotoListPagerAdapter.TYPE_LATEST;
+    private static final int DEF_OFFSCREEN_PAGE = 3;
+
     protected PhotoListPagerAdapter adapterPhotoPages;
     protected PhotoDetailsDataStore photoDetailsDataStore;
     protected PreferenceDataStore prefDataStore;
@@ -48,7 +50,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     private void initViews() {
         pagerPhotoPage.addOnPageChangeListener(onPhotoListPageChanged);
         pagerPhotoPage.setAdapter(adapterPhotoPages);
-        pagerPhotoPage.setOffscreenPageLimit(5);
+        pagerPhotoPage.setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
     }
 
     private void initData() {

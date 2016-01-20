@@ -46,7 +46,7 @@ public class PhotoListPageViewPresenter {
                 return Observable.empty();
         }
 
-        return photoQueryObservable.observeOn(Schedulers.newThread())
-                .subscribeOn(AndroidSchedulers.mainThread());
+        return photoQueryObservable.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread());
     }
 }

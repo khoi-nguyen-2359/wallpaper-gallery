@@ -32,8 +32,8 @@ public class PhotoListPagerViewPresenter {
                 subscriber.onNext(pageCount);
                 subscriber.onCompleted();
             }
-        }).observeOn(Schedulers.newThread())
-        .subscribeOn(AndroidSchedulers.mainThread())
+        }).observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.newThread())
         .subscribe(new Subscriber<Integer>() {
             @Override
             public void onCompleted() {
