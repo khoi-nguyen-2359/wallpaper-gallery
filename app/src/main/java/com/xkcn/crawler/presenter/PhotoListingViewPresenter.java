@@ -42,27 +42,6 @@ public class PhotoListingViewPresenter {
 
                     }
                 });
-//                .subscribe(new Observer<PhotoDetails>() {
-//                    @Override
-//                    public void onCompleted() {
-//                        view.hideLoading();
-//                    }
-//
-//                    @Override
-//                    public void onError(Throwable e) {
-//                        view.hideLoading();
-//                        view.showToast(e.getMessage());
-//                    }
-//
-//                    @Override
-//                    public void onNext(PhotoDetails photoDetails) {
-//                        view.showWallpaperChooser(photoDetails);
-//                    }
-//                });
-    }
-
-    public void setView(PhotoListingView view) {
-        this.view = view;
     }
 
     public void setView(PhotoListingView view) {
