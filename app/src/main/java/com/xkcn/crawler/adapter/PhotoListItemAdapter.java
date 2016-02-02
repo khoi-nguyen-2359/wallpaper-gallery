@@ -12,7 +12,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.event.OnPhotoListItemClicked;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.view.PhotoActionsView;
 
 import java.util.ArrayList;

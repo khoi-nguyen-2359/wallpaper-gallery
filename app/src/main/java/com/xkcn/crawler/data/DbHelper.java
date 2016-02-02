@@ -1,4 +1,4 @@
-package com.xkcn.crawler.db;
+package com.xkcn.crawler.data;
 
 import android.content.Context;
 
@@ -11,19 +11,10 @@ import com.xkcn.crawler.XkcnApp;
 public class DbHelper extends SQLiteAssetHelper {
     public static final String DB_NAME = "xkcn.db";
     public static final int DB_VERSION = 1;
-    private static DbHelper instance;
 
-    private DbHelper(Context context) {
+    public DbHelper(Context context) {
         super(context, DB_NAME, null, DB_VERSION);
         setForcedUpgrade(DB_VERSION);
-    }
-
-    public static DbHelper getInstance() {
-        if (instance == null) {
-            instance = new DbHelper(XkcnApp.app());
-            instance.getWritableDatabase();	// copy db from asset for the first time
-        }
-
-        return instance;
+        getWritableDatabase();
     }
 }

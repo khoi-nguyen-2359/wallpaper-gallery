@@ -1,4 +1,4 @@
-package com.xkcn.crawler.model;
+package com.xkcn.crawler.data.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;

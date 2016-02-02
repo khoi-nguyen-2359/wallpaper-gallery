@@ -5,46 +5,55 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.widget.ImageView;
 
+import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.executors.UiThreadImmediateExecutorService;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.backends.okhttp.OkHttpImagePipelineConfigFactory;
-import com.facebook.imagepipeline.core.DefaultExecutorSupplier;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.facebook.imagepipeline.core.ImagePipelineFactory;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
-import com.facebook.imagepipeline.producers.NetworkFetcher;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.fantageek.toolkit.util.L;
 import com.squareup.okhttp.OkHttpClient;
+import com.xkcn.crawler.imageloader.error.ImageLoadingFailureError;
+import com.xkcn.crawler.imageloader.error.NoDataSourceResultError;
+import com.xkcn.crawler.imageloader.error.NoTargetImageViewError;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
+
+import rx.Observable;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 4/4/15.
  */
 public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
-    private final L logger;
+    private final L logger = L.get(this);
 
-    public static void release(Context context, Object key) {
-        XkcnImageLoader instance = XkcnImageLoaderFactory.getInstance(context);
-        if (instance instanceof XkcnFrescoImageLoader) {
-            XkcnFrescoImageLoader frescoInstance = (XkcnFrescoImageLoader) instance;
-            frescoInstance.release(key);
-            frescoInstance.logger.d("release %s", key);
+    public XkcnFrescoImageLoader(Context context) {
+        init(context);
+    }
+
+    public static void release(XkcnImageLoader xkcnImageLoader, Object key) {
+        if (!(xkcnImageLoader instanceof XkcnFrescoImageLoader)) {
+            return;
         }
+
+        XkcnFrescoImageLoader frescoImageLoader = (XkcnFrescoImageLoader) xkcnImageLoader;
+        frescoImageLoader.release(key);
     }
 
     public static void init(Context context) {
@@ -61,12 +70,6 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
     }
 
     private Map<ImageView, CloseableReference<CloseableImage>> holdingReferences;
-    private Executor callbackExecutor;
-
-    XkcnFrescoImageLoader() {
-        callbackExecutor = new MainThreadExecutor();
-        logger = L.get("XkcnFrescoImageLoader");
-    }
 
     private void track(ImageView key, CloseableReference<CloseableImage> refToTrack) {
         if (key == null || refToTrack == null) {
@@ -97,81 +100,79 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
     }
 
     @Override
-    public void load(String uri, ImageView imageView, XkcnImageLoader.Callback callback) {
-        ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        ImageRequest imageRequest = ImageRequestBuilder
-                .newBuilderWithSource(Uri.parse(uri))
-                .build();
-        DataSource<CloseableReference<CloseableImage>>
-                dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
-        RequestInfo reqInfo = new RequestInfo(imageView, callback);
-        dataSource.subscribe(new ImageListener(reqInfo), callbackExecutor);
+    public Observable loadObservable(final String url, final ImageView imageView) {
+        final WeakReference<ImageView> weakImageView = new WeakReference<>(imageView);
+        return Observable.create(new Observable.OnSubscribe<Boolean>() {
+            @Override
+            public void call(final Subscriber<? super Boolean> subscriber) {
+                ImagePipeline imagePipeline = Fresco.getImagePipeline();
+                ImageRequest imageRequest = ImageRequestBuilder
+                        .newBuilderWithSource(Uri.parse(url))
+                        .build();
+                DataSource<CloseableReference<CloseableImage>>
+                        dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
+                dataSource.subscribe(new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
+                    @Override
+                    protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                        if (!dataSource.isFinished()) {
+                            return;
+                        }
+
+                        if (weakImageView.get() == null) {
+                            subscriber.onError(new NoTargetImageViewError());
+                            return;
+                        }
+
+                        CloseableReference<CloseableImage> imageReference = dataSource.getResult();
+                        if (imageReference == null) {
+                            subscriber.onError(new NoDataSourceResultError());
+                            return;
+                        }
+
+                        ImageView ivTarget = weakImageView.get();
+                        try {
+                            if (ivTarget == null) {
+                                throw new NullPointerException();
+                            }
+
+                            CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
+                            Bitmap bm = imgBm.getUnderlyingBitmap();
+                            ivTarget.setImageBitmap(bm);
+                            track(ivTarget, imageReference);
+                            subscriber.onNext(true);
+                            subscriber.onCompleted();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            CloseableReference.closeSafely(imageReference);
+                            subscriber.onError(e);
+                        }
+                    }
+
+                    @Override
+                    protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+                        subscriber.onError(new ImageLoadingFailureError());
+                    }
+                }, UiThreadImmediateExecutorService.getInstance());
+            }
+        });
     }
 
     @Override
-    public void load(File file, ImageView imageView, Callback callback) {
+    public Observable loadObservable(File file, ImageView imageView) {
         if (file == null) {
-            return;
+            return Observable.empty();
         }
 
-        load("file://" + file.getAbsolutePath(), imageView, callback);
+        return loadObservable("file://" + file.getAbsolutePath(), imageView).subscribeOn(Schedulers.io());
     }
 
-    static class RequestInfo {
-        WeakReference<ImageView> targetRef;
-        WeakReference<Callback> callbackRef;
-
-        RequestInfo(ImageView imageViewTarget, Callback callback) {
-            targetRef = new WeakReference<>(imageViewTarget);
-            callbackRef = new WeakReference<>(callback);
-        }
+    @Override
+    public void load(String url, ImageView imageView) {
+        loadObservable(url, imageView).subscribe();
     }
 
-    class ImageListener extends BaseDataSubscriber<CloseableReference<CloseableImage>> {
-        private RequestInfo reqInfo;
-
-        ImageListener(RequestInfo reqInfo) {
-            this.reqInfo = reqInfo;
-        }
-
-        @Override
-        protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-            if (!dataSource.isFinished() || reqInfo == null || reqInfo.targetRef.get() == null) {
-                return;
-            }
-
-            CloseableReference<CloseableImage> imageReference = dataSource.getResult();
-            if (imageReference == null) {
-                return;
-            }
-
-            ImageView ivTarget = reqInfo.targetRef.get();
-            Callback cbLoading = reqInfo.callbackRef.get();
-
-            try {
-                CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
-                Bitmap bm = imgBm.getUnderlyingBitmap();
-                ivTarget.setImageBitmap(bm);
-                if (cbLoading != null) {
-                    cbLoading.onCompleted();
-                }
-                track(ivTarget, imageReference);
-            } catch (Exception e) {
-                e.printStackTrace();
-                if (cbLoading != null) {
-                    cbLoading.onFailed();
-                }
-                CloseableReference.closeSafely(imageReference);
-            }
-        }
-
-        @Override
-        protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-            Callback cbLoading = reqInfo.callbackRef.get();
-            if (cbLoading != null) {
-                cbLoading.onFailed();
-            }
-        }
+    @Override
+    public void load(File file, ImageView imageView) {
+        loadObservable(file, imageView).subscribe();
     }
-
 }

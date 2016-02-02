@@ -2,11 +2,10 @@ package com.xkcn.crawler.adapter;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.xkcn.crawler.fragment.PhotoSinglePageFragment;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 
 import java.util.List;
 
@@ -32,5 +31,9 @@ public class PhotoSinglePagerAdapter extends FragmentStatePagerAdapter {
 
     public void setPhotoDatas(List<PhotoDetails> photoListPage) {
         this.photoListPage = photoListPage;
+    }
+
+    public List<PhotoDetails> getPhotoListPage() {
+        return photoListPage;
     }
 }

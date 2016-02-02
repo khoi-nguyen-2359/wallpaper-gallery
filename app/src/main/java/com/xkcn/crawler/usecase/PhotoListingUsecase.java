@@ -1,8 +1,7 @@
 package com.xkcn.crawler.usecase;
 
-import com.xkcn.crawler.data.PhotoDetailsDataStore;
-import com.xkcn.crawler.data.PreferenceDataStore;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.PhotoDetailsRepository;
+import com.xkcn.crawler.data.model.PhotoDetails;
 
 import java.util.List;
 
@@ -13,11 +12,11 @@ import rx.Subscriber;
  * Created by khoinguyen on 12/18/15.
  */
 public class PhotoListingUsecase {
-    private PhotoDetailsDataStore photoDetailsDataStore;
+    private PhotoDetailsRepository photoDetailsRepository;
     private int perPage;
 
-    public PhotoListingUsecase(PhotoDetailsDataStore photoDetailsDataStore, int perPage) {
-        this.photoDetailsDataStore = photoDetailsDataStore;
+    public PhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository, int perPage) {
+        this.photoDetailsRepository = photoDetailsRepository;
         this.perPage = perPage;
     }
 
@@ -25,7 +24,7 @@ public class PhotoListingUsecase {
         return Observable.create(new Observable.OnSubscribe<List<PhotoDetails>>() {
             @Override
             public void call(Subscriber<? super List<PhotoDetails>> subscriber) {
-                List<PhotoDetails> hotestPhotos = photoDetailsDataStore.getHotestPhotos(page, perPage);
+                List<PhotoDetails> hotestPhotos = photoDetailsRepository.getHotestPhotos(page, perPage);
                 subscriber.onNext(hotestPhotos);
                 subscriber.onCompleted();
             }
@@ -36,7 +35,7 @@ public class PhotoListingUsecase {
         return Observable.create(new Observable.OnSubscribe<List<PhotoDetails>>() {
             @Override
             public void call(Subscriber<? super List<PhotoDetails>> subscriber) {
-                List<PhotoDetails> hotestPhotos = photoDetailsDataStore.getLatestPhotos(page, perPage);
+                List<PhotoDetails> hotestPhotos = photoDetailsRepository.getLatestPhotos(page, perPage);
                 subscriber.onNext(hotestPhotos);
                 subscriber.onCompleted();
             }

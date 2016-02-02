@@ -1,23 +1,21 @@
-package com.xkcn.crawler.db;
+package com.xkcn.crawler.data;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fantageek.toolkit.util.L;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by khoinguyen on 12/27/14.
+ * Created by khoinguyen on 11/1/15.
  */
-public final class PhotoDao {
-//    public static final int DOWNLOAD_STATE_OK = 1;
-//    public static final int DOWNLOAD_STATE_NONE = 0;
-
-    private static L logger = L.get(PhotoDao.class.getSimpleName());
+public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
+    private static L logger = L.get(PhotoDetailsSqliteRepository.class.getSimpleName());
 
     private static final int PHOTO_PER_PAGE = 15;
 
@@ -35,9 +33,8 @@ public final class PhotoDao {
     public static final String COL_TITLE = "TITLE";
     public static final String COL_TAGS = "TAGS";
     public static final String COL_NOTES = "NOTES";
-//    public static final String COL_DOWNLOAD_STATE = "DOWNLOAD_STATE";
 
-    public static PhotoDetails toPhoto(Cursor cursor) {
+    public PhotoDetails toPhoto(Cursor cursor) {
         PhotoDetails photo = new PhotoDetails();
         int idx;
         if ((idx = cursor.getColumnIndex(COL_IDENTIFIER)) != -1)        photo.setIdentifier(cursor.getLong(idx));
@@ -58,7 +55,7 @@ public final class PhotoDao {
         return photo;
     }
 
-    public static ContentValues toContentValues(PhotoDetails photo) {
+    public ContentValues toContentValues(PhotoDetails photo) {
         ContentValues cv = new ContentValues();
         cv.put(COL_IDENTIFIER, photo.getIdentifier());
         cv.put(COL_PHOTO100, photo.getPhoto100());
@@ -78,27 +75,17 @@ public final class PhotoDao {
         return cv;
     }
 
-    public static long getLargestPhotoId() {
-        long largestPhotoId = 0;
+    private final DbHelper dbHelper;
 
-        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
-
-        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER}, null, null, null, null, COL_IDENTIFIER + " desc", "1");
-        if (c != null) {
-            if (c.moveToNext()) {
-                largestPhotoId = c.getLong(0);
-            }
-
-            c.close();
-        }
-
-        return largestPhotoId;
+    public PhotoDetailsSqliteRepository(Context context) {
+        dbHelper = new DbHelper(context);
     }
 
-    public static List<PhotoDetails> queryLatest(int page, int perPage) {
+    @Override
+    public List<PhotoDetails> getLatestPhotos(int page, int perPage) {
         List<PhotoDetails> photoList = new ArrayList<>();
 
-        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * perPage) + "," + perPage);
         if (c != null) {
@@ -111,13 +98,13 @@ public final class PhotoDao {
             c.close();
         }
 
-        return photoList;
-    }
+        return photoList;    }
 
-    public static List<PhotoDetails> queryHotest(int page, int perPage) {
+    @Override
+    public List<PhotoDetails> getHotestPhotos(int page, int perPage) {
         List<PhotoDetails> photoList = new ArrayList<>();
 
-        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
 
         Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * perPage) + "," + perPage);
         if (c != null) {
@@ -133,7 +120,60 @@ public final class PhotoDao {
         return photoList;
     }
 
-    public static int bulkInsertPhoto(List<PhotoDetails> photoList) {
+    @Override
+    public PhotoDetails getPhotoDetails(long photoId) {
+        PhotoDetails photoDetails = null;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, null, COL_IDENTIFIER+"=?", new String[]{photoId+""}, null, null, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                photoDetails = toPhoto(c);
+            }
+
+            c.close();
+        }
+
+        return photoDetails;
+    }
+
+    @Override
+    public int getPageCount(int perPage) {
+        int pageCount = 0;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+        Cursor c = db.rawQuery("select count(*)/" + perPage + " from " + TABLE_NAME, null);
+        if (c != null) {
+            if (c.moveToFirst()) {
+                pageCount = c.getInt(0);
+            }
+
+            c.close();
+        }
+
+        return pageCount;
+    }
+
+    public long getLargestPhotoId() {
+        long largestPhotoId = 0;
+
+        SQLiteDatabase db = dbHelper.getReadableDatabase();
+
+        Cursor c = db.query(TABLE_NAME, new String[]{COL_IDENTIFIER}, null, null, null, null, COL_IDENTIFIER + " desc", "1");
+        if (c != null) {
+            if (c.moveToNext()) {
+                largestPhotoId = c.getLong(0);
+            }
+
+            c.close();
+        }
+
+        return largestPhotoId;
+    }
+
+    @Override
+    public int addPhotos(List<PhotoDetails> photoList) {
         if (photoList == null || photoList.size() == 0)
             return 0;
 
@@ -147,11 +187,11 @@ public final class PhotoDao {
         return bulkInsert(listCv);
     }
 
-    private static int bulkInsert(List<ContentValues> listCv) {
+    private int bulkInsert(List<ContentValues> listCv) {
         if (listCv == null || listCv.size() == 0)
             return 0;
 
-        SQLiteDatabase db = DbHelper.getInstance().getWritableDatabase();
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         int nAffected = 0;
         int nInserted = 0;
@@ -180,22 +220,5 @@ public final class PhotoDao {
         logger.d("bulkInsert inserted=%d", nInserted);
 
         return nInserted;
-    }
-
-    public static PhotoDetails queryPhoto(long photoIdentifier) {
-        PhotoDetails photoDetails = null;
-
-        SQLiteDatabase db = DbHelper.getInstance().getReadableDatabase();
-
-        Cursor c = db.query(TABLE_NAME, null, COL_IDENTIFIER+"=?", new String[]{photoIdentifier+""}, null, null, null);
-        if (c != null) {
-            if (c.moveToNext()) {
-                photoDetails = toPhoto(c);
-            }
-
-            c.close();
-        }
-
-        return photoDetails;
     }
 }

@@ -1,13 +1,13 @@
 package com.xkcn.crawler.data;
 
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 
 import java.util.List;
 
 /**
  * Created by khoinguyen on 11/1/15.
  */
-public interface PhotoDetailsDataStore {
+public interface PhotoDetailsRepository {
     long getLargestPhotoId();
     List<PhotoDetails> getLatestPhotos(int page, int perPage);
     List<PhotoDetails> getHotestPhotos(int page, int perPage);

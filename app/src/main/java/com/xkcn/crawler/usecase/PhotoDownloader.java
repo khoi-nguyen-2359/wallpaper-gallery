@@ -3,6 +3,7 @@ package com.xkcn.crawler.usecase;
 import android.content.Context;
 import android.net.Uri;
 
+import com.facebook.common.executors.CallerThreadExecutor;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
@@ -14,7 +15,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.XkcnApp;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.usecase.error.PhotoDownloadFailedError;
 import com.xkcn.crawler.usecase.error.PhotoDownloadInProgressError;
 import com.xkcn.crawler.util.AndroidUtils;
@@ -25,9 +26,6 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.HashSet;
 import java.util.Locale;
-import java.util.concurrent.SynchronousQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -35,27 +33,18 @@ import rx.Subscriber;
 /**
  * Created by khoinguyen on 2/4/15.
  */
-public final class PhotoDownloadUsecase {
+public final class PhotoDownloader {
     public static final String SUFF_DOWNLOAD_TMP_FILE = "downloading.";
 
-    private static PhotoDownloadUsecase instance;
-
-    public static PhotoDownloadUsecase getInstance() {
-        if (instance == null) {
-            instance = new PhotoDownloadUsecase();
-        }
-
-        return instance;
-    }
-
     private HashSet<String> downloadingUris;
-    private ThreadPoolExecutor executorService;
 
-    private PhotoDownloadUsecase() {
+    private final String externalFileDirPath;
+    private final String photoDirPath;
+
+    public PhotoDownloader(XkcnApp xkcnApp) {
         downloadingUris = new HashSet<>();
-
-        executorService = new ThreadPoolExecutor(0, Integer.MAX_VALUE, 60, TimeUnit.SECONDS,
-                new SynchronousQueue<Runnable>());
+        externalFileDirPath = xkcnApp.getExternalFilesDir(null).getAbsolutePath();
+        photoDirPath = xkcnApp.getDir("photo", Context.MODE_PRIVATE).getAbsolutePath();
     }
 
     private Observable<PhotoDetails> createPhotoDownloadObservable(final PhotoDetails photoDetails, final String downloadUrl) {
@@ -119,7 +108,7 @@ public final class PhotoDownloadUsecase {
                         subscriber.onError(new PhotoDownloadFailedError());
                         downloadingUris.remove(downloadUrl);
                     }
-                }, executorService);
+                }, CallerThreadExecutor.getInstance());
             }
         });
     }
@@ -129,7 +118,7 @@ public final class PhotoDownloadUsecase {
         return createPhotoDownloadObservable(photoDetails, downloadUrl);
     }
 
-    public static void savePhoto(InputStream is, String downloadUri) throws Exception {
+    private void savePhoto(InputStream is, String downloadUri) throws Exception {
         String fileName = AndroidUtils.getResourceName(downloadUri);
         File tmpFile = getDownloadTempFile(fileName);
 
@@ -152,20 +141,17 @@ public final class PhotoDownloadUsecase {
         }
     }
 
-    public static File getExternalPhotoDir() {
-        File photoDir = new File(XkcnApp.app().getExternalFilesDir(null).getAbsolutePath() + "/photo");
+    private File getExternalPhotoDir() {
+        File photoDir = new File(externalFileDirPath + "/photo");
         if (!photoDir.exists()) {
+            //todo: what if failed to mkdirs
             photoDir.mkdirs();
         }
 
         return photoDir;
     }
 
-    public static File getPhotoDir() {
-        return XkcnApp.app().getDir("photo", Context.MODE_PRIVATE);
-    }
-
-    public static File getDownloadTempFile(String fileName) {
+    private File getDownloadTempFile(String fileName) {
         // first check app external storage
         File photoFile = null;
         if (AndroidUtils.isExternalStorageWritable()) {
@@ -173,20 +159,20 @@ public final class PhotoDownloadUsecase {
         }
 
         // second check app internal storage
-        return new File(String.format(Locale.US, "%s/%s%s", getPhotoDir().getAbsolutePath(), SUFF_DOWNLOAD_TMP_FILE, fileName));
+        return new File(String.format(Locale.US, "%s/%s%s", photoDirPath, SUFF_DOWNLOAD_TMP_FILE, fileName));
     }
 
-    public static File getDownloadFile(String downloadUrl) {
+    public File getDownloadFile(String downloadUrl) {
         String fileName = AndroidUtils.getResourceName(downloadUrl);
         File photoFile = null;
         if (AndroidUtils.isExternalStorageReadable()) {
-            photoFile = new File(PhotoDownloadUsecase.getExternalPhotoDir().getAbsolutePath() + "/" + fileName);
+            photoFile = new File(getExternalPhotoDir().getAbsolutePath() + "/" + fileName);
             if (photoFile.exists()) {
                 return photoFile;
             }
         }
 
         // second check app internal storage
-        return new File(PhotoDownloadUsecase.getPhotoDir().getAbsolutePath() + "/" + fileName);
+        return new File(photoDirPath + "/" + fileName);
     }
 }

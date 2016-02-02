@@ -1,8 +1,7 @@
 package com.xkcn.crawler.presenter;
 
-import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
-import com.xkcn.crawler.data.PhotoDetailsDataStore;
-import com.xkcn.crawler.data.PreferenceDataStore;
+import com.xkcn.crawler.data.PhotoDetailsRepository;
+import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.view.PhotoListPagerView;
 
 import rx.Observable;
@@ -15,12 +14,12 @@ import rx.schedulers.Schedulers;
  */
 public class PhotoListPagerViewPresenter {
     private PhotoListPagerView view;
-    private PhotoDetailsDataStore photoDetailsDataStore;
-    private PreferenceDataStore prefDataStore;
+    private PhotoDetailsRepository photoDetailsRepository;
+    private PreferenceRepository prefDataStore;
 
-    public PhotoListPagerViewPresenter(PhotoListPagerView view, PhotoDetailsDataStore photoDetailsDataStore, PreferenceDataStore prefDataStore) {
+    public PhotoListPagerViewPresenter(PhotoListPagerView view, PhotoDetailsRepository photoDetailsRepository, PreferenceRepository prefDataStore) {
         this.view = view;
-        this.photoDetailsDataStore = photoDetailsDataStore;
+        this.photoDetailsRepository = photoDetailsRepository;
         this.prefDataStore = prefDataStore;
     }
 
@@ -28,7 +27,7 @@ public class PhotoListPagerViewPresenter {
         Observable.create(new Observable.OnSubscribe<Integer>() {
             @Override
             public void call(Subscriber<? super Integer> subscriber) {
-                int pageCount = photoDetailsDataStore.getPageCount(prefDataStore.getListPagerPhotoPerPage());
+                int pageCount = photoDetailsRepository.getPageCount(prefDataStore.getListPagerPhotoPerPage());
                 subscriber.onNext(pageCount);
                 subscriber.onCompleted();
             }
