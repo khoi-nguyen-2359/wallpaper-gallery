@@ -1,13 +1,12 @@
 package com.xkcn.crawler.data;
 
+import android.content.Context;
 import android.content.SharedPreferences;
-
-import com.xkcn.crawler.XkcnApp;
 
 /**
  * Created by khoinguyen on 11/1/15.
  */
-public class PreferenceDataStoreImpl implements PreferenceDataStore {
+public class PreferenceRepositoryImpl implements PreferenceRepository {
     private static final String APP_PREF = "APP_PREF";
     private static final long PERIOD_UPDATE = 86400000;
     private static final String PREF_LAST_UPDATE = "PREF_LAST_UPDATE";
@@ -16,8 +15,14 @@ public class PreferenceDataStoreImpl implements PreferenceDataStore {
     private static final long INVALID_PHOTO_ID = -1;
     private static final String PREF_HAS_OPENED_LEFT_DRAWER = "PREF_HAS_OPENED_LEFT_DRAWER";
 
-    public static SharedPreferences getPref() {
-        return XkcnApp.app().getSharedPreferences(APP_PREF, 0);
+    private SharedPreferences sharedPreferences;
+
+    public PreferenceRepositoryImpl(Context context) {
+        sharedPreferences = context.getSharedPreferences(APP_PREF, 0);
+    }
+
+    private SharedPreferences getPref() {
+        return sharedPreferences;
     }
 
     @Override

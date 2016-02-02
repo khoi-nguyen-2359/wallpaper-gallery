@@ -15,16 +15,16 @@ import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
 import com.xkcn.crawler.adapter.PhotoSinglePagerAdapter;
-import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
-import com.xkcn.crawler.data.PreferenceDataStore;
-import com.xkcn.crawler.data.PreferenceDataStoreImpl;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.presenter.PhotoSinglePagerViewPresenter;
 import com.xkcn.crawler.usecase.PhotoListingUsecase;
 import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoActionsView;
 import com.xkcn.crawler.view.PhotoSinglePagerView;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import butterknife.Bind;
@@ -139,9 +139,8 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         int page = getIntent().getIntExtra(EXTRA_PHOTO_LIST_PAGE, 0);
         int listingType = getCurrentType();
 
-        PreferenceDataStore prefDataStore = new PreferenceDataStoreImpl();
-        int perPage = prefDataStore.getListPagerPhotoPerPage();
-        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(new PhotoDetailsSqliteDataStore(), perPage);
+        int perPage = preferenceRepository.getListPagerPhotoPerPage();
+        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository, perPage);
         presenter = new PhotoSinglePagerViewPresenter(photoListingUsecase, listingType, page);
         presenter.setView(this);
 
@@ -156,10 +155,41 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         super.onStop();
     }
 
+    private ViewPager.OnPageChangeListener onPageChanged = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+            bindPhotoToActionView(position);
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
+
+    private void bindPhotoToActionView(int position) {
+        if (adapterPhotoSingles == null) {
+            return;
+        }
+
+        List<PhotoDetails> photoListPage = adapterPhotoSingles.getPhotoListPage();
+        if (photoListPage == null || photoListPage.isEmpty() || position < 0 || position >= photoListPage.size()) {
+            return;
+        }
+
+        viewPhotoActions.bind(photoListPage.get(position));
+    }
+
     @Override
     public void setupPagerAdapter(List<PhotoDetails> photoListPage) {
         if (adapterPhotoSingles == null) {
             adapterPhotoSingles = new PhotoSinglePagerAdapter(getSupportFragmentManager());
+            pagerPhotoSingle.addOnPageChangeListener(onPageChanged);
             pagerPhotoSingle.setAdapter(adapterPhotoSingles);
         }
 

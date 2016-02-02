@@ -1,6 +1,5 @@
 package com.xkcn.crawler.fragment;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -12,10 +11,8 @@ import android.widget.Toast;
 
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
-import com.xkcn.crawler.imageloader.XkcnImageLoader;
-import com.xkcn.crawler.imageloader.XkcnImageLoaderFactory;
-import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.usecase.PhotoDownloadUsecase;
+import com.xkcn.crawler.data.model.PhotoDetails;
+import com.xkcn.crawler.presenter.PhotoSinglePageViewPresenter;
 import com.xkcn.crawler.view.PhotoSinglePageView;
 
 import java.io.File;
@@ -24,12 +21,15 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
+import rx.Observable;
+import rx.Subscriber;
 
 /**
  * Created by khoinguyen on 12/15/15.
  */
-public class PhotoSinglePageFragment extends Fragment implements PhotoSinglePageView {
+public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSinglePageView {
     private static final String ARG_PHOTO_DETAILS = "ARG_PHOTO_DETAILS";
+    private View rootView;
 
     public static Fragment instantiate(PhotoDetails photoDetails) {
         PhotoSinglePageFragment f = new PhotoSinglePageFragment();
@@ -40,21 +40,24 @@ public class PhotoSinglePageFragment extends Fragment implements PhotoSinglePage
         return f;
     }
 
-    private PhotoDownloadUsecase photoDownloadManager;
-    private XkcnImageLoader xkcnImageLoader;
-
     private PhotoDetails photoDetails;
 
     @Bind(R.id.iv_photo) ImageViewTouch ivPhoto;
     @Bind(R.id.progress_bar) ProgressBar progressBar;
 
+    private PhotoSinglePageViewPresenter presenter;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        initData();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        initData();
-        View rootView = inflater.inflate(R.layout.fragment_photo_single_page, container, false);
-        ButterKnife.bind(this, rootView);
-        initViews();
+        initViews(inflater, container);
 
         loadPhoto();
 
@@ -65,52 +68,61 @@ public class PhotoSinglePageFragment extends Fragment implements PhotoSinglePage
     public void onDestroyView() {
         super.onDestroyView();
 
-        XkcnFrescoImageLoader.release(getContext(), ivPhoto);
+        XkcnFrescoImageLoader.release(xkcnImageLoader, ivPhoto);
 
         ButterKnife.unbind(this);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
     private void initData() {
-        photoDownloadManager = PhotoDownloadUsecase.getInstance();
-        xkcnImageLoader = XkcnImageLoaderFactory.getInstance(getContext());
-
         Bundle args = getArguments();
         photoDetails = args.getParcelable(ARG_PHOTO_DETAILS);
+
+        presenter = new PhotoSinglePageViewPresenter(photoDetails, photoDownloader);
+        presenter.setView(this);
     }
 
-    private void initViews() {
+    private void initViews(LayoutInflater inflater, ViewGroup container) {
+        rootView = inflater.inflate(R.layout.fragment_photo_single_page, container, false);
+        ButterKnife.bind(this, rootView);
+
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
     }
 
-    private XkcnImageLoader.Callback loadSingleHighPhotoCallback = new XkcnImageLoader.Callback() {
+    private Subscriber<Boolean> imageLoaderSubscriber = new Subscriber<Boolean>() {
         @Override
-        public void onLoaded(Bitmap bitmap) {
+        public void onCompleted() {
+            progressBar.setVisibility(View.GONE);
+            photoDownloader.createPhotoDownloadObservable(photoDetails);
         }
 
         @Override
-        public void onFailed() {
+        public void onError(Throwable e) {
             progressBar.setVisibility(View.GONE);
             Toast.makeText(getContext(), R.string.photo_action_download_failed_retry, Toast.LENGTH_SHORT).show();
         }
 
         @Override
-        public void onCompleted() {
-            progressBar.setVisibility(View.GONE);
-            photoDownloadManager.createPhotoDownloadObservable(photoDetails);
+        public void onNext(Boolean aBoolean) {
+
         }
     };
 
     private void loadPhoto() {
-        File downloadedPhoto = PhotoDownloadUsecase.getDownloadFile(photoDetails.getDefaultDownloadUrl());
+        File downloadedPhoto = photoDownloader.getDownloadFile(photoDetails.getDefaultDownloadUrl());
+        Observable imgLoadObservable = null;
         if (downloadedPhoto.exists()) {
-            xkcnImageLoader.load(downloadedPhoto, ivPhoto, loadSingleHighPhotoCallback);
+            imgLoadObservable = xkcnImageLoader.loadObservable(downloadedPhoto, ivPhoto);
         } else {
-            xkcnImageLoader.load(photoDetails.getPhotoHigh(), ivPhoto, loadSingleHighPhotoCallback);
+            imgLoadObservable = xkcnImageLoader.loadObservable(photoDetails.getPhotoHigh(), ivPhoto);
         }
+
+        if (imgLoadObservable != null) {
+            imgLoadObservable.subscribe(imageLoaderSubscriber);
+        }
+    }
+
+    @Override
+    public void displayPhoto(File downloadedPhoto) {
+
     }
 }

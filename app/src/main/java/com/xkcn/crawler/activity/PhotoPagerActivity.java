@@ -5,13 +5,11 @@ import android.app.ProgressDialog;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.event.SetWallpaperClicked;
-import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.usecase.PhotoDownloadUsecase;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.presenter.PhotoListingViewPresenter;
 import com.xkcn.crawler.util.AndroidUtils;
 import com.xkcn.crawler.util.UiUtils;
@@ -22,16 +20,17 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by khoinguyen on 1/21/15.
  */
-public abstract class PhotoPagerActivity extends AppCompatActivity implements PhotoListingView {
+public abstract class PhotoPagerActivity extends XkcnActivity implements PhotoListingView {
 
-    private Dialog proDlg;
-    private PhotoListingViewPresenter presenter;
+    protected Dialog proDlg;
+    protected PhotoListingViewPresenter presenter;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        presenter = new PhotoListingViewPresenter(this);
+        presenter = new PhotoListingViewPresenter(photoDownloader);
+        presenter.setView(this);
     }
 
     @Override
@@ -69,7 +68,7 @@ public abstract class PhotoPagerActivity extends AppCompatActivity implements Ph
 
     @Override
     public void showWallpaperChooser(PhotoDetails photoDetails) {
-        Uri uri = Uri.fromFile(PhotoDownloadUsecase.getDownloadFile(photoDetails.getDefaultDownloadUrl()));
+        Uri uri = Uri.fromFile(photoDownloader.getDownloadFile(photoDetails.getDefaultDownloadUrl()));
         AndroidUtils.startSetWallpaperChooser(this, uri);
     }
     /*=====*/

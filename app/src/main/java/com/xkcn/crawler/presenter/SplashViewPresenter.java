@@ -1,8 +1,6 @@
 package com.xkcn.crawler.presenter;
 
-import com.xkcn.crawler.data.PreferenceDataStore;
-import com.xkcn.crawler.data.PreferenceDataStoreImpl;
-import com.xkcn.crawler.service.UpdateService;
+import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.view.SplashView;
 
 /**
@@ -10,9 +8,9 @@ import com.xkcn.crawler.view.SplashView;
  */
 public class SplashViewPresenter {
     private SplashView view;
-    private PreferenceDataStore prefDataStore;
+    private PreferenceRepository prefDataStore;
 
-    public SplashViewPresenter(SplashView view, PreferenceDataStore prefDataStore) {
+    public SplashViewPresenter(SplashView view, PreferenceRepository prefDataStore) {
         this.view = view;
         this.prefDataStore = prefDataStore;
     }

@@ -6,7 +6,7 @@ def configs = rootProject.extensions.getByName("ext")
 
 repositories {
     flatDir {
-        dirs 'aars' //this way we can find the .aar file in libs folder
+        dirs '../aars'
     }
     maven { url 'https://maven.fabric.io/public' }
 }
@@ -52,6 +52,7 @@ dependencies {
     compile 'com.android.support:design:' + configs.androidSupportLibVersion
 
     compile(name: 'toolkit', ext: 'aar')
+
     compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;
     }

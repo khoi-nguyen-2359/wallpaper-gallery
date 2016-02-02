@@ -2,7 +2,6 @@ package com.xkcn.crawler.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.view.LayoutInflater;
@@ -13,10 +12,8 @@ import com.fantageek.toolkit.util.L;
 import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListItemAdapter;
-import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
-import com.xkcn.crawler.data.PreferenceDataStoreImpl;
 import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.presenter.PhotoListPageViewPresenter;
 import com.xkcn.crawler.usecase.PhotoListingUsecase;
 import com.xkcn.crawler.view.PhotoListPageView;
@@ -28,7 +25,7 @@ import de.greenrobot.event.EventBus;
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public abstract class PhotoListPageFragment extends Fragment implements PhotoListPageView {
+public abstract class PhotoListPageFragment extends XkcnFragment implements PhotoListPageView {
     protected static final String ARG_PAGE = "ARG_PAGE";
     protected static final String ARG_TYPE = "ARG_TYPE";
 
@@ -51,10 +48,15 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        root = inflater.inflate(R.layout.fragment_photo_page, container, false);
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
         initData();
-        initPhotoList();
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        initView(inflater, container);
         presenter.loadPhotoListPage();
         return root;
     }
@@ -73,8 +75,7 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
 
     private void initData() {
         nPhotoCol = getResources().getInteger(R.integer.photo_page_col);
-        PreferenceDataStoreImpl prefDataStore = new PreferenceDataStoreImpl();
-        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(new PhotoDetailsSqliteDataStore(), prefDataStore.getListPagerPhotoPerPage());
+        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository, preferenceRepository.getListPagerPhotoPerPage());
 
         presenter = new PhotoListPageViewPresenter(photoListingUsecase, getListingType(), getPage());
         presenter.setView(this);
@@ -95,13 +96,17 @@ public abstract class PhotoListPageFragment extends Fragment implements PhotoLis
         logger.d("setupPagerAdapter %d", photos != null ? photos.size() : 0);
     }
 
-    public void initPhotoList() {
+    public View initView(LayoutInflater inflater, ViewGroup container) {
+        root = inflater.inflate(R.layout.fragment_photo_page, container, false);
+
         listPhoto = (RecyclerView) root.findViewById(R.id.photo_list);
         listPhoto.setHasFixedSize(true);
         listPhoto.addItemDecoration(new SimpleDividerItemDec(null, RecyclerView.VERTICAL, getResources().getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
         StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(nPhotoCol, StaggeredGridLayoutManager.VERTICAL);
         listPhoto.setLayoutManager(rcvLayoutMan);
+
+        return root;
     }
 
     public int getPage() {

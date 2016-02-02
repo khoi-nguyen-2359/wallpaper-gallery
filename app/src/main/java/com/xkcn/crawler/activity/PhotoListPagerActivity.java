@@ -12,14 +12,14 @@ import android.view.MenuItem;
 
 import com.xkcn.crawler.R;
 import com.xkcn.crawler.adapter.PhotoListPagerAdapter;
-import com.xkcn.crawler.data.PhotoDetailsDataStore;
-import com.xkcn.crawler.data.PhotoDetailsSqliteDataStore;
-import com.xkcn.crawler.data.PreferenceDataStore;
-import com.xkcn.crawler.data.PreferenceDataStoreImpl;
+import com.xkcn.crawler.data.PhotoDetailsRepository;
+import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.event.OnPhotoListItemClicked;
 import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.crawler.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.crawler.view.PhotoListPagerView;
+
+import javax.inject.Inject;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -31,8 +31,8 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     private static final int DEF_OFFSCREEN_PAGE = 4;
 
     protected PhotoListPagerAdapter adapterPhotoPages;
-    protected PhotoDetailsDataStore photoDetailsDataStore;
-    protected PreferenceDataStore prefDataStore;
+
+
     protected PhotoListPagerViewPresenter presenter;
 
     @Bind(R.id.pager_photo_page) ViewPager pagerPhotoPage;
@@ -54,10 +54,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     }
 
     private void initData() {
-        photoDetailsDataStore = new PhotoDetailsSqliteDataStore();
-        prefDataStore = new PreferenceDataStoreImpl();
-
-        presenter = new PhotoListPagerViewPresenter(this, photoDetailsDataStore, prefDataStore);
+        presenter = new PhotoListPagerViewPresenter(this, photoDetailsRepository, preferenceRepository);
     }
 
     @Override

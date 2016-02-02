@@ -11,11 +11,11 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.fantageek.toolkit.util.L;
-import com.xkcn.crawler.data.PreferenceDataStore;
-import com.xkcn.crawler.data.PreferenceDataStoreImpl;
-import com.xkcn.crawler.db.PhotoTagDao;
-import com.xkcn.crawler.model.PhotoDetails;
-import com.xkcn.crawler.db.PhotoDao;
+import com.xkcn.crawler.XkcnApp;
+import com.xkcn.crawler.data.PhotoDetailsRepository;
+import com.xkcn.crawler.data.PhotoTagRepository;
+import com.xkcn.crawler.data.PreferenceRepository;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.event.CrawlNextPageEvent;
 import com.xkcn.crawler.event.PhotoCrawlingFinishedEvent;
 
@@ -27,6 +27,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.inject.Inject;
 
 import de.greenrobot.event.EventBus;
 
@@ -43,12 +45,58 @@ public class UpdateService extends Service {
     private long lastUpdatedPhotoId;
 
     private L logger = L.get(UpdateService.class.getSimpleName());
-    private PreferenceDataStore prefDataStore;
+
+    @Inject
+    PreferenceRepository prefDataStore;
+    @Inject
+    PhotoDetailsRepository photoDetailsRepository;
+    @Inject
+    PhotoTagRepository photoTagRepository;
 
     public static void startActionUpdate(Context context) {
         Intent intent = new Intent(context, UpdateService.class);
         intent.setAction(ACTION_UPDATE);
         context.startService(intent);
+    }
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+
+        ((XkcnApp)getApplication()).getApplicationComponent().inject(this);
+
+        createWebBrowser();
+
+        EventBus.getDefault().register(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        EventBus.getDefault().unregister(this);
+
+        super.onDestroy();
+    }
+
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        if (ACTION_UPDATE.equals(action)) {
+            lastUpdatedPhotoId = prefDataStore.getLastCrawledPhotoId();
+            if (!prefDataStore.hasPhotoCrawled()) {
+                lastUpdatedPhotoId = photoDetailsRepository.getLargestPhotoId();
+                prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId);
+            }
+            logger.d("update started lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
+
+            startPageCrawling(1);
+        }
+
+        return START_NOT_STICKY;
     }
 
     private void createWebBrowser() {
@@ -84,44 +132,6 @@ public class UpdateService extends Service {
                 logger.d("page %d error %s", crawlingPage, description);
             }
         });
-    }
-
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        prefDataStore = new PreferenceDataStoreImpl();
-        createWebBrowser();
-
-        EventBus.getDefault().register(this);
-    }
-
-    @Override
-    public void onDestroy() {
-        EventBus.getDefault().unregister(this);
-
-        super.onDestroy();
-    }
-
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
-    }
-
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent.getAction();
-        if (ACTION_UPDATE.equals(action)) {
-            lastUpdatedPhotoId = prefDataStore.getLastCrawledPhotoId();
-            if (!prefDataStore.hasPhotoCrawled()) {
-                lastUpdatedPhotoId = PhotoDao.getLargestPhotoId();
-                prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId);
-            }
-            logger.d("update started lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
-
-            startPageCrawling(1);
-        }
-
-        return START_NOT_STICKY;
     }
 
     private void startPageCrawling(int page) {
@@ -228,8 +238,8 @@ public class UpdateService extends Service {
             }
             logger.d("crawled list size=%d", photoList.size());
 
-            PhotoDao.bulkInsertPhoto(photoList);
-            PhotoTagDao.bulkInsert(photoTags);
+            photoDetailsRepository.addPhotos(photoList);
+            photoTagRepository.addTags(photoTags);
 
             int listSize = photoList.size();
             long lastPhotoId = listSize > 0 ? photoList.get(listSize - 1).getIdentifier() : 0;
@@ -237,7 +247,7 @@ public class UpdateService extends Service {
             if (listSize == 0 || lastPhotoId <= lastUpdatedPhotoId) {
                 logger.d("processHTML done");
                 if (lastPhotoId > 0 && lastPhotoId <= lastUpdatedPhotoId) {
-                    prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId = PhotoDao.getLargestPhotoId());
+                    prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId = photoDetailsRepository.getLargestPhotoId());
                     prefDataStore.setLastPhotoCrawlTime(System.currentTimeMillis());
                     logger.d("update finished lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
                 }

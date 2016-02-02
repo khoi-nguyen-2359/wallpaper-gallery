@@ -1,6 +1,6 @@
 package com.xkcn.crawler.event;
 
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 
 /**
  * Created by khoinguyen on 2/11/15.
@@ -17,11 +17,5 @@ public class SetWallpaperClicked {
 
     public void setPhoto(PhotoDetails photo) {
         this.photo = photo;
-    }
-
-    public static class EventHandler {
-        public void onEventMainThead(SetWallpaperClicked event) {
-
-        }
     }
 }

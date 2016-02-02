@@ -3,6 +3,7 @@ package com.xkcn.crawler.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.text.Html;
@@ -14,8 +15,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.xkcn.crawler.R;
-import com.xkcn.crawler.XkcnApp;
-import com.xkcn.crawler.model.PhotoDetails;
+import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.event.SetWallpaperClicked;
 
 import de.greenrobot.event.EventBus;
@@ -97,11 +97,12 @@ public class PhotoActionsView extends FrameLayout {
 
     private void onShareClicked() {
         String sendText = null;
+        Resources resources = getResources();
         if (TextUtils.isEmpty(photo.getPermalinkMeta())) {
-            sendText = XkcnApp.app().getString(R.string.send_to_trailing_text, photo.getPermalink());
+            sendText = resources.getString(R.string.send_to_trailing_text, photo.getPermalink());
         } else {
             Spanned spanned = Html.fromHtml(photo.getPermalinkMeta());
-            sendText = XkcnApp.app().getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());;
+            sendText = resources.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());;
         }
 
         Intent i = new Intent();
@@ -109,7 +110,7 @@ public class PhotoActionsView extends FrameLayout {
         i.putExtra(Intent.EXTRA_TEXT, sendText);
         i.setType("text/plain");
 
-        getContext().startActivity(Intent.createChooser(i, XkcnApp.app().getString(R.string.send_to)));
+        getContext().startActivity(Intent.createChooser(i, resources.getString(R.string.send_to)));
     }
 
     private void onSetWallpaperClicked() {
