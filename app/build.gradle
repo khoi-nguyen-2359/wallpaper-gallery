@@ -33,6 +33,8 @@ android {
         }
 
         debug {
+            minifyEnabled false
+
             buildConfigField "boolean", "LOGGABLE", "true"
 
             debuggable true
