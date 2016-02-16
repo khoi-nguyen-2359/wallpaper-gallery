@@ -15,6 +15,8 @@ import com.xkcn.crawler.util.AndroidUtils;
 import com.xkcn.crawler.util.UiUtils;
 import com.xkcn.crawler.view.PhotoListingView;
 
+import java.io.File;
+
 import de.greenrobot.event.EventBus;
 
 /**
@@ -67,8 +69,8 @@ public abstract class PhotoPagerActivity extends XkcnActivity implements PhotoLi
     }
 
     @Override
-    public void showWallpaperChooser(String photoUrl) {
-        Uri uri = Uri.fromFile(photoDownloader.getDownloadFile(photoUrl));
+    public void showWallpaperChooser(File photoFile) {
+        Uri uri = Uri.fromFile(photoFile);
         AndroidUtils.startSetWallpaperChooser(this, uri);
     }
     /*=====*/

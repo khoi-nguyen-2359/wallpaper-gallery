@@ -1,4 +1,4 @@
-package com.xkcn.crawler.usecase;
+package com.xkcn.crawler.imageloader;
 
 import android.content.Context;
 import android.net.Uri;
@@ -16,19 +16,19 @@ import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.XkcnApp;
 import com.xkcn.crawler.data.model.PhotoDetails;
-import com.xkcn.crawler.usecase.error.PhotoDownloadFailedError;
-import com.xkcn.crawler.usecase.error.PhotoDownloadInProgressError;
 import com.xkcn.crawler.util.AndroidUtils;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 import rx.Observable;
 import rx.Subscriber;
+import rx.functions.Action0;
 
 /**
  * Created by khoinguyen on 2/4/15.
@@ -36,39 +36,42 @@ import rx.Subscriber;
 public final class PhotoDownloader {
     public static final String SUFF_DOWNLOAD_TMP_FILE = "downloading.";
 
-    private HashSet<String> downloadingUris;
-
     private final String externalFileDirPath;
     private final String photoDirPath;
     private L logger;
 
+    private Map<String, Observable<File>> mapDownloadObservables;
+
     public PhotoDownloader(XkcnApp xkcnApp) {
-        downloadingUris = new HashSet<>();
         externalFileDirPath = xkcnApp.getExternalFilesDir(null).getAbsolutePath();
         photoDirPath = xkcnApp.getDir("photo", Context.MODE_PRIVATE).getAbsolutePath();
         logger = L.get(this);
+        mapDownloadObservables = new HashMap<>();
     }
 
-    private Observable<String> createPhotoDownloadObservable(final String downloadUrl) {
-        return Observable.create(new Observable.OnSubscribe<String>() {
-            @Override
-            public void call(Subscriber<? super String> subscriber) {
-                if (downloadingUris.contains(downloadUrl)) {
-                    logger.d("photo is being downloaded");
-                    subscriber.onError(new PhotoDownloadInProgressError());
-                    return;
-                }
+    private Observable<File> getPhotoDownloadObservable(final String downloadUrl) {
+        Observable<File> downloadingObservable = mapDownloadObservables.get(downloadUrl);
+        if (downloadingObservable != null) {
+            logger.d("photo is being downloaded");
+            return downloadingObservable;
+        }
 
+        Observable<File> getFileFromDiskObservable = Observable.create(new Observable.OnSubscribe<File>() {
+            @Override
+            public void call(Subscriber<? super File> subscriber) {
+                logger.d("photo is being searched in disk");
                 File downloadedFile = getDownloadFile(downloadUrl);
                 if (downloadedFile.exists()) {
-                    logger.d("photo already downloaded");
-                    subscriber.onNext(downloadUrl);
-                    subscriber.onCompleted();
-                    return;
+                    subscriber.onNext(downloadedFile);
                 }
+                subscriber.onCompleted();
+            }
+        });
 
-                logger.d("start photo download");
-                downloadingUris.add(downloadUrl);
+        Observable<File> saveFileFromFrescoObservable = Observable.create(new Observable.OnSubscribe<File>() {
+            @Override
+            public void call(Subscriber<? super File> subscriber) {
+                logger.d("photo is beging fetched from fresco");
                 ImageRequest request = ImageRequestBuilder
                         .newBuilderWithSource(Uri.parse(downloadUrl))
                         .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
@@ -79,14 +82,33 @@ public final class PhotoDownloader {
                 dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, downloadUrl), CallerThreadExecutor.getInstance());
             }
         });
+
+        final Observable<File> result = Observable.concat(getFileFromDiskObservable, saveFileFromFrescoObservable)
+                .first()
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        mapDownloadObservables.remove(downloadUrl);
+                        logger.d("end photo fetching");
+                    }
+                });
+
+        result.doOnSubscribe(new Action0() {
+            @Override
+            public void call() {
+                mapDownloadObservables.put(downloadUrl, result);
+            }
+        });
+
+        return result;
     }
 
     class PhotoDownloadSubscriber extends BaseDataSubscriber<CloseableReference<PooledByteBuffer>> {
 
-        private final Subscriber<? super String> subscriber;
+        private final Subscriber<? super File> subscriber;
         private final String downloadUrl;
 
-        PhotoDownloadSubscriber(Subscriber<? super String> subscriber, String photoUrl) {
+        PhotoDownloadSubscriber(Subscriber<? super File> subscriber, String photoUrl) {
             this.subscriber = subscriber;
             this.downloadUrl = photoUrl;
         }
@@ -102,35 +124,30 @@ public final class PhotoDownloader {
                 cf = dataSource.getResult();
                 PooledByteBuffer buffer = cf.get();
                 PooledByteBufferInputStream is = new PooledByteBufferInputStream(buffer);
-                savePhoto(is, downloadUrl);
-                subscriber.onNext(downloadUrl);
-                subscriber.onCompleted();
+                File savedFile = savePhoto(is, downloadUrl);
+                subscriber.onNext(savedFile);
                 is.close();
+                subscriber.onCompleted();
             } catch (Exception e) {
                 e.printStackTrace();
-                subscriber.onError(new PhotoDownloadFailedError());
+                subscriber.onError(e);
             } finally {
                 CloseableReference.closeSafely(cf);
-                downloadingUris.remove(downloadUrl);
             }
-
-            logger.d("end file downloading");
         }
 
         @Override
         protected void onFailureImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
-            logger.d("end file downloading");
-            subscriber.onError(new PhotoDownloadFailedError());
-            downloadingUris.remove(downloadUrl);
+            subscriber.onError(dataSource.getFailureCause());
         }
     }
 
-    public Observable<String> createPhotoDownloadObservable(final PhotoDetails photoDetails) {
+    public Observable<File> getPhotoDownloadObservable(final PhotoDetails photoDetails) {
         final String downloadUrl = photoDetails.getDefaultDownloadUrl();
-        return createPhotoDownloadObservable(downloadUrl);
+        return getPhotoDownloadObservable(downloadUrl);
     }
 
-    private void savePhoto(InputStream is, String downloadUri) throws Exception {
+    private File savePhoto(InputStream is, String downloadUri) throws Exception {
         String fileName = AndroidUtils.getResourceName(downloadUri);
         File tmpFile = getDownloadTempFile(fileName);
 
@@ -151,6 +168,8 @@ public final class PhotoDownloader {
         if (!tmpFile.renameTo(fixedFile)) {
             throw new Exception("Rename download temp file failed!");
         }
+
+        return fixedFile;
     }
 
     private File getExternalPhotoDir() {

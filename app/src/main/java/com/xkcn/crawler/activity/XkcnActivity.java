@@ -1,8 +1,6 @@
 package com.xkcn.crawler.activity;
 
 import android.os.Bundle;
-import android.os.PersistableBundle;
-import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 
 import com.xkcn.crawler.XkcnApp;
@@ -11,7 +9,7 @@ import com.xkcn.crawler.data.PhotoTagRepository;
 import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.di.ApplicationComponent;
 import com.xkcn.crawler.imageloader.XkcnImageLoader;
-import com.xkcn.crawler.usecase.PhotoDownloader;
+import com.xkcn.crawler.imageloader.PhotoDownloader;
 
 import javax.inject.Inject;
 

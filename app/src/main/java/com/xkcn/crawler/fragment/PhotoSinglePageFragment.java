@@ -23,7 +23,6 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
 
 /**
  * Created by khoinguyen on 12/15/15.
@@ -94,7 +93,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
         public void onCompleted() {
             progressBar.setVisibility(View.GONE);
             // todo: why create no use?
-            photoDownloader.createPhotoDownloadObservable(photoDetails);
+//            photoDownloader.getPhotoDownloadObservable(photoDetails);
         }
 
         @Override

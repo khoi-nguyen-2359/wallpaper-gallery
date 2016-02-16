@@ -1,7 +1,7 @@
 package com.xkcn.crawler.presenter;
 
 import com.xkcn.crawler.data.model.PhotoDetails;
-import com.xkcn.crawler.usecase.PhotoDownloader;
+import com.xkcn.crawler.imageloader.PhotoDownloader;
 import com.xkcn.crawler.view.PhotoSinglePageView;
 
 /**
