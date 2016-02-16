@@ -5,6 +5,7 @@ import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.view.PhotoListPagerView;
 
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -31,21 +32,22 @@ public class PhotoListPagerViewPresenter {
                 subscriber.onNext(pageCount);
                 subscriber.onCompleted();
             }
-        }).observeOn(AndroidSchedulers.mainThread())
+        })
                 .subscribeOn(Schedulers.newThread())
-        .subscribe(new Subscriber<Integer>() {
-            @Override
-            public void onCompleted() {
-            }
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Integer>() {
+                    @Override
+                    public void onCompleted() {
+                    }
 
-            @Override
-            public void onError(Throwable e) {
-            }
+                    @Override
+                    public void onError(Throwable e) {
+                    }
 
-            @Override
-            public void onNext(Integer pageCount) {
-                view.setupPagerAdapter(pageCount, view.getCurrentType());
-            }
-        });;
+                    @Override
+                    public void onNext(Integer pageCount) {
+                        view.setupPagerAdapter(pageCount, view.getCurrentType());
+                    }
+                });
     }
 }

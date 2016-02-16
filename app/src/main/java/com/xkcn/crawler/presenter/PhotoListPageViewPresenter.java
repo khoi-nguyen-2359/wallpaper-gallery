@@ -47,8 +47,8 @@ public class PhotoListPageViewPresenter {
         }
 
         photoQueryObservable
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<PhotoDetails>>() {
                     @Override
                     public void onCompleted() {

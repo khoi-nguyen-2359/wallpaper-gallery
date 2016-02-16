@@ -40,18 +40,19 @@ public final class PhotoDownloader {
 
     private final String externalFileDirPath;
     private final String photoDirPath;
+    private L logger;
 
     public PhotoDownloader(XkcnApp xkcnApp) {
         downloadingUris = new HashSet<>();
         externalFileDirPath = xkcnApp.getExternalFilesDir(null).getAbsolutePath();
         photoDirPath = xkcnApp.getDir("photo", Context.MODE_PRIVATE).getAbsolutePath();
+        logger = L.get(this);
     }
 
-    private Observable<PhotoDetails> createPhotoDownloadObservable(final PhotoDetails photoDetails, final String downloadUrl) {
-        return Observable.create(new Observable.OnSubscribe<PhotoDetails>() {
+    private Observable<String> createPhotoDownloadObservable(final String downloadUrl) {
+        return Observable.create(new Observable.OnSubscribe<String>() {
             @Override
-            public void call(final Subscriber<? super PhotoDetails> subscriber) {
-                final L logger = L.get();
+            public void call(Subscriber<? super String> subscriber) {
                 if (downloadingUris.contains(downloadUrl)) {
                     logger.d("photo is being downloaded");
                     subscriber.onError(new PhotoDownloadInProgressError());
@@ -61,7 +62,7 @@ public final class PhotoDownloader {
                 File downloadedFile = getDownloadFile(downloadUrl);
                 if (downloadedFile.exists()) {
                     logger.d("photo already downloaded");
-                    subscriber.onNext(photoDetails);
+                    subscriber.onNext(downloadUrl);
                     subscriber.onCompleted();
                     return;
                 }
@@ -75,47 +76,58 @@ public final class PhotoDownloader {
 
                 ImagePipeline imagePipeline = Fresco.getImagePipeline();
                 DataSource<CloseableReference<PooledByteBuffer>> dataSource = imagePipeline.fetchEncodedImage(request, this);
-                dataSource.subscribe(new BaseDataSubscriber<CloseableReference<PooledByteBuffer>>() {
-                    @Override
-                    protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
-                        if (!dataSource.isFinished()) {
-                            return;
-                        }
-
-                        CloseableReference<PooledByteBuffer> cf = null;
-                        try {
-                            cf = dataSource.getResult();
-                            PooledByteBuffer buffer = cf.get();
-                            PooledByteBufferInputStream is = new PooledByteBufferInputStream(buffer);
-                            savePhoto(is, downloadUrl);
-                            subscriber.onNext(photoDetails);
-                            subscriber.onCompleted();
-                            is.close();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            subscriber.onError(new PhotoDownloadFailedError());
-                        } finally {
-                            CloseableReference.closeSafely(cf);
-                            downloadingUris.remove(downloadUrl);
-                        }
-
-                        logger.d("end file downloading");
-                    }
-
-                    @Override
-                    protected void onFailureImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
-                        logger.d("end file downloading");
-                        subscriber.onError(new PhotoDownloadFailedError());
-                        downloadingUris.remove(downloadUrl);
-                    }
-                }, CallerThreadExecutor.getInstance());
+                dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, downloadUrl), CallerThreadExecutor.getInstance());
             }
         });
     }
 
-    public Observable<PhotoDetails> createPhotoDownloadObservable(final PhotoDetails photoDetails) {
+    class PhotoDownloadSubscriber extends BaseDataSubscriber<CloseableReference<PooledByteBuffer>> {
+
+        private final Subscriber<? super String> subscriber;
+        private final String downloadUrl;
+
+        PhotoDownloadSubscriber(Subscriber<? super String> subscriber, String photoUrl) {
+            this.subscriber = subscriber;
+            this.downloadUrl = photoUrl;
+        }
+
+        @Override
+        protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
+            if (!dataSource.isFinished()) {
+                return;
+            }
+
+            CloseableReference<PooledByteBuffer> cf = null;
+            try {
+                cf = dataSource.getResult();
+                PooledByteBuffer buffer = cf.get();
+                PooledByteBufferInputStream is = new PooledByteBufferInputStream(buffer);
+                savePhoto(is, downloadUrl);
+                subscriber.onNext(downloadUrl);
+                subscriber.onCompleted();
+                is.close();
+            } catch (Exception e) {
+                e.printStackTrace();
+                subscriber.onError(new PhotoDownloadFailedError());
+            } finally {
+                CloseableReference.closeSafely(cf);
+                downloadingUris.remove(downloadUrl);
+            }
+
+            logger.d("end file downloading");
+        }
+
+        @Override
+        protected void onFailureImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
+            logger.d("end file downloading");
+            subscriber.onError(new PhotoDownloadFailedError());
+            downloadingUris.remove(downloadUrl);
+        }
+    }
+
+    public Observable<String> createPhotoDownloadObservable(final PhotoDetails photoDetails) {
         final String downloadUrl = photoDetails.getDefaultDownloadUrl();
-        return createPhotoDownloadObservable(photoDetails, downloadUrl);
+        return createPhotoDownloadObservable(downloadUrl);
     }
 
     private void savePhoto(InputStream is, String downloadUri) throws Exception {

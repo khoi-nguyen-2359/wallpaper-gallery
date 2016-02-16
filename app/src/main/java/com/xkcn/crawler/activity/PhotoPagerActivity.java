@@ -67,8 +67,8 @@ public abstract class PhotoPagerActivity extends XkcnActivity implements PhotoLi
     }
 
     @Override
-    public void showWallpaperChooser(PhotoDetails photoDetails) {
-        Uri uri = Uri.fromFile(photoDownloader.getDownloadFile(photoDetails.getDefaultDownloadUrl()));
+    public void showWallpaperChooser(String photoUrl) {
+        Uri uri = Uri.fromFile(photoDownloader.getDownloadFile(photoUrl));
         AndroidUtils.startSetWallpaperChooser(this, uri);
     }
     /*=====*/

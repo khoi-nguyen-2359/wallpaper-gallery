@@ -100,61 +100,81 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
     }
 
     @Override
-    public Observable loadObservable(final String url, final ImageView imageView) {
-        final WeakReference<ImageView> weakImageView = new WeakReference<>(imageView);
-        return Observable.create(new Observable.OnSubscribe<Boolean>() {
-            @Override
-            public void call(final Subscriber<? super Boolean> subscriber) {
-                ImagePipeline imagePipeline = Fresco.getImagePipeline();
-                ImageRequest imageRequest = ImageRequestBuilder
-                        .newBuilderWithSource(Uri.parse(url))
-                        .build();
-                DataSource<CloseableReference<CloseableImage>>
-                        dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
-                dataSource.subscribe(new BaseDataSubscriber<CloseableReference<CloseableImage>>() {
-                    @Override
-                    protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                        if (!dataSource.isFinished()) {
-                            return;
-                        }
+    public Observable loadObservable(String url, final ImageView imageView) {
+        WeakReference<ImageView> weakImageView = new WeakReference<>(imageView);
+        return Observable.create(new OnPhotoLoadSubscribe(url, weakImageView));
+    }
 
-                        if (weakImageView.get() == null) {
-                            subscriber.onError(new NoTargetImageViewError());
-                            return;
-                        }
+    class OnPhotoLoadSubscribe implements Observable.OnSubscribe<Object> {
+        private String url;
+        private WeakReference<ImageView> weakImageView;
 
-                        CloseableReference<CloseableImage> imageReference = dataSource.getResult();
-                        if (imageReference == null) {
-                            subscriber.onError(new NoDataSourceResultError());
-                            return;
-                        }
+        OnPhotoLoadSubscribe(String url, WeakReference<ImageView> weakImageView) {
+            this.url = url;
+            this.weakImageView = weakImageView;
+        }
 
-                        ImageView ivTarget = weakImageView.get();
-                        try {
-                            if (ivTarget == null) {
-                                throw new NullPointerException();
-                            }
+        @Override
+        public void call(Subscriber<? super Object> subscriber) {
+            ImagePipeline imagePipeline = Fresco.getImagePipeline();
+            ImageRequest imageRequest = ImageRequestBuilder
+                    .newBuilderWithSource(Uri.parse(url))
+                    .build();
+            DataSource<CloseableReference<CloseableImage>>
+                    dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
+            dataSource.subscribe(new PhotoLoadSubscriber(weakImageView, subscriber), UiThreadImmediateExecutorService.getInstance());
+        }
+    }
 
-                            CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
-                            Bitmap bm = imgBm.getUnderlyingBitmap();
-                            ivTarget.setImageBitmap(bm);
-                            track(ivTarget, imageReference);
-                            subscriber.onNext(true);
-                            subscriber.onCompleted();
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                            CloseableReference.closeSafely(imageReference);
-                            subscriber.onError(e);
-                        }
-                    }
+    class PhotoLoadSubscriber extends BaseDataSubscriber<CloseableReference<CloseableImage>> {
+        private WeakReference<ImageView> weakImageView;
+        private Subscriber<? super Object> subscriber;
 
-                    @Override
-                    protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-                        subscriber.onError(new ImageLoadingFailureError());
-                    }
-                }, UiThreadImmediateExecutorService.getInstance());
+        PhotoLoadSubscriber(WeakReference<ImageView> weakImageView, Subscriber<? super Object> subscriber) {
+            this.weakImageView = weakImageView;
+            this.subscriber = subscriber;
+        }
+
+        @Override
+        protected void onNewResultImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+            if (!dataSource.isFinished()) {
+                return;
             }
-        });
+
+            if (weakImageView.get() == null) {
+                subscriber.onError(new NoTargetImageViewError());
+                return;
+            }
+
+            CloseableReference<CloseableImage> imageReference = dataSource.getResult();
+            if (imageReference == null) {
+                subscriber.onError(new NoDataSourceResultError());
+                return;
+            }
+
+            ImageView ivTarget = weakImageView.get();
+            try {
+                if (ivTarget == null) {
+                    throw new NullPointerException();
+                }
+
+                CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
+                Bitmap bm = imgBm.getUnderlyingBitmap();
+                ivTarget.setImageBitmap(bm);
+                track(ivTarget, imageReference);
+                subscriber.onNext(null);
+                subscriber.onCompleted();
+            } catch (Exception e) {
+                e.printStackTrace();
+                CloseableReference.closeSafely(imageReference);
+                subscriber.onError(e);
+            }
+        }
+
+        @Override
+        protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
+            subscriber.onError(new ImageLoadingFailureError());
+        }
     }
 
     @Override

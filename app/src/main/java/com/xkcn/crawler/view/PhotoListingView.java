@@ -11,6 +11,6 @@ public interface PhotoListingView {
     void showLoading();
     void hideLoading();
 
-    void showWallpaperChooser(PhotoDetails photoDetails);
+    void showWallpaperChooser(String photoUrl);
     int getCurrentType();
 }

@@ -4,6 +4,7 @@ import com.xkcn.crawler.data.model.PhotoDetails;
 import com.xkcn.crawler.usecase.PhotoDownloader;
 import com.xkcn.crawler.view.PhotoListingView;
 
+import rx.Observer;
 import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
@@ -22,9 +23,9 @@ public class PhotoListingViewPresenter {
     public void loadWallpaperSetting(PhotoDetails photoDetails) {
         view.showLoading();
         photoDownloader.createPhotoDownloadObservable(photoDetails)
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.newThread())
-                .subscribe(new Subscriber<PhotoDetails>() {
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<String>() {
                     @Override
                     public void onCompleted() {
                         view.hideLoading();
@@ -37,8 +38,8 @@ public class PhotoListingViewPresenter {
                     }
 
                     @Override
-                    public void onNext(PhotoDetails photoDetails) {
-                        view.showWallpaperChooser(photoDetails);
+                    public void onNext(String photoUrl) {
+                        view.showWallpaperChooser(photoUrl);
 
                     }
                 });

@@ -22,6 +22,7 @@ import butterknife.ButterKnife;
 import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 import rx.Observable;
+import rx.Observer;
 import rx.Subscriber;
 
 /**
@@ -88,10 +89,11 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
         ivPhoto.setDisplayType(ImageViewTouchBase.DisplayType.FIT_TO_SCREEN);
     }
 
-    private Subscriber<Boolean> imageLoaderSubscriber = new Subscriber<Boolean>() {
+    private Observer<Object> imageLoaderSubscriber = new Observer<Object>() {
         @Override
         public void onCompleted() {
             progressBar.setVisibility(View.GONE);
+            // todo: why create no use?
             photoDownloader.createPhotoDownloadObservable(photoDetails);
         }
 
@@ -102,7 +104,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
         }
 
         @Override
-        public void onNext(Boolean aBoolean) {
+        public void onNext(Object aBoolean) {
 
         }
     };
