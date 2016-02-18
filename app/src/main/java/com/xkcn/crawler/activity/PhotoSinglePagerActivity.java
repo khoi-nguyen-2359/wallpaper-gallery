@@ -158,12 +158,13 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
     private ViewPager.OnPageChangeListener onPageChanged = new ViewPager.OnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+            if (positionOffset == 0) {
+                bindPhotoToActionView(position);
+            }
         }
 
         @Override
         public void onPageSelected(int position) {
-            bindPhotoToActionView(position);
         }
 
         @Override
