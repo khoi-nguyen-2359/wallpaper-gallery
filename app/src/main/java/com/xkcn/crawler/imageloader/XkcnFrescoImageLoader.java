@@ -20,7 +20,6 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.fantageek.toolkit.util.L;
 import com.squareup.okhttp.OkHttpClient;
-import com.xkcn.crawler.imageloader.error.ImageLoadingFailureError;
 import com.xkcn.crawler.imageloader.error.NoDataSourceResultError;
 import com.xkcn.crawler.imageloader.error.NoTargetImageViewError;
 
@@ -173,7 +172,7 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
         @Override
         protected void onFailureImpl(DataSource<CloseableReference<CloseableImage>> dataSource) {
-            subscriber.onError(new ImageLoadingFailureError());
+            subscriber.onError(dataSource.getFailureCause());
         }
     }
 
