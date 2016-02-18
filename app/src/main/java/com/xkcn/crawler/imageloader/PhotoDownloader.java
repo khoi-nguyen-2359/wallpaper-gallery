@@ -53,7 +53,7 @@ public final class PhotoDownloader {
         Observable<File> downloadingObservable = mapDownloadObservables.get(downloadUrl);
         if (downloadingObservable != null) {
             logger.d("photo is being downloaded");
-            return downloadingObservable;
+            return downloadingObservable.cache();
         }
 
         Observable<File> getFileFromDiskObservable = Observable.create(new Observable.OnSubscribe<File>() {
@@ -83,7 +83,7 @@ public final class PhotoDownloader {
             }
         });
 
-        final Observable<File> result = Observable.concat(getFileFromDiskObservable, saveFileFromFrescoObservable)
+        Observable<File> result = Observable.concat(getFileFromDiskObservable, saveFileFromFrescoObservable)
                 .first()
                 .doOnTerminate(new Action0() {
                     @Override
