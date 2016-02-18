@@ -93,12 +93,7 @@ public final class PhotoDownloader {
                     }
                 });
 
-        result.doOnSubscribe(new Action0() {
-            @Override
-            public void call() {
-                mapDownloadObservables.put(downloadUrl, result);
-            }
-        });
+        mapDownloadObservables.put(downloadUrl, result);
 
         return result;
     }
