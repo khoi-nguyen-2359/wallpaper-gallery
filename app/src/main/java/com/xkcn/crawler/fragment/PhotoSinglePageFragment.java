@@ -23,6 +23,7 @@ import it.sephiroth.android.library.imagezoom.ImageViewTouch;
 import it.sephiroth.android.library.imagezoom.ImageViewTouchBase;
 import rx.Observable;
 import rx.Observer;
+import rx.Subscription;
 
 /**
  * Created by khoinguyen on 12/15/15.
@@ -47,6 +48,8 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
 
     private PhotoSinglePageViewPresenter presenter;
 
+    private Subscription photoLoadSubscription;
+
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,14 +57,25 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
         initData();
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        photoLoadSubscription.unsubscribe();
+    }
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         initViews(inflater, container);
 
-        loadPhoto();
-
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        loadPhoto();
     }
 
     @Override
@@ -110,15 +124,10 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
 
     private void loadPhoto() {
         File downloadedPhoto = photoDownloader.getDownloadFile(photoDetails.getDefaultDownloadUrl());
-        Observable imgLoadObservable = null;
         if (downloadedPhoto.exists()) {
-            imgLoadObservable = xkcnImageLoader.loadObservable(downloadedPhoto, ivPhoto);
+            photoLoadSubscription = xkcnImageLoader.load(downloadedPhoto, ivPhoto, imageLoaderSubscriber);
         } else {
-            imgLoadObservable = xkcnImageLoader.loadObservable(photoDetails.getPhotoHigh(), ivPhoto);
-        }
-
-        if (imgLoadObservable != null) {
-            imgLoadObservable.subscribe(imageLoaderSubscriber);
+            photoLoadSubscription = xkcnImageLoader.load(photoDetails.getPhotoHigh(), ivPhoto, imageLoaderSubscriber);
         }
     }
 

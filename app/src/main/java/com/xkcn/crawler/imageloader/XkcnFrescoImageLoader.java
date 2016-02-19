@@ -19,19 +19,21 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.fantageek.toolkit.util.L;
 import com.squareup.okhttp.OkHttpClient;
-import com.xkcn.crawler.imageloader.error.NoDataSourceResultError;
-import com.xkcn.crawler.imageloader.error.NoTargetImageViewError;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.WeakHashMap;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Observer;
 import rx.Subscriber;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action0;
+import rx.functions.Action1;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 
@@ -41,9 +43,11 @@ import rx.schedulers.Schedulers;
 public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
     private final L logger = L.get(this);
+    private WeakHashMap<ImageView, Subscription> mapImageLoadSubscriptions;
 
     public XkcnFrescoImageLoader(Context context) {
         init(context);
+        mapImageLoadSubscriptions = new WeakHashMap<>();
     }
 
     public static void release(XkcnImageLoader xkcnImageLoader, Object key) {
@@ -55,7 +59,7 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
         frescoImageLoader.release(key);
     }
 
-    public static void init(Context context) {
+    private static void init(Context context) {
         final int DEFAULT_READ_TIMEOUT_MILLIS = 20 * 1000; // 20s
         final int DEFAULT_WRITE_TIMEOUT_MILLIS = 20 * 1000; // 20s
         final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 15 * 1000; // 15s
@@ -98,9 +102,16 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
         holdingReferences.remove(key);
     }
 
-    public Observable loadObservable(final String url, ImageView imageView) {
+    @Override
+    public Subscription load(final String url, final ImageView imageView, Observer observer) {
+        Subscription subscription = mapImageLoadSubscriptions.get(imageView);
+        if (subscription != null) {
+            subscription.unsubscribe();
+        }
+
         final WeakReference<ImageView> weakImageView = new WeakReference<>(imageView);
-        return Observable.create(new Observable.OnSubscribe<CloseableReference>() {
+
+        subscription = Observable.create(new Observable.OnSubscribe<CloseableReference>() {
             @Override
             public void call(Subscriber<? super CloseableReference> subscriber) {
                 ImagePipeline imagePipeline = Fresco.getImagePipeline();
@@ -120,28 +131,34 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
                             @Override
                             public void call(Subscriber<? super Object> subscriber) {
                                 ImageView ivTarget = weakImageView.get();
-                                if (ivTarget == null) {
-                                    subscriber.onError(new NoTargetImageViewError());
-                                    return;
-                                }
-
-                                try {
-                                    CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
-                                    Bitmap bm = imgBm.getUnderlyingBitmap();
-                                    ivTarget.setImageBitmap(bm);
-                                    track(ivTarget, imageReference);
-                                    subscriber.onCompleted();
-                                } catch (Exception e) {
-                                    e.printStackTrace();
-                                    CloseableReference.closeSafely(imageReference);
-                                    subscriber.onError(e);
-                                }
+                                CloseableStaticBitmap imgBm = (CloseableStaticBitmap) imageReference.get();
+                                Bitmap bm = imgBm.getUnderlyingBitmap();
+                                ivTarget.setImageBitmap(bm);
+                                track(ivTarget, imageReference);
+                                subscriber.onCompleted();
                             }
                         })
+                                .doOnError(new Action1<Throwable>() {
+                                    @Override
+                                    public void call(Throwable throwable) {
+                                        CloseableReference.closeSafely(imageReference);
+                                    }
+                                })
                                 .subscribeOn(AndroidSchedulers.mainThread())
                                 .observeOn(AndroidSchedulers.mainThread());
                     }
-                });
+                })
+                .doOnTerminate(new Action0() {
+                    @Override
+                    public void call() {
+                        mapImageLoadSubscriptions.remove(weakImageView.get());
+                    }
+                })
+                .subscribe(observer);
+
+        mapImageLoadSubscriptions.put(imageView, subscription);
+
+        return subscription;
     }
 
     class PhotoLoadSubscriber extends BaseDataSubscriber<CloseableReference<CloseableImage>> {
@@ -158,11 +175,6 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
             }
 
             CloseableReference<CloseableImage> imageReference = dataSource.getResult();
-            if (imageReference == null) {
-                subscriber.onError(new NoDataSourceResultError());
-                return;
-            }
-
             subscriber.onNext(imageReference);
             subscriber.onCompleted();
         }
@@ -173,21 +185,52 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
         }
     }
 
-    public Observable loadObservable(File file, ImageView imageView) {
+    @Override
+    public Subscription load(File file, ImageView imageView, Observer observer) {
         if (file == null) {
-            return Observable.empty();
+            return Observable.empty().subscribe(observer);
         }
 
-        return loadObservable("file://" + file.getAbsolutePath(), imageView);
+        return load("file://" + file.getAbsolutePath(), imageView, observer);
     }
 
     @Override
     public void load(String url, ImageView imageView) {
-        loadObservable(url, imageView).subscribe();
+        load(url, imageView, new Observer() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+        });
     }
 
     @Override
     public void load(File file, ImageView imageView) {
-        loadObservable(file, imageView).subscribe();
+        load(file, imageView, new Observer() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+
+            }
+
+            @Override
+            public void onNext(Object o) {
+
+            }
+        });
     }
 }
