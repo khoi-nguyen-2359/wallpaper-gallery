@@ -3,9 +3,12 @@ package com.xkcn.crawler.imageloader;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Handler;
 import android.widget.ImageView;
 
 import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.executors.HandlerExecutorService;
+import com.facebook.common.executors.HandlerExecutorServiceImpl;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
@@ -25,6 +28,8 @@ import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
@@ -32,9 +37,12 @@ import rx.Observer;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.android.schedulers.HandlerScheduler;
 import rx.functions.Action0;
 import rx.functions.Action1;
 import rx.functions.Func1;
+import rx.observers.Observers;
+import rx.schedulers.ImmediateScheduler;
 import rx.schedulers.Schedulers;
 
 /**
@@ -110,7 +118,6 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
         }
 
         final WeakReference<ImageView> weakImageView = new WeakReference<>(imageView);
-
         subscription = Observable.create(new Observable.OnSubscribe<CloseableReference>() {
             @Override
             public void call(Subscriber<? super CloseableReference> subscriber) {
@@ -120,10 +127,9 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
                         .build();
                 DataSource<CloseableReference<CloseableImage>>
                         dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
-                dataSource.subscribe(new PhotoLoadSubscriber(subscriber), CallerThreadExecutor.getInstance());
+                dataSource.subscribe(new PhotoLoadSubscriber(subscriber), new HandlerExecutorServiceImpl(new Handler()));
             }
         })
-                .subscribeOn(Schedulers.io())
                 .flatMap(new Func1<CloseableReference, Observable<?>>() {
                     @Override
                     public Observable<?> call(final CloseableReference imageReference) {
@@ -154,6 +160,8 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
                         mapImageLoadSubscriptions.remove(weakImageView.get());
                     }
                 })
+                .subscribeOn(Schedulers.io())
+                .observeOn(HandlerScheduler.from(new Handler()))
                 .subscribe(observer);
 
         mapImageLoadSubscriptions.put(imageView, subscription);
@@ -196,41 +204,11 @@ public class XkcnFrescoImageLoader implements XkcnImageLoader {
 
     @Override
     public void load(String url, ImageView imageView) {
-        load(url, imageView, new Observer() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Object o) {
-
-            }
-        });
+        load(url, imageView, Observers.empty());
     }
 
     @Override
     public void load(File file, ImageView imageView) {
-        load(file, imageView, new Observer() {
-            @Override
-            public void onCompleted() {
-
-            }
-
-            @Override
-            public void onError(Throwable e) {
-
-            }
-
-            @Override
-            public void onNext(Object o) {
-
-            }
-        });
+        load(file, imageView, Observers.empty());
     }
 }
