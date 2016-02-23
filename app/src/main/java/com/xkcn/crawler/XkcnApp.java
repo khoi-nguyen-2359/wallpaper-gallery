@@ -2,6 +2,7 @@ package com.xkcn.crawler;
 
 import android.app.Application;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
 import com.fantageek.toolkit.util.L;
 import com.xkcn.crawler.di.ApplicationComponent;
 import com.xkcn.crawler.di.ApplicationModule;
@@ -19,6 +20,7 @@ public class XkcnApp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fresco.initialize(this);
         initInjector();
         Fabric.with(this, new Crashlytics());
         L.setClassLoggable(BuildConfig.LOGGABLE);

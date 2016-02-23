@@ -2,13 +2,11 @@ package com.xkcn.crawler.di;
 
 import android.content.Context;
 
-import com.xkcn.crawler.activity.SplashActivity;
 import com.xkcn.crawler.activity.XkcnActivity;
 import com.xkcn.crawler.data.PhotoDetailsRepository;
 import com.xkcn.crawler.data.PhotoTagRepository;
 import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.fragment.XkcnFragment;
-import com.xkcn.crawler.imageloader.XkcnImageLoader;
 import com.xkcn.crawler.service.UpdateService;
 
 import javax.inject.Singleton;
@@ -27,7 +25,6 @@ public interface ApplicationComponent {
     void inject(UpdateService updateService);
 
     Context context();
-    XkcnImageLoader xkcnImageLoader();
     PhotoDetailsRepository photoDetailsDataStore();
     PreferenceRepository preferenceDataStore();
     PhotoTagRepository photoTagRepository();

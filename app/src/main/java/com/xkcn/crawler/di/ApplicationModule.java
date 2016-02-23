@@ -9,8 +9,6 @@ import com.xkcn.crawler.data.PhotoTagRepository;
 import com.xkcn.crawler.data.PhotoTagSqliteRepository;
 import com.xkcn.crawler.data.PreferenceRepository;
 import com.xkcn.crawler.data.PreferenceRepositoryImpl;
-import com.xkcn.crawler.imageloader.XkcnFrescoImageLoader;
-import com.xkcn.crawler.imageloader.XkcnImageLoader;
 import com.xkcn.crawler.imageloader.PhotoDownloader;
 
 import javax.inject.Singleton;
@@ -32,11 +30,6 @@ public class ApplicationModule {
     @Provides @Singleton
     Context provideContext() {
         return this.xkcnApp;
-    }
-
-    @Provides @Singleton
-    XkcnImageLoader provideXkcnImageLoader() {
-        return new XkcnFrescoImageLoader(xkcnApp);
     }
 
     @Provides @Singleton

@@ -7,18 +7,11 @@
     android:layout_height="match_parent"
     android:background="#000">
 
-    <it.sephiroth.android.library.imagezoom.ImageViewTouch
+    <com.xkcn.crawler.view.custom.DraweePhotoView
         android:id="@+id/iv_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:actualImageScaleType="fitCenter"
         />
-
-    <ProgressBar
-        android:layout_gravity="center"
-        android:id="@+id/progress_bar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-
 
 </FrameLayout>
