@@ -13,7 +13,7 @@ import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.service.UpdateService;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by khoinguyen on 1/14/16.

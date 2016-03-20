@@ -15,5 +15,7 @@ public interface PhotoDetailsRepository {
 
     PhotoDetails getPhotoDetails(long photoId);
 
+    int updatePhotosStatus(int status);
+
     int getPageCount(int perPage);
 }

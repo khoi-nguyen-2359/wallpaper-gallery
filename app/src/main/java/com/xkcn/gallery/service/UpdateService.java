@@ -15,10 +15,15 @@ import com.xkcn.gallery.XkcnApp;
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PhotoTagRepository;
 import com.xkcn.gallery.data.PreferenceRepository;
+import com.xkcn.gallery.data.model.ModelConstants;
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.model.PhotoTag;
 import com.xkcn.gallery.event.CrawlNextPageEvent;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 import org.htmlcleaner.HtmlCleaner;
 import org.htmlcleaner.TagNode;
 
@@ -29,8 +34,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.inject.Inject;
-
-import de.greenrobot.event.EventBus;
 
 public class UpdateService extends Service {
     public static final String XPATH_POST_ID = "//*[@id=\"post-%d\"]";
@@ -142,6 +145,7 @@ public class UpdateService extends Service {
         webview.loadUrl(urlToCrawl);
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(CrawlNextPageEvent e) {
         startPageCrawling(e.getPage());
     }
@@ -213,7 +217,7 @@ public class UpdateService extends Service {
         @JavascriptInterface
         public void processHTML(String html) {
             List<PhotoDetails> photoList = new ArrayList<>();
-            HashSet<String> photoTags = new HashSet<>();
+            HashSet<String> photoTagValues = new HashSet<>();
             if (html != null) {
                 HtmlCleaner htmlCleaner = new HtmlCleaner();
                 TagNode root = htmlCleaner.clean(html);
@@ -222,8 +226,9 @@ public class UpdateService extends Service {
                         Object[] objs = root.evaluateXPath(String.format(XPATH_POST_ID, i));
                         if (objs.length > 0) {
                             TagNode post = (TagNode) objs[0];
-                            PhotoDetails photo = parsePhotoNode(htmlCleaner, post, photoTags);
+                            PhotoDetails photo = parsePhotoNode(htmlCleaner, post, photoTagValues);
                             if (photo != null) {
+                                photo.setStatus(ModelConstants.PHOTO_STATUS_CRAWLING);
                                 photoList.add(photo);
                             }
                         } else {
@@ -239,6 +244,7 @@ public class UpdateService extends Service {
             logger.d("crawled list size=%d", photoList.size());
 
             photoDetailsRepository.addPhotos(photoList);
+            List<PhotoTag> photoTags = createCrawlingPhotoTags(photoTagValues);
             photoTagRepository.addTags(photoTags);
 
             int listSize = photoList.size();
@@ -250,6 +256,9 @@ public class UpdateService extends Service {
                     prefDataStore.setLastCrawledPhotoId(lastUpdatedPhotoId = photoDetailsRepository.getLargestPhotoId());
                     prefDataStore.setLastPhotoCrawlTime(System.currentTimeMillis());
                     logger.d("update finished lastUpdatedPhotoId=%d", lastUpdatedPhotoId);
+
+                    photoDetailsRepository.updatePhotosStatus(ModelConstants.PHOTO_STATUS_CRAWLED);
+                    photoTagRepository.updatePhotosStatus(ModelConstants.PHOTO_STATUS_CRAWLED);
                 }
                 EventBus.getDefault().post(new PhotoCrawlingFinishedEvent());
                 stopSelf();
@@ -257,5 +266,23 @@ public class UpdateService extends Service {
                 EventBus.getDefault().post(new CrawlNextPageEvent(crawlingPage + 1));
             }
         }
+    }
+
+    private List<PhotoTag> createCrawlingPhotoTags(HashSet<String> photoTagValues) {
+        List<PhotoTag> photoTags = new ArrayList<>();
+
+        if (photoTagValues == null || photoTags.isEmpty()) {
+            return photoTags;
+        }
+
+        for (String val : photoTagValues) {
+            PhotoTag tag = new PhotoTag();
+            tag.setTag(val);
+            tag.setStatus(ModelConstants.PHOTO_STATUS_CRAWLING);
+
+            photoTags.add(tag);
+        }
+
+        return photoTags;
     }
 }

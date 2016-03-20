@@ -20,6 +20,7 @@ public class PhotoDetails implements Parcelable {
     String title;
     String tags;
     int notes;
+    int status;
 
     public PhotoDetails() {
     }
@@ -144,6 +145,7 @@ public class PhotoDetails implements Parcelable {
         dest.writeString(title);
         dest.writeString(tags);
         dest.writeInt(notes);
+        dest.writeInt(status);
     }
 
     public static final Parcelable.Creator<PhotoDetails> CREATOR
@@ -171,6 +173,7 @@ public class PhotoDetails implements Parcelable {
         title = in.readString();
         tags = in.readString();
         notes = in.readInt();
+        status = in.readInt();
     }
 
     public int getNotes() {
@@ -179,5 +182,13 @@ public class PhotoDetails implements Parcelable {
 
     public void setNotes(int notes) {
         this.notes = notes;
+    }
+
+    public void setStatus(int status) {
+        this.status = status;
+    }
+
+    public int getStatus() {
+        return status;
     }
 }

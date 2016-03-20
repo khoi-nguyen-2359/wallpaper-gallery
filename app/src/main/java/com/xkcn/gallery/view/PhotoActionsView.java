@@ -18,7 +18,7 @@ import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
 
 /**
  * Created by khoinguyen on 1/25/15.

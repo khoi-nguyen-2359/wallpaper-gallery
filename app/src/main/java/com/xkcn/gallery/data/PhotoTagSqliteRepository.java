@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fantageek.toolkit.util.L;
+import com.xkcn.gallery.data.model.PhotoTag;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -20,6 +21,7 @@ public class PhotoTagSqliteRepository implements PhotoTagRepository {
     public static final String TABLE_NAME = "PHOTO_TAG";
     public static final String COL_TAG = "TAG";
     private static final String COL_MARK = "MARK";
+    private static final String COL_STATUS = "STATUS";
 
     private DbHelper dbHelper;
 
@@ -27,17 +29,30 @@ public class PhotoTagSqliteRepository implements PhotoTagRepository {
         dbHelper = new DbHelper(context);
     }
 
+    public ContentValues toContentValues(PhotoTag tag) {
+        if (tag == null) {
+            return null;
+        }
+
+        ContentValues cv = new ContentValues();
+        cv.put(COL_TAG, tag.getTag());
+        cv.put(COL_STATUS, tag.getStatus());
+
+        return cv;
+    }
+
     @Override
-    public int addTags(HashSet<String> photoTags) {
+    public int addTags(List<PhotoTag> photoTags) {
         if (photoTags == null || photoTags.size() == 0)
             return 0;
 
         List<ContentValues> listCv = new ArrayList<>();
         ContentValues cv = null;
-        for (String tag : photoTags) {
-            cv = new ContentValues();
-            cv.put(COL_TAG, tag);
-            listCv.add(cv);
+        for (PhotoTag tag : photoTags) {
+            cv = toContentValues(tag);
+            if (cv != null) {
+                listCv.add(cv);
+            }
         }
 
         return bulkInsert(listCv);
@@ -93,5 +108,15 @@ public class PhotoTagSqliteRepository implements PhotoTagRepository {
         return result;
     }
 
+    @Override
+    public int updatePhotosStatus(int status) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
 
+        ContentValues cv = new ContentValues();
+        cv.put(COL_STATUS, status);
+        int nAffected = db.update(TABLE_NAME, cv, null, null);
+        logger.d("updatePhotosStatus affected=%d", nAffected);
+
+        return nAffected;
+    }
 }

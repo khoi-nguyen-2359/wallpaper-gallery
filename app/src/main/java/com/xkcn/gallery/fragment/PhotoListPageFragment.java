@@ -12,15 +12,17 @@ import com.fantageek.toolkit.util.L;
 import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListItemAdapter;
-import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.PhotoListPageViewPresenter;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoListPageView;
 
-import java.util.List;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-import de.greenrobot.event.EventBus;
+import java.util.List;
 
 /**
  * Created by khoinguyen on 12/22/14.
@@ -120,10 +122,10 @@ public abstract class PhotoListPageFragment extends XkcnFragment implements Phot
     /**
      * event bus
      **/
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
         presenter.loadPhotoListPage();
     }
-
 
     /** END - event bus **/
 }

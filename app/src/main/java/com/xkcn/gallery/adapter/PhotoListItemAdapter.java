@@ -15,10 +15,10 @@ import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.view.PhotoActionsView;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import de.greenrobot.event.EventBus;
 
 /**
  * Created by khoinguyen on 12/22/14.

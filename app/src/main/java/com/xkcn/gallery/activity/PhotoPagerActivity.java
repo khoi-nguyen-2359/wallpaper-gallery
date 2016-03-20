@@ -15,9 +15,11 @@ import com.xkcn.gallery.util.AndroidUtils;
 import com.xkcn.gallery.util.UiUtils;
 import com.xkcn.gallery.view.PhotoListingView;
 
-import java.io.File;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-import de.greenrobot.event.EventBus;
+import java.io.File;
 
 /**
  * Created by khoinguyen on 1/21/15.
@@ -48,6 +50,7 @@ public abstract class PhotoPagerActivity extends XkcnActivity implements PhotoLi
     }
 
     /*=====*/
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(SetWallpaperClicked event) {
         PhotoDetails photoDetails = event.getPhoto();
         presenter.loadWallpaperSetting(photoDetails);

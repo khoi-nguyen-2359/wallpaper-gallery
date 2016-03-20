@@ -17,6 +17,9 @@ import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.gallery.view.PhotoListPagerView;
 
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 
@@ -140,10 +143,12 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     /*** event bus ***/
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
         presenter.loadPageCount();
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(OnPhotoListItemClicked event) {
         Intent intent = PhotoSinglePagerActivity.intentViewSinglePhoto(this, adapterPhotoPages.getType(), pagerPhotoPage.getCurrentItem()+1, event.getClickedPosition());
         startActivity(intent);

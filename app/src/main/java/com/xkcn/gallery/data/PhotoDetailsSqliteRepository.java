@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.fantageek.toolkit.util.L;
+import com.xkcn.gallery.data.model.ModelConstants;
 import com.xkcn.gallery.data.model.PhotoDetails;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
     public static final String COL_TITLE = "TITLE";
     public static final String COL_TAGS = "TAGS";
     public static final String COL_NOTES = "NOTES";
+    public static final String COL_STATUS = "STATUS";
 
     public PhotoDetails toPhoto(Cursor cursor) {
         PhotoDetails photo = new PhotoDetails();
@@ -50,7 +52,7 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
         if ((idx = cursor.getColumnIndex(COL_TITLE)) != -1)             photo.setTitle(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_TAGS)) != -1)              photo.setTags(cursor.getString(idx));
         if ((idx = cursor.getColumnIndex(COL_NOTES)) != -1)             photo.setNotes(cursor.getInt(idx));
-//        if ((idx = cursor.getColumnIndex(COL_DOWNLOAD_STATE)) != -1)    photo.setDownloadedState(cursor.getInt(idx));
+        if ((idx = cursor.getColumnIndex(COL_STATUS)) != -1)            photo.setStatus(cursor.getInt(idx));
 
         return photo;
     }
@@ -70,7 +72,7 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
         cv.put(COL_TITLE, photo.getTitle());
         cv.put(COL_TAGS, photo.getTags());
         cv.put(COL_NOTES, photo.getNotes());
-//        cv.put(COL_DOWNLOAD_STATE, photo.getDownloadedState());
+        cv.put(COL_STATUS, photo.getStatus());
 
         return cv;
     }
@@ -87,7 +89,7 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * perPage) + "," + perPage);
+        Cursor c = db.query(TABLE_NAME, null, COL_STATUS+"="+ ModelConstants.PHOTO_STATUS_CRAWLED, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * perPage) + "," + perPage);
         if (c != null) {
             PhotoDetails photo = null;
             while (c.moveToNext()) {
@@ -106,7 +108,7 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
 
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-        Cursor c = db.query(TABLE_NAME, null, null, null, null, null, COL_NOTES + " desc", ((page - 1) * perPage) + "," + perPage);
+        Cursor c = db.query(TABLE_NAME, null, COL_STATUS+"="+ ModelConstants.PHOTO_STATUS_CRAWLED, null, null, null, COL_NOTES + " desc", ((page - 1) * perPage) + "," + perPage);
         if (c != null) {
             PhotoDetails photo = null;
             while (c.moveToNext()) {
@@ -136,6 +138,18 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
         }
 
         return photoDetails;
+    }
+
+    @Override
+    public int updatePhotosStatus(int status) {
+        SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+        ContentValues cv = new ContentValues();
+        cv.put(COL_STATUS, status);
+        int nAffected = db.update(TABLE_NAME, cv, null, null);
+        logger.d("updatePhotosStatus affected=%d", nAffected);
+
+        return nAffected;
     }
 
     @Override

@@ -8,7 +8,9 @@ import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.fragment.DebugOptionsDialog;
 
-import de.greenrobot.event.EventBus;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 /**
  * Created by khoinguyen on 1/14/16.
@@ -62,6 +64,7 @@ public class PhotoListPagerActivityImpl extends PhotoListPagerActivity {
     /* event bus */
 
     private class DebugEventListener {
+        @Subscribe(threadMode = ThreadMode.MAIN)
         public void onEventMainThread(RefreshPhotoListingPager event) {
             presenter.loadPageCount();
         }
