@@ -18,14 +18,7 @@ public class SplashActivity extends XkcnActivity implements SplashView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        presenter = new SplashViewPresenter(this, preferenceRepository);
-        presenter.checkToCrawlPhoto();
         finish();
         startActivity(new Intent(this, PhotoListPagerActivityImpl.class));
-    }
-
-    @Override
-    public void startActionUpdate() {
-        UpdateService.startActionUpdate(this);
     }
 }

@@ -5,4 +5,6 @@ package com.xkcn.gallery.view;
  */
 public interface PhotoListPagerView extends PhotoListingView {
     void setupPagerAdapter(int pageCount, int type);
+
+    void startActionUpdate();
 }

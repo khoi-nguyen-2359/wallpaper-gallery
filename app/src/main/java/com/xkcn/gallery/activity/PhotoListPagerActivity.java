@@ -15,6 +15,7 @@ import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.PhotoListPagerViewPresenter;
+import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.view.PhotoListPagerView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -44,6 +45,12 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         initTemplateViews();
         initViews();
         presenter.loadPageCount();
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        presenter.checkToCrawlPhoto();
     }
 
     private void initViews() {
@@ -139,6 +146,11 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Override
     public int getCurrentType() {
         return adapterPhotoPages != null ? adapterPhotoPages.getType() : PHOTO_TYPE_DEFAULT;
+    }
+
+    @Override
+    public void startActionUpdate() {
+        UpdateService.startActionUpdate(this);
     }
 
     /*** event bus ***/

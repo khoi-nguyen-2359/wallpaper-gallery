@@ -14,10 +14,4 @@ public class SplashViewPresenter {
         this.view = view;
         this.prefDataStore = prefDataStore;
     }
-
-    public void checkToCrawlPhoto() {
-        if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - prefDataStore.getUpdatePeriod()) {
-            view.startActionUpdate();
-        }
-    }
 }

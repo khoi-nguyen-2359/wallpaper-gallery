@@ -2,7 +2,10 @@ package com.xkcn.gallery.presenter;
 
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PreferenceRepository;
+import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.view.PhotoListPagerView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import rx.Observable;
 import rx.Observer;
@@ -49,5 +52,13 @@ public class PhotoListPagerViewPresenter {
                         view.setupPagerAdapter(pageCount, view.getCurrentType());
                     }
                 });
+    }
+
+    public void checkToCrawlPhoto() {
+        if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - prefDataStore.getUpdatePeriod()) {
+            view.startActionUpdate();
+        } else {
+            EventBus.getDefault().post(new PhotoCrawlingFinishedEvent());
+        }
     }
 }
