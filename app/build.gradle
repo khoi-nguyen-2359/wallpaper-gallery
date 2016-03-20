@@ -16,7 +16,7 @@ android {
     buildToolsVersion configs.androidBuildToolVersion
 
     defaultConfig {
-        applicationId "com.fantageek.xkcn"
+        applicationId configs.applicationId
         minSdkVersion configs.androidMinSdk
         targetSdkVersion configs.androidMaxSdk
         versionCode 1

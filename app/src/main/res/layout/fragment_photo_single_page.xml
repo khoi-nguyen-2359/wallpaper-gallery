@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="#000">
 
-    <com.xkcn.crawler.view.custom.DraweePhotoView
+    <com.xkcn.gallery.view.custom.DraweePhotoView
         android:id="@+id/iv_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

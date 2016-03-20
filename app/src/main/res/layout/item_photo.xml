@@ -17,7 +17,7 @@
         app:actualImageScaleType="focusCrop"
         />
 
-    <com.xkcn.crawler.view.PhotoActionsView
+    <com.xkcn.gallery.view.PhotoActionsView
         android:id="@+id/view_actions"
         app:type="icon"
         android:layout_gravity="bottom"

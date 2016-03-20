@@ -11,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.xkcn.crawler.view.SidebarView
+    <com.xkcn.gallery.view.SidebarView
         android:id="@+id/sidebar"
         android:layout_gravity="start"
         android:onClick="emptyOnClick"
@@ -66,6 +66,6 @@
             </LinearLayout>
         </ScrollView>
 
-    </com.xkcn.crawler.view.SidebarView>
+    </com.xkcn.gallery.view.SidebarView>
 
 </android.support.v4.widget.DrawerLayout>

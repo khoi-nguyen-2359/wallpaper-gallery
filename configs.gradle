@@ -2,7 +2,8 @@ ext {
     androidCompileSdk = 23
     androidMinSdk = 16
     androidMaxSdk = 23
-    androidBuildToolVersion = "23.0.1"
-    androidSupportLibVersion = "23.1.1"
-    gmsVersion = "8.3.0"
+    androidBuildToolVersion = "24.0.0 rc2"
+    androidSupportLibVersion = "23.2.1"
+    applicationId = "com.xkcn.gallery"
+    gmsVersion = "8.4.0"
 }

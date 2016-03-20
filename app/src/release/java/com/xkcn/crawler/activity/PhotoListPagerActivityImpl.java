@@ -1,6 +1,6 @@
-package com.xkcn.crawler.activity;
+package com.xkcn.gallery.activity;
 
-import com.xkcn.crawler.activity.PhotoListPagerActivity;
+import com.xkcn.gallery.activity.PhotoListPagerActivity;
 
 /**
  * Created by khoinguyen on 1/14/16.

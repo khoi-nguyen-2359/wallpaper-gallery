@@ -4,12 +4,12 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <com.xkcn.crawler.view.custom.HackyViewPager
+    <com.xkcn.gallery.view.custom.HackyViewPager
         android:id="@+id/pager_photo_single"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.xkcn.crawler.view.PhotoActionsView
+    <com.xkcn.gallery.view.PhotoActionsView
         android:visibility="invisible"
         android:id="@+id/photo_actions"
         app:type="text"
