@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  *******************************************************************************/
-package com.xkcn.gallery.view.custom;
+package com.xkcn.gallery.view.custom.draweephoto;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -25,17 +25,18 @@ import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.ImageView;
 
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.DataSource;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.drawable.ProgressBarDrawable;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeHolder;
-import com.facebook.imagepipeline.common.ResizeOptions;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
@@ -49,6 +50,9 @@ import uk.co.senab.photoview.PhotoViewAttacher.OnMatrixChangedListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnPhotoTapListener;
 import uk.co.senab.photoview.PhotoViewAttacher.OnViewTapListener;
 
+/**
+ * Customized from https://github.com/chrisbanes/PhotoView/blob/master/library/src/main/java/uk/co/senab/photoview/PhotoView.java
+ */
 public class DraweePhotoView extends ImageView implements IPhotoView {
 
     private PhotoViewAttacher mAttacher;
@@ -56,7 +60,6 @@ public class DraweePhotoView extends ImageView implements IPhotoView {
     private ScaleType mPendingScaleType;
 
     DraweeHolder<GenericDraweeHierarchy> mDraweeHolder;
-//    private CloseableReference<CloseableImage> imageReference = null;
 
     public DraweePhotoView(Context context) {
         this(context, null);
@@ -86,9 +89,10 @@ public class DraweePhotoView extends ImageView implements IPhotoView {
 
         if (mDraweeHolder == null) {
             GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(getResources())
-                    .setProgressBarImage(new CustomProgressbarDrawable())
+                    .setProgressBarImage(new ProgressBarDrawable())
                     .build();
             mDraweeHolder = DraweeHolder.create(hierarchy, getContext());
+            mDraweeHolder.getTopLevelDrawable().setCallback(this);
         }
     }
 
@@ -328,15 +332,14 @@ public class DraweePhotoView extends ImageView implements IPhotoView {
     @Override
     protected void onDetachedFromWindow() {
         mAttacher.cleanup();
-        mDraweeHolder.onDetach();
         super.onDetachedFromWindow();
+        mDraweeHolder.onDetach();
     }
 
     @Override
     protected void onAttachedToWindow() {
-        init();
-        mDraweeHolder.onAttach();
         super.onAttachedToWindow();
+        mDraweeHolder.onAttach();
     }
 
     @Override
@@ -356,6 +359,11 @@ public class DraweePhotoView extends ImageView implements IPhotoView {
         mDraweeHolder.onAttach();
     }
 
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        return mDraweeHolder.onTouchEvent(event) || super.onTouchEvent(event);
+    }
+
     public void setImageUri(String url) {
         ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(url)).build();
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
@@ -372,43 +380,6 @@ public class DraweePhotoView extends ImageView implements IPhotoView {
                             if (imageReference != null) {
                                 CloseableImage image = imageReference.get();
                                 // do something with the image
-                                if (image != null && image instanceof CloseableStaticBitmap) {
-                                    CloseableStaticBitmap closeableStaticBitmap = (CloseableStaticBitmap) image;
-                                    Bitmap bitmap = closeableStaticBitmap.getUnderlyingBitmap();
-                                    if (bitmap != null) {
-                                        setImageBitmap(bitmap);
-                                    }
-                                }
-                            }
-                        } finally {
-                            dataSource.close();
-                            CloseableReference.closeSafely(imageReference);
-                        }
-                    }
-                })
-                .setTapToRetryEnabled(true)
-                .build();
-        mDraweeHolder.setController(controller);
-    }
-
-    public void setImageUri(String uri, int width, int height) {
-        ImageRequest imageRequest = ImageRequestBuilder.newBuilderWithSource(Uri.parse(uri))
-                .setAutoRotateEnabled(true)
-                .setResizeOptions(new ResizeOptions(width, height))
-                .build();
-        ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        final DataSource<CloseableReference<CloseableImage>> dataSource = imagePipeline.fetchDecodedImage(imageRequest, this);
-        DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setOldController(mDraweeHolder.getController())
-                .setImageRequest(imageRequest)
-                .setControllerListener(new BaseControllerListener<ImageInfo>() {
-                    @Override
-                    public void onFinalImageSet(String s, @Nullable ImageInfo imageInfo, @Nullable Animatable animatable) {
-                        CloseableReference<CloseableImage> imageReference = null;
-                        try {
-                            imageReference = dataSource.getResult();
-                            if (imageReference != null) {
-                                CloseableImage image = imageReference.get();
                                 if (image != null && image instanceof CloseableStaticBitmap) {
                                     CloseableStaticBitmap closeableStaticBitmap = (CloseableStaticBitmap) image;
                                     Bitmap bitmap = closeableStaticBitmap.getUnderlyingBitmap();

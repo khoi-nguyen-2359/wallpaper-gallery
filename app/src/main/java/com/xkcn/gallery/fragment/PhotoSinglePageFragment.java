@@ -12,7 +12,7 @@ import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.presenter.PhotoSinglePageViewPresenter;
 import com.xkcn.gallery.view.PhotoSinglePageView;
-import com.xkcn.gallery.view.custom.DraweePhotoView;
+import com.xkcn.gallery.view.custom.draweephoto.PhotoDraweeView;
 
 import java.io.File;
 
@@ -39,7 +39,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
     private PhotoDetails photoDetails;
 
     @Bind(R.id.iv_photo)
-    DraweePhotoView ivPhoto;
+    PhotoDraweeView ivPhoto;
 
     private PhotoSinglePageViewPresenter presenter;
 
@@ -103,7 +103,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
     };
 
     private void loadPhoto() {
-        ivPhoto.setImageUri(photoDetails.getDefaultDownloadUrl());
+        ivPhoto.setImageUrl(photoDetails.getDefaultDownloadUrl());
     }
 
     @Override
