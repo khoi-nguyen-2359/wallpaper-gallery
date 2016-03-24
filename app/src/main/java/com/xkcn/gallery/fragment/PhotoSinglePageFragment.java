@@ -2,29 +2,25 @@ package com.xkcn.gallery.fragment;
 
 import android.content.res.Resources;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
-import com.facebook.drawee.drawable.ProgressBarDrawable;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.presenter.PhotoSinglePageViewPresenter;
 import com.xkcn.gallery.view.PhotoSinglePageView;
-import com.xkcn.gallery.view.custom.CustomProgressbarDrawable;
+import com.xkcn.gallery.view.custom.DashLineProgressDrawable;
 import com.xkcn.gallery.view.custom.draweephoto.XkcnPhotoView;
 
 import java.io.File;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
-import rx.Observer;
 
 /**
  * Created by khoinguyen on 12/15/15.
@@ -92,7 +88,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
 
         Resources resources = getResources();
         GenericDraweeHierarchy hierachy = ivPhoto.getHierarchy();
-        CustomProgressbarDrawable progressDrawable = new CustomProgressbarDrawable();
+        DashLineProgressDrawable progressDrawable = new DashLineProgressDrawable();
         progressDrawable.setElapsedProgressColor(resources.getColor(R.color.xkcn_avatar_pink));
         progressDrawable.setBackgroundColor(Color.BLACK);
         progressDrawable.setRemainedProgressColor(resources.getColor(android.R.color.darker_gray));

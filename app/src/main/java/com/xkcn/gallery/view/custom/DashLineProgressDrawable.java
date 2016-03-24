@@ -13,11 +13,12 @@ import android.view.animation.AccelerateDecelerateInterpolator;
 import android.view.animation.LinearInterpolator;
 
 import com.facebook.drawee.drawable.DrawableUtils;
+import com.khoinguyen.logging.L;
 
 /**
  * Created by khoinguyen on 16/03/22.
  */
-public class CustomProgressbarDrawable extends Drawable {
+public class DashLineProgressDrawable extends Drawable {
 
     private static final int MAX_LEVEL = 10000;
     private static final int BAR_WIDTH_DEFAULT = 30;
@@ -36,7 +37,7 @@ public class CustomProgressbarDrawable extends Drawable {
 
     private ObjectAnimator animFillElapsedProgress;
 
-    public CustomProgressbarDrawable() {
+    public DashLineProgressDrawable() {
         paintElapsedProgress = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintRemainedProgress = new Paint(Paint.ANTI_ALIAS_FLAG);
         barWidth = BAR_WIDTH_DEFAULT;
@@ -53,14 +54,15 @@ public class CustomProgressbarDrawable extends Drawable {
         float startY = bounds.height() / 2f;
         float stopX = bounds.width() * (3f / 4);
         canvas.drawLine(startX, startY, stopX, startY, paintRemainedProgress);
-
+//        L.get(this).d("startX=%f startY=%f stopX=%f", startX, startY, stopX);
         paintElapsedProgress.setColor(elapsedProgressColor);
         paintElapsedProgress.setStrokeWidth(barWidth);
-        float progressStopX = stopX * (progress *1f / MAX_LEVEL);
+        float progressStopX = startX + (stopX - startX) * (progress *1f / MAX_LEVEL);
         float dashOffset = dashOffsetPercent * barWidth;
         Path progressPath = new Path();
         progressPath.moveTo(startX, startY);
         progressPath.lineTo(progressStopX, startY);
+        L.get(this).d("progressStopX=%f", progressStopX);
 
         PathEffect effect = new PathDashPathEffect(makeProgressDashPath(barWidth, barWidth), barWidth, dashOffset, PathDashPathEffect.Style.ROTATE);
         paintElapsedProgress.setPathEffect(effect);
