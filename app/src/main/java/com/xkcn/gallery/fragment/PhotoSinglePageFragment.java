@@ -1,5 +1,8 @@
 package com.xkcn.gallery.fragment;
 
+import android.content.res.Resources;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -8,11 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.facebook.drawee.drawable.ProgressBarDrawable;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.presenter.PhotoSinglePageViewPresenter;
 import com.xkcn.gallery.view.PhotoSinglePageView;
-import com.xkcn.gallery.view.custom.draweephoto.PhotoDraweeView;
+import com.xkcn.gallery.view.custom.CustomProgressbarDrawable;
+import com.xkcn.gallery.view.custom.draweephoto.XkcnPhotoView;
 
 import java.io.File;
 
@@ -39,7 +45,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
     private PhotoDetails photoDetails;
 
     @Bind(R.id.iv_photo)
-    PhotoDraweeView ivPhoto;
+    XkcnPhotoView ivPhoto;
 
     private PhotoSinglePageViewPresenter presenter;
 
@@ -83,24 +89,16 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
     private void initViews(LayoutInflater inflater, ViewGroup container) {
         rootView = inflater.inflate(R.layout.fragment_photo_single_page, container, false);
         ButterKnife.bind(this, rootView);
+
+        Resources resources = getResources();
+        GenericDraweeHierarchy hierachy = ivPhoto.getHierarchy();
+        CustomProgressbarDrawable progressDrawable = new CustomProgressbarDrawable();
+        progressDrawable.setElapsedProgressColor(resources.getColor(R.color.xkcn_avatar_pink));
+        progressDrawable.setBackgroundColor(Color.BLACK);
+        progressDrawable.setRemainedProgressColor(resources.getColor(android.R.color.darker_gray));
+        progressDrawable.setBarWidth(resources.getDimensionPixelSize(R.dimen.photo_single_page_progress_bar_width));
+        hierachy.setProgressBarImage(progressDrawable);
     }
-
-    private Observer<Object> imageLoaderSubscriber = new Observer<Object>() {
-        @Override
-        public void onCompleted() {
-            // todo: why create no use?
-//            photoDownloader.getPhotoDownloadObservable(photoDetails);
-        }
-
-        @Override
-        public void onError(Throwable e) {
-            Toast.makeText(getContext(), R.string.photo_action_download_failed_retry, Toast.LENGTH_SHORT).show();
-        }
-
-        @Override
-        public void onNext(Object aBoolean) {
-        }
-    };
 
     private void loadPhoto() {
         ivPhoto.setImageUrl(photoDetails.getDefaultDownloadUrl());

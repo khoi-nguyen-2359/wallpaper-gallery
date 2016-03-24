@@ -10,7 +10,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.fantageek.toolkit.util.L;
+import com.khoinguyen.logging.L;
 import com.xkcn.gallery.XkcnApp;
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PhotoTagRepository;

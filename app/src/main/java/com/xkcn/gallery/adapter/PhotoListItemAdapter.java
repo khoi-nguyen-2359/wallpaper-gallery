@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.fantageek.toolkit.util.L;
+import com.khoinguyen.logging.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.data.model.PhotoDetails;

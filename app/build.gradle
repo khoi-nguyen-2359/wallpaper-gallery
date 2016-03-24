@@ -63,7 +63,8 @@ dependencies {
     compile 'com.android.support:recyclerview-v7:' + configs.androidSupportLibVersion
     compile 'com.android.support:design:' + configs.androidSupportLibVersion
 
-    compile(name: 'toolkit', ext: 'aar')
+    compile(name: 'logging', ext: 'aar')
+    compile(name: 'recyclerview', ext: 'aar')
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;

@@ -11,7 +11,7 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
-import com.fantageek.toolkit.util.L;
+import com.khoinguyen.logging.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.adapter.PhotoSinglePagerAdapter;

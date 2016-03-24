@@ -5,7 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.fantageek.toolkit.util.L;
+import com.khoinguyen.logging.L;
 import com.xkcn.gallery.data.model.PhotoTag;
 
 import java.util.ArrayList;

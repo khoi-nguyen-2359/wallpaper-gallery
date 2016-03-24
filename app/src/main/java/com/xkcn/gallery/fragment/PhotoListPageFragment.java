@@ -8,8 +8,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.fantageek.toolkit.util.L;
-import com.fantageek.toolkit.view.recyclerview.SimpleDividerItemDec;
+import com.khoinguyen.logging.L;
+import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListItemAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;

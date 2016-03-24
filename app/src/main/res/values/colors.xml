@@ -13,4 +13,5 @@
     <color name="sidebar_hotest_btn_bg_normal">#ff7500</color>
     <color name="sidebar_last_update_text">#acacac</color>
     <color name="sidebar_tagcloud_text_normal">#fff</color>
+    <color name="xkcn_avatar_pink">#FF2193</color>
 </resources>

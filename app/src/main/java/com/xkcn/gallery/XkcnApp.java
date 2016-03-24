@@ -3,7 +3,7 @@ package com.xkcn.gallery;
 import android.app.Application;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.fantageek.toolkit.util.L;
+import com.khoinguyen.logging.L;
 import com.xkcn.gallery.di.ApplicationComponent;
 import com.xkcn.gallery.di.ApplicationModule;
 import com.xkcn.gallery.di.DaggerApplicationComponent;

@@ -13,7 +13,7 @@ import com.facebook.imagepipeline.memory.PooledByteBuffer;
 import com.facebook.imagepipeline.memory.PooledByteBufferInputStream;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
-import com.fantageek.toolkit.util.L;
+import com.khoinguyen.logging.L;
 import com.xkcn.gallery.XkcnApp;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.util.AndroidUtils;
@@ -49,7 +49,7 @@ public final class PhotoDownloader {
         mapDownloadObservables = new HashMap<>();
     }
 
-    private Observable<File> getPhotoDownloadObservable(final String downloadUrl) {
+    public Observable<File> getPhotoDownloadObservable(final String downloadUrl) {
         Observable<File> downloadingObservable = mapDownloadObservables.get(downloadUrl);
         if (downloadingObservable != null) {
             logger.d("photo is being downloaded");

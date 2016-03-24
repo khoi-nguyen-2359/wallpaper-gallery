@@ -14,29 +14,32 @@ import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.xkcn.gallery.XkcnApp;
+import com.xkcn.gallery.di.ApplicationComponent;
+import com.xkcn.gallery.imageloader.PhotoDownloader;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
-public class PhotoDraweeView extends SimpleDraweeView implements IAttacher {
+public class XkcnPhotoView extends SimpleDraweeView implements IAttacher {
 
     private Attacher mAttacher;
 
-    public PhotoDraweeView(Context context, GenericDraweeHierarchy hierarchy) {
+    public XkcnPhotoView(Context context, GenericDraweeHierarchy hierarchy) {
         super(context, hierarchy);
         init();
     }
 
-    public PhotoDraweeView(Context context) {
+    public XkcnPhotoView(Context context) {
         super(context);
         init();
     }
 
-    public PhotoDraweeView(Context context, AttributeSet attrs) {
+    public XkcnPhotoView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public PhotoDraweeView(Context context, AttributeSet attrs, int defStyle) {
+    public XkcnPhotoView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -144,7 +147,7 @@ public class PhotoDraweeView extends SimpleDraweeView implements IAttacher {
         mAttacher.update(imageInfoWidth, imageInfoHeight);
     }
 
-    public void setImageUrl(String url) {
+    public void setImageUrl(final String url) {
         PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
         controller.setUri(url);
         controller.setOldController(getController());

@@ -6,11 +6,12 @@
     android:layout_height="match_parent"
     android:background="#000">
 
-    <com.xkcn.gallery.view.custom.draweephoto.PhotoDraweeView
+    <com.xkcn.gallery.view.custom.draweephoto.XkcnPhotoView
         android:id="@+id/iv_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:actualImageScaleType="fitCenter"
+        app:failureImage="@drawable/photo_load_failed"
         />
 
 </FrameLayout>
