@@ -11,6 +11,7 @@ import android.view.MotionEvent;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 import com.facebook.drawee.controller.BaseControllerListener;
+import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
@@ -23,6 +24,7 @@ import uk.co.senab.photoview.PhotoViewAttacher;
 public class XkcnPhotoView extends SimpleDraweeView implements IAttacher {
 
     private Attacher mAttacher;
+    private BaseControllerListener<ImageInfo> listener;
 
     public XkcnPhotoView(Context context, GenericDraweeHierarchy hierarchy) {
         super(context, hierarchy);
@@ -151,16 +153,66 @@ public class XkcnPhotoView extends SimpleDraweeView implements IAttacher {
         PipelineDraweeControllerBuilder controller = Fresco.newDraweeControllerBuilder();
         controller.setUri(url);
         controller.setOldController(getController());
-        controller.setControllerListener(new BaseControllerListener<ImageInfo>() {
-            @Override
-            public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
-                super.onFinalImageSet(id, imageInfo, animatable);
-                if (imageInfo == null) {
-                    return;
-                }
-                update(imageInfo.getWidth(), imageInfo.getHeight());
-            }
-        });
+        controller.setControllerListener(baseControllerListener);
         setController(controller.build());
+    }
+
+    private ControllerListener<? super ImageInfo> baseControllerListener = new BaseControllerListener<ImageInfo>() {
+        @Override
+        public void onFinalImageSet(String id, ImageInfo imageInfo, Animatable animatable) {
+            super.onFinalImageSet(id, imageInfo, animatable);
+            if (imageInfo == null) {
+                return;
+            }
+            update(imageInfo.getWidth(), imageInfo.getHeight());
+
+            if (listener != null) {
+                listener.onFinalImageSet(id, imageInfo, animatable);
+            }
+        }
+
+        @Override
+        public void onFailure(String id, Throwable throwable) {
+            super.onFailure(id, throwable);
+            if (listener != null) {
+                listener.onFailure(id, throwable);
+            }
+        }
+
+        @Override
+        public void onIntermediateImageFailed(String id, Throwable throwable) {
+            super.onIntermediateImageFailed(id, throwable);
+            if (listener != null) {
+                listener.onIntermediateImageFailed(id, throwable);
+            }
+        }
+
+        @Override
+        public void onIntermediateImageSet(String id, ImageInfo imageInfo) {
+            super.onIntermediateImageSet(id, imageInfo);
+            if (listener != null) {
+                listener.onIntermediateImageSet(id, imageInfo);
+            }
+        }
+
+        @Override
+        public void onRelease(String id) {
+            super.onRelease(id);
+            if (listener != null) {
+                listener.onRelease(id);
+            }
+        }
+
+        @Override
+        public void onSubmit(String id, Object callerContext) {
+            super.onSubmit(id, callerContext);
+            if (listener != null) {
+                listener.onSubmit(id, callerContext);
+            }
+        }
+    };
+
+    public void setListener(BaseControllerListener<ImageInfo> listener) {
+        this.listener = listener;
     }
 }

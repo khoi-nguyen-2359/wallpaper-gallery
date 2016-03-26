@@ -16,11 +16,14 @@ import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.adapter.PhotoSinglePagerAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.event.PagerSinglePhotoSelected;
 import com.xkcn.gallery.presenter.PhotoSinglePagerViewPresenter;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.util.UiUtils;
 import com.xkcn.gallery.view.PhotoActionsView;
 import com.xkcn.gallery.view.PhotoSinglePagerView;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.List;
 
@@ -38,6 +41,7 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
 
     private boolean enabledToggleStatusBar;
     private L logger;
+    private PhotoPagerLoadingTracker photoPagerLoadingTracker;
 
     public static Intent intentViewSinglePhoto(Context context, int listingType, int page, int selectedPosition) {
         Intent i = new Intent(context, PhotoSinglePagerActivityImpl.class);
@@ -162,6 +166,8 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
 
         @Override
         public void onPageSelected(int position) {
+            photoPagerLoadingTracker.changeCurrentPhotoPage(getPhotoDetails(position).getIdentifier());
+            EventBus.getDefault().post(new PagerSinglePhotoSelected());
         }
 
         @Override
@@ -170,33 +176,44 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         }
     };
 
-    private void bindPhotoToActionView(int position) {
+    private PhotoDetails getPhotoDetails(int position) {
         if (adapterPhotoSingles == null) {
-            return;
+            return null;
         }
 
-        List<PhotoDetails> photoListPage = adapterPhotoSingles.getPhotoListPage();
-        if (photoListPage == null || photoListPage.isEmpty() || position < 0 || position >= photoListPage.size()) {
-            return;
+        List<PhotoDetails> photos = adapterPhotoSingles.getPhotoListPage();
+        if (photos == null || position < 0 || position >= photos.size()) {
+            return null;
         }
 
-        viewPhotoActions.bind(photoListPage.get(position));
+        return photos.get(position);
+    }
+
+    private void bindPhotoToActionView(int position) {
+        viewPhotoActions.bind(getPhotoDetails(position));
     }
 
     @Override
     public void setupPagerAdapter(List<PhotoDetails> photoListPage) {
         if (adapterPhotoSingles == null) {
+            photoPagerLoadingTracker = new PhotoPagerLoadingTracker();
             adapterPhotoSingles = new PhotoSinglePagerAdapter(getSupportFragmentManager());
             pagerPhotoSingle.addOnPageChangeListener(onPageChanged);
             pagerPhotoSingle.setAdapter(adapterPhotoSingles);
         }
 
-        adapterPhotoSingles.setPhotoDatas(photoListPage);
         int selectedPosition = getSelectedPosition();
+
+        adapterPhotoSingles.setPhotoDatas(photoListPage);
+        photoPagerLoadingTracker.setup(photoListPage, selectedPosition);
         adapterPhotoSingles.notifyDataSetChanged();
         pagerPhotoSingle.setCurrentItem(selectedPosition);
-
         logger.d("setupPagerAdapter %d, select %d", photoListPage != null ? photoListPage.size() : 0, selectedPosition);
+    }
+
+    @Override
+    public PhotoPagerLoadingTracker getPhotoPagerLoadingTracker() {
+        return photoPagerLoadingTracker;
     }
 
     public int getSelectedPosition() {
@@ -229,5 +246,4 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
             });
         }
     }
-
 }

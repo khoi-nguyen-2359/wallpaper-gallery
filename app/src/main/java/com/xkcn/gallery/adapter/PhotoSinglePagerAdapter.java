@@ -6,6 +6,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 
 import com.xkcn.gallery.fragment.PhotoSinglePageFragment;
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.view.PhotoSinglePagerView;
 
 import java.util.List;
 

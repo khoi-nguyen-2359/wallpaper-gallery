@@ -62,7 +62,7 @@ public class DashLineProgressDrawable extends Drawable {
         Path progressPath = new Path();
         progressPath.moveTo(startX, startY);
         progressPath.lineTo(progressStopX, startY);
-        L.get(this).d("progressStopX=%f", progressStopX);
+//        L.get(this).d("progressStopX=%f", progressStopX);
 
         PathEffect effect = new PathDashPathEffect(makeProgressDashPath(barWidth, barWidth), barWidth, dashOffset, PathDashPathEffect.Style.ROTATE);
         paintElapsedProgress.setPathEffect(effect);
