@@ -14,6 +14,7 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     private static final long INVALID_TIME = 1;
     private static final long INVALID_PHOTO_ID = -1;
     private static final String PREF_HAS_OPENED_LEFT_DRAWER = "PREF_HAS_OPENED_LEFT_DRAWER";
+    private static final String PREF_LAST_WATCHED_PHOTO_LIST_PAGE = "PREF_LAST_WATCHED_PHOTO_LIST_PAGE";
 
     private SharedPreferences sharedPreferences;
 
@@ -69,4 +70,15 @@ public class PreferenceRepositoryImpl implements PreferenceRepository {
     public long getUpdatePeriod() {
         return PERIOD_UPDATE;
     }
+
+    @Override
+    public void setLastWatchedPhotoListPage(int position) {
+        getPref().edit().putInt(PREF_LAST_WATCHED_PHOTO_LIST_PAGE, position).apply();
+    }
+
+    @Override
+    public int getLastWatchedPhotoListPage() {
+        return getPref().getInt(PREF_LAST_WATCHED_PHOTO_LIST_PAGE, 0);
+    }
+
 }

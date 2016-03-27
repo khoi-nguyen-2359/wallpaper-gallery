@@ -15,4 +15,7 @@ public interface PreferenceRepository {
     int getListPagerPhotoPerPage();
 
     long getUpdatePeriod();
+
+    void setLastWatchedPhotoListPage(int position);
+    int getLastWatchedPhotoListPage();
 }

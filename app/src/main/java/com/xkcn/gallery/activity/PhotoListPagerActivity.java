@@ -32,7 +32,6 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     protected PhotoListPagerAdapter adapterPhotoPages;
 
-
     protected PhotoListPagerViewPresenter presenter;
 
     @Bind(R.id.pager_photo_page) ViewPager pagerPhotoPage;
@@ -51,6 +50,13 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     protected void onStart() {
         super.onStart();
         presenter.checkToCrawlPhoto();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+
+        presenter.saveLastWatchedPhotoListPage(pagerPhotoPage.getCurrentItem());
     }
 
     private void initViews() {
@@ -73,6 +79,8 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         adapterPhotoPages.setPageCount(pageCount);
         adapterPhotoPages.setType(type);
         adapterPhotoPages.notifyDataSetChanged();
+
+        presenter.loadLastWatchedPhotoListPage();
     }
 
     protected PhotoListPagerAdapter createPhotoListPagerAdapter() {
@@ -151,6 +159,11 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Override
     public void startActionUpdate() {
         UpdateService.startActionUpdate(this);
+    }
+
+    @Override
+    public void setLastWatchedPhotoListPage(Integer page) {
+        pagerPhotoPage.setCurrentItem(page);
     }
 
     /*** event bus ***/

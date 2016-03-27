@@ -7,4 +7,6 @@ public interface PhotoListPagerView extends PhotoListingView {
     void setupPagerAdapter(int pageCount, int type);
 
     void startActionUpdate();
+
+    void setLastWatchedPhotoListPage(Integer page);
 }
