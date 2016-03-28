@@ -4,6 +4,7 @@
     android:layout_height="match_parent">
 
     <android.support.v7.widget.RecyclerView
+        android:background="#fff"
         android:clipToPadding="false"
         android:id="@+id/photo_list"
         android:layout_width="match_parent"

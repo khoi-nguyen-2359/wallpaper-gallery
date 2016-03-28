@@ -1,5 +1,6 @@
 package com.xkcn.gallery.fragment;
 
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
@@ -103,10 +104,11 @@ public abstract class PhotoListPageFragment extends XkcnFragment implements Phot
 
         listPhoto = (RecyclerView) root.findViewById(R.id.photo_list);
         listPhoto.setHasFixedSize(true);
-        listPhoto.addItemDecoration(new SimpleDividerItemDec(null, RecyclerView.VERTICAL, getResources().getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
+        Resources resources = getResources();
         StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(nPhotoCol, StaggeredGridLayoutManager.VERTICAL);
         listPhoto.setLayoutManager(rcvLayoutMan);
+        listPhoto.addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
         return root;
     }

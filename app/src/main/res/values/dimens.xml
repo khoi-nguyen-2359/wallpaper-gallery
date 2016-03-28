@@ -2,6 +2,7 @@
     <!-- Default screen margins, per the Android Design guidelines. -->
     <dimen name="activity_horizontal_margin">10dp</dimen>
     <dimen name="activity_vertical_margin">12dp</dimen>
+    <dimen name="photo_list_pager_photo_item_hor_margin">5dp</dimen>
     <dimen name="item_photo_corner_radius">5dp</dimen>
     <dimen name="item_photo_content_padding">0dp</dimen>
     <dimen name="sidebar_tagcloud_corner">5dp</dimen>
@@ -11,6 +12,7 @@
     <dimen name="nav_header_vertical_spacing">16dp</dimen>
     <dimen name="nav_header_height">160dp</dimen>
     <dimen name="fab_margin">16dp</dimen>
-    <dimen name="photo_list_pager_item_offset">6dp</dimen>
+    <dimen name="photo_list_pager_item_offset">3dp</dimen>
     <dimen name="photo_single_page_progress_bar_width">10dp</dimen>
+    <dimen name="photo_list_pager_photo_border_width">10dp</dimen>
 </resources>

@@ -8,12 +8,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.logging.L;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.view.PhotoActionsView;
+import com.xkcn.gallery.event.OnPhotoListItemClicked;
 
 import org.greenrobot.eventbus.EventBus;
 
@@ -34,14 +36,17 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         SimpleDraweeView ivPhoto;
-        PhotoActionsView viewPhotoActions;
 
         public ViewHolder(View itemView) {
             super(itemView);
             ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
             PointF focusPoint = new PointF(0.5f, 0.4f);
-            ivPhoto.getHierarchy().setActualImageFocusPoint(focusPoint);
-            viewPhotoActions = (PhotoActionsView) itemView.findViewById(R.id.view_actions);
+            GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
+                    .setActualImageFocusPoint(focusPoint)
+                    .setOverlay(itemView.getResources().getDrawable(R.drawable.photo_list_pager_photo_item_border))
+                    .setActualImageScaleType(ScalingUtils.ScaleType.FOCUS_CROP)
+                    .build();
+            ivPhoto.setHierarchy(photoHierarchy);
         }
     }
 
@@ -60,13 +65,11 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
-        return new ViewHolder(inflater.inflate(R.layout.item_photo, viewGroup, false));
+        return new ViewHolder(inflater.inflate(R.layout.photo_list_pager_photo_item, viewGroup, false));
     }
 
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
-        viewHolder.viewPhotoActions.bind(dataPhotos.get(i));
-
         viewHolder.ivPhoto.setAspectRatio(1.5f);
         viewHolder.ivPhoto.setImageURI(Uri.parse(dataPhotos.get(i).getPhoto500()));
 

@@ -1,1 +1,9 @@
-<resources></resources>
+<resources>
+    <style name="AppTheme.PhotoListPagerActivity" parent="AppTheme">
+        <item name="android:statusBarColor">#000</item>
+    </style>
+
+    <style name="AppTheme.SplashActivity" parent="AppTheme">
+        <item name="android:statusBarColor">#000</item>
+    </style>
+</resources>

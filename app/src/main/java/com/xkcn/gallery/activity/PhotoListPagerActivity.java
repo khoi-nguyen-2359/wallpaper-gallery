@@ -1,6 +1,7 @@
 package com.xkcn.gallery.activity;
 
 import android.content.Intent;
+import android.graphics.PixelFormat;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
@@ -44,6 +45,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         initTemplateViews();
         initViews();
         presenter.loadPageCount();
+        getWindow().setFormat(PixelFormat.RGBA_8888);
     }
 
     @Override

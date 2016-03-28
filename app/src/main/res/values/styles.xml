@@ -1,11 +1,13 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="AppTheme.MainActivity" parent="AppTheme"></style>
+    <style name="AppTheme.PhotoListPagerActivity" parent="AppTheme"></style>
+
+    <style name="AppTheme.SplashActivity" parent="AppTheme"></style>
 
     <style name="AppTheme.SinglePhotoActivity" parent="AppTheme"></style>
 
@@ -21,7 +23,7 @@
 
     <color name="sidebar_tagcloud_text">#fff</color>
 
-    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+    <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 </resources>
