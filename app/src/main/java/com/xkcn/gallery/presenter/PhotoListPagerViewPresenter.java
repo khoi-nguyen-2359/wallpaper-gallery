@@ -60,8 +60,6 @@ public class PhotoListPagerViewPresenter {
     public void checkToCrawlPhoto() {
         if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - prefDataStore.getUpdatePeriod()) {
             view.startActionUpdate();
-        } else {
-            EventBus.getDefault().post(new PhotoCrawlingFinishedEvent());
         }
     }
 

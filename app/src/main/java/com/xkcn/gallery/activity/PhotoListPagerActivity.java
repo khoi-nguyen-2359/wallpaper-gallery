@@ -165,7 +165,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     @Override
     public void setLastWatchedPhotoListPage(Integer page) {
-        pagerPhotoPage.setCurrentItem(page);
+        pagerPhotoPage.setCurrentItem(page, false);
     }
 
     /*** event bus ***/

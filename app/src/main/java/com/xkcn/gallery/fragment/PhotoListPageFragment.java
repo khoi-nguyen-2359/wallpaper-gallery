@@ -95,8 +95,6 @@ public abstract class PhotoListPageFragment extends XkcnFragment implements Phot
 
         adapterPhotos.setDataPhotos(photos);
         adapterPhotos.notifyDataSetChanged();
-
-        logger.d("setupPagerAdapter %d", photos != null ? photos.size() : 0);
     }
 
     public View initView(LayoutInflater inflater, ViewGroup container) {
