@@ -20,22 +20,24 @@ public class PhotoSinglePagerViewPresenter {
     private PhotoListingUsecase photoListingUsecase;
     private int listingType;
     private int photoPage;
+    private int perPage;
 
-    public PhotoSinglePagerViewPresenter(PhotoListingUsecase photoListingUsecase, int listingType, int page) {
+    public PhotoSinglePagerViewPresenter(PhotoListingUsecase photoListingUsecase, int listingType, int page, int perPage) {
         this.photoListingUsecase = photoListingUsecase;
         this.listingType = listingType;
         this.photoPage = page;
+        this.perPage = perPage;
     }
 
     public void loadPhotoListPage() {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
             case PhotoListPagerAdapter.TYPE_HOTEST: {
-                photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(photoPage);
+                photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(photoPage, perPage);
                 break;
             }
             case PhotoListPagerAdapter.TYPE_LATEST: {
-                photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(photoPage);
+                photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(photoPage, perPage);
                 break;
             }
             default:

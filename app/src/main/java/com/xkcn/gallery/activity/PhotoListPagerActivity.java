@@ -9,6 +9,7 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 
 import com.xkcn.gallery.R;
@@ -17,6 +18,7 @@ import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
+import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoListPagerView;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -45,7 +47,6 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         initTemplateViews();
         initViews();
         presenter.loadPageCount();
-        getWindow().setFormat(PixelFormat.RGBA_8888);
     }
 
     @Override
@@ -74,19 +75,17 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Override
     public void setupPagerAdapter(int pageCount, int type) {
         if (adapterPhotoPages == null) {
-            adapterPhotoPages = createPhotoListPagerAdapter();
+            PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository);
+            adapterPhotoPages = new PhotoListPagerAdapter(LayoutInflater.from(this), photoListingUsecase);
             pagerPhotoPage.setAdapter(adapterPhotoPages);
         }
 
         adapterPhotoPages.setPageCount(pageCount);
         adapterPhotoPages.setType(type);
+        adapterPhotoPages.setPerPage(preferenceRepository.getListPagerPhotoPerPage());
         adapterPhotoPages.notifyDataSetChanged();
 
         presenter.loadLastWatchedPhotoListPage();
-    }
-
-    protected PhotoListPagerAdapter createPhotoListPagerAdapter() {
-        return new PhotoListPagerAdapter(getSupportFragmentManager());
     }
 
     private ViewPager.OnPageChangeListener onPhotoListPageChanged = new ViewPager.OnPageChangeListener() {

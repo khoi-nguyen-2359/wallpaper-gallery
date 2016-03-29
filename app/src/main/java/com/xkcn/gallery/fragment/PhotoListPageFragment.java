@@ -77,13 +77,13 @@ public abstract class PhotoListPageFragment extends XkcnFragment implements Phot
     }
 
     private void initData() {
-        nPhotoCol = getResources().getInteger(R.integer.photo_page_col);
-        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository, preferenceRepository.getListPagerPhotoPerPage());
-
-        presenter = new PhotoListPageViewPresenter(photoListingUsecase, getListingType(), getPage());
-        presenter.setView(this);
-
-        logger = L.get(getClass().getSimpleName());
+//        nPhotoCol = getResources().getInteger(R.integer.photo_page_col);
+//        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository, preferenceRepository.getListPagerPhotoPerPage());
+//
+//        presenter = new PhotoListPageViewPresenter(photoListingUsecase, getListingType(), getPage(), perPage);
+//        presenter.setView(this);
+//
+//        logger = L.get(getClass().getSimpleName());
     }
 
     @Override

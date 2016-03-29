@@ -20,11 +20,13 @@ public class PhotoListPageViewPresenter {
     private PhotoListingUsecase photoListingUsecase;
     private int listingType;
     private int photoPage;
+    private int perPage;
 
-    public PhotoListPageViewPresenter(PhotoListingUsecase photoListingUsecase, int listingType, int photoPage) {
+    public PhotoListPageViewPresenter(PhotoListingUsecase photoListingUsecase, int listingType, int photoPage, int perPage) {
         this.photoListingUsecase = photoListingUsecase;
         this.listingType = listingType;
         this.photoPage = photoPage;
+        this.perPage = perPage;
     }
 
     public void setView(PhotoListPageView view) {
@@ -35,11 +37,11 @@ public class PhotoListPageViewPresenter {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
             case PhotoListPagerAdapter.TYPE_HOTEST: {
-                photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(photoPage);
+                photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(photoPage, perPage);
                 break;
             }
             case PhotoListPagerAdapter.TYPE_LATEST: {
-                photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(photoPage);
+                photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(photoPage, perPage);
                 break;
             }
             default:

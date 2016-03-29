@@ -141,8 +141,8 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         int listingType = getCurrentType();
 
         int perPage = preferenceRepository.getListPagerPhotoPerPage();
-        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository, perPage);
-        presenter = new PhotoSinglePagerViewPresenter(photoListingUsecase, listingType, page);
+        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository);
+        presenter = new PhotoSinglePagerViewPresenter(photoListingUsecase, listingType, page, perPage);
         presenter.setView(this);
 
         enabledToggleStatusBar = false;

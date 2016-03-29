@@ -13,14 +13,12 @@ import rx.Subscriber;
  */
 public class PhotoListingUsecase {
     private PhotoDetailsRepository photoDetailsRepository;
-    private int perPage;
 
-    public PhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository, int perPage) {
+    public PhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
         this.photoDetailsRepository = photoDetailsRepository;
-        this.perPage = perPage;
     }
 
-    public Observable<List<PhotoDetails>> createHotestPhotoDetailsObservable(final int page) {
+    public Observable<List<PhotoDetails>> createHotestPhotoDetailsObservable(final int page, final int perPage) {
         return Observable.create(new Observable.OnSubscribe<List<PhotoDetails>>() {
             @Override
             public void call(Subscriber<? super List<PhotoDetails>> subscriber) {
@@ -31,7 +29,7 @@ public class PhotoListingUsecase {
         });
     }
 
-    public Observable<List<PhotoDetails>> createLatestPhotoDetailsObservable(final int page) {
+    public Observable<List<PhotoDetails>> createLatestPhotoDetailsObservable(final int page, final int perPage) {
         return Observable.create(new Observable.OnSubscribe<List<PhotoDetails>>() {
             @Override
             public void call(Subscriber<? super List<PhotoDetails>> subscriber) {

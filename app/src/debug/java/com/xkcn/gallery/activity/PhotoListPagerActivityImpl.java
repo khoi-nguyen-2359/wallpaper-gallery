@@ -56,11 +56,6 @@ public class PhotoListPagerActivityImpl extends PhotoListPagerActivity {
         return super.onNavigationItemSelected(item);
     }
 
-    @Override
-    protected PhotoListPagerAdapter createPhotoListPagerAdapter() {
-        return new PhotoListPagerAdapter(getSupportFragmentManager());
-    }
-
     /* event bus */
 
     private class DebugEventListener {
