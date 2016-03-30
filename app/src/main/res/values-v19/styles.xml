@@ -1,4 +1,7 @@
 <resources>
+    <style name="AppTheme.PhotoListPagerActivity" parent="AppTheme">
+        <item name="android:windowTranslucentStatus">true</item>
+    </style>
 
     <style name="AppTheme.SinglePhotoActivity" parent="AppTheme">
         <item name="android:windowTranslucentStatus">true</item>

@@ -4,9 +4,9 @@ import android.graphics.PointF;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
-import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
@@ -46,6 +46,9 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Bind(R.id.nav_view) NavigationView viewNavigation;
     @Bind(R.id.content_view)
     RelativeLayout contentViewLayout;
+
+    @Bind(R.id.main_coordinator_layout)
+    CoordinatorLayout mainCoordinatorLayout;
 
     @Bind(R.id.app_bar)
     AppBarLayout appBarLayout;
@@ -193,6 +196,8 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         contentViewLayout.addView(transitImageView);
         transitImageView.setTranslationX(locationInContentLayout.x);
         transitImageView.setTranslationY(locationInContentLayout.y);
+
+
     }
 
     /*** end - event bus ***/

@@ -1,5 +1,6 @@
 package com.xkcn.gallery.adapter;
 
+import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
 import android.view.LayoutInflater;
 import android.view.View;
