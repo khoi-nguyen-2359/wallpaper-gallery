@@ -65,6 +65,7 @@ dependencies {
 
     compile(name: 'logging', ext: 'aar')
     compile(name: 'recyclerview', ext: 'aar')
+    compile(name: 'ui', ext: 'aar')
 
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;

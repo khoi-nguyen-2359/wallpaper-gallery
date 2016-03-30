@@ -1,8 +1,9 @@
 package com.xkcn.gallery.activity;
 
-import android.content.Intent;
-import android.graphics.PixelFormat;
+import android.graphics.PointF;
 import android.os.Bundle;
+import android.support.design.widget.AppBarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.ViewPager;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,8 +12,12 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.widget.ImageView;
+import android.widget.RelativeLayout;
 
+import com.khoinguyen.ui.UiUtils;
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.adapter.PhotoListItemAdapter;
 import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
@@ -39,6 +44,11 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     @Bind(R.id.pager_photo_page) ViewPager pagerPhotoPage;
     @Bind(R.id.nav_view) NavigationView viewNavigation;
+    @Bind(R.id.content_view)
+    RelativeLayout contentViewLayout;
+
+    @Bind(R.id.app_bar)
+    AppBarLayout appBarLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +109,6 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
         @Override
         public void onPageScrollStateChanged(int state) {
-
         }
     };
 
@@ -174,10 +183,16 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         presenter.loadPageCount();
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(OnPhotoListItemClicked event) {
-        Intent intent = PhotoSinglePagerActivity.intentViewSinglePhoto(this, adapterPhotoPages.getType(), pagerPhotoPage.getCurrentItem()+1, event.getClickedPosition());
-        startActivity(intent);
+    @Subscribe
+    public void handleOnPhotoItemClicked(OnPhotoListItemClicked event) {
+        PhotoListItemAdapter.ViewHolder vh = event.getItemViewHolder();
+        PointF locationInContentLayout = UiUtils.getViewLocationInAnotherView(contentViewLayout, vh.ivPhoto);
+
+        ImageView transitImageView = new ImageView(this);
+        transitImageView.setImageBitmap(vh.ivPhoto.getDrawingCache());
+        contentViewLayout.addView(transitImageView);
+        transitImageView.setTranslationX(locationInContentLayout.x);
+        transitImageView.setTranslationY(locationInContentLayout.y);
     }
 
     /*** end - event bus ***/

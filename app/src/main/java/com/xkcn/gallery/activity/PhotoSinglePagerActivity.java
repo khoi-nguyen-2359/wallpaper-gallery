@@ -12,6 +12,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.khoinguyen.logging.L;
+import com.khoinguyen.ui.UiUtils;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.adapter.PhotoSinglePagerAdapter;
@@ -19,7 +20,6 @@ import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PagerSinglePhotoSelected;
 import com.xkcn.gallery.presenter.PhotoSinglePagerViewPresenter;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.util.UiUtils;
 import com.xkcn.gallery.view.PhotoActionsView;
 import com.xkcn.gallery.view.PhotoSinglePagerView;
 

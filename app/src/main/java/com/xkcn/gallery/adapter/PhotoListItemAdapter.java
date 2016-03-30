@@ -7,6 +7,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -30,33 +31,18 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
     public static final float RATIO_SCALE = 1.0f;
     private L logger;
 
-    public List<PhotoDetails> getDataPhotos() {
-        return dataPhotos;
-    }
-
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        SimpleDraweeView ivPhoto;
-
-        public ViewHolder(View itemView) {
-            super(itemView);
-            ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
-            PointF focusPoint = new PointF(0.5f, 0.4f);
-            GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
-                    .setActualImageFocusPoint(focusPoint)
-//                    .setOverlay(itemView.getResources().getDrawable(R.drawable.photo_list_pager_photo_item_border))
-                    .setActualImageScaleType(ScalingUtils.ScaleType.FOCUS_CROP)
-                    .build();
-            ivPhoto.setHierarchy(photoHierarchy);
-        }
-    }
-
     private final LayoutInflater inflater;
     private List<PhotoDetails> dataPhotos;
+    private View.OnClickListener onItemViewClicked;
 
     public PhotoListItemAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         dataPhotos = new ArrayList<>();
         logger = L.get(getClass().getSimpleName());
+    }
+
+    public List<PhotoDetails> getDataPhotos() {
+        return dataPhotos;
     }
 
     public void setDataPhotos(List<PhotoDetails> dataPhotos) {
@@ -76,8 +62,9 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EventBus.getDefault().post(new OnPhotoListItemClicked(i));
-                logger.d("OnPhotoListItemClicked %d", i);
+                if (onItemViewClicked != null) {
+                    onItemViewClicked.onClick(v);
+                }
             }
         });
     }
@@ -85,5 +72,26 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
     @Override
     public int getItemCount() {
         return dataPhotos.size();
+    }
+
+    public void setOnItemViewClicked(View.OnClickListener onItemViewClicked) {
+        this.onItemViewClicked = onItemViewClicked;
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder {
+        public SimpleDraweeView ivPhoto;
+
+        public ViewHolder(View itemView) {
+            super(itemView);
+            ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
+            ivPhoto.setDrawingCacheEnabled(true);
+            PointF focusPoint = new PointF(0.5f, 0.4f);
+            GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
+                    .setActualImageFocusPoint(focusPoint)
+//                    .setOverlay(itemView.getResources().getDrawable(R.drawable.photo_list_pager_photo_item_border))
+                    .setActualImageScaleType(ScalingUtils.ScaleType.FOCUS_CROP)
+                    .build();
+            ivPhoto.setHierarchy(photoHierarchy);
+        }
     }
 }

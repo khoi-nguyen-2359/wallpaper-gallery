@@ -7,12 +7,12 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.Toast;
 
+import com.khoinguyen.ui.UiUtils;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.util.AndroidUtils;
-import com.xkcn.gallery.util.UiUtils;
 import com.xkcn.gallery.view.PhotoListingView;
 
 import org.greenrobot.eventbus.EventBus;
