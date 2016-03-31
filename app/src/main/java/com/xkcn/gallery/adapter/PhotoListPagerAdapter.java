@@ -3,10 +3,12 @@ package com.xkcn.gallery.adapter;
 import android.os.Build;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.WindowInsetsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.khoinguyen.logging.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.presenter.PhotoListPageViewPresenter;
@@ -25,22 +27,18 @@ public class PhotoListPagerAdapter extends PagerAdapter {
     protected int pageCount;
     private LayoutInflater inflater;
     private PhotoListingUsecase photoListingUsecase;
-    private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
     private int perPage;
+    private int windowInsetsBottom;
 
-    public PhotoListPagerAdapter(LayoutInflater inflater, PhotoListingUsecase photoListingUsecase, SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig) {
+    public PhotoListPagerAdapter(LayoutInflater inflater, PhotoListingUsecase photoListingUsecase) {
         this.inflater = inflater;
         this.photoListingUsecase = photoListingUsecase;
-        this.kitkatSystemBarConfig = kitkatSystemBarConfig;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
         PhotoListPageViewImpl itemView = (PhotoListPageViewImpl) inflater.inflate(R.layout.photo_list_page_view, container, false);
-
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-            itemView.setPadding(0, 0, 0, kitkatSystemBarConfig.getPixelInsetBottom());
-        }
+        itemView.setPadding(0,0,0,windowInsetsBottom);
 
         PhotoListPageViewPresenter presenter = new PhotoListPageViewPresenter(photoListingUsecase, type, position + 1, perPage);
         presenter.setView(itemView);
@@ -81,5 +79,9 @@ public class PhotoListPagerAdapter extends PagerAdapter {
 
     public void setPerPage(int perPage) {
         this.perPage = perPage;
+    }
+
+    public void setWindowInsetsBottom(int windowInsetsBottom) {
+        this.windowInsetsBottom = windowInsetsBottom;
     }
 }
