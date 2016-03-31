@@ -1,6 +1,7 @@
 package com.xkcn.gallery.activity;
 
 import android.graphics.PointF;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
@@ -16,12 +17,12 @@ import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.ui.UiUtils;
+import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListItemAdapter;
 import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
@@ -65,6 +66,9 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Bind(R.id.toolbar_container)
     FrameLayout toolbarContainerLayout;
 
+    private SystemBarTintManager kitkatTintManager;
+    private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -96,13 +100,16 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     private void initData() {
         presenter = new PhotoListPagerViewPresenter(this, photoDetailsRepository, preferenceRepository);
+
+        kitkatTintManager = new SystemBarTintManager(this);
+        kitkatSystemBarConfig = kitkatTintManager.getConfig();
     }
 
     @Override
     public void setupPagerAdapter(int pageCount, int type) {
         if (adapterPhotoPages == null) {
             PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository);
-            adapterPhotoPages = new PhotoListPagerAdapter(LayoutInflater.from(this), photoListingUsecase);
+            adapterPhotoPages = new PhotoListPagerAdapter(LayoutInflater.from(this), photoListingUsecase, kitkatSystemBarConfig);
             pagerPhotoPage.setAdapter(adapterPhotoPages);
         }
 
@@ -143,6 +150,10 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
         viewNavigation.setNavigationItemSelectedListener(this);
 
+        applyWindowInsets();
+    }
+
+    private void applyWindowInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
@@ -152,14 +163,9 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
             }
         });
 
-        ViewCompat.setOnApplyWindowInsetsListener(contentViewLayout, new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
-                contentViewLayout.setPadding(0,0,0,insets.getSystemWindowInsetBottom());
-
-                return insets;
-            }
-        });
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+            toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
+        }
     }
 
     @Override
