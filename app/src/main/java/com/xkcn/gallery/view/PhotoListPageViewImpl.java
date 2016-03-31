@@ -43,8 +43,6 @@ public class PhotoListPageViewImpl extends RecyclerView implements PhotoListPage
     }
 
     private void init() {
-        setHasFixedSize(true);
-
         Resources resources = getResources();
         int nLayoutCol = resources.getInteger(R.integer.photo_page_col);
         StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(nLayoutCol, StaggeredGridLayoutManager.VERTICAL);

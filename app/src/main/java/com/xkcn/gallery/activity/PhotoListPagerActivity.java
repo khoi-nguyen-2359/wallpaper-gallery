@@ -6,12 +6,18 @@ import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
+import android.support.v4.view.OnApplyWindowInsetsListener;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
@@ -53,8 +59,15 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Bind(R.id.app_bar)
     AppBarLayout appBarLayout;
 
+    @Bind(R.id.toolbar)
+    Toolbar toolbar;
+
+    @Bind(R.id.toolbar_container)
+    FrameLayout toolbarContainerLayout;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         initData();
         initTemplateViews();
@@ -118,7 +131,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     protected void initTemplateViews() {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
         toolbar.setTitle(getString(R.string.app_name));
         setSupportActionBar(toolbar);
 
@@ -129,6 +142,15 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         toggle.syncState();
 
         viewNavigation.setNavigationItemSelectedListener(this);
+
+        ViewCompat.setOnApplyWindowInsetsListener(toolbar, new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
+
+                return insets;
+            }
+        });
     }
 
     @Override
