@@ -17,7 +17,6 @@
         
         <FrameLayout
             android:id="@+id/toolbar_container"
-            android:fitsSystemWindows="true"
             app:layout_scrollFlags="scroll|enterAlways"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

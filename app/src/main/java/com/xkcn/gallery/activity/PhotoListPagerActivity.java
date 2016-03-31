@@ -151,6 +151,15 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
                 return insets;
             }
         });
+
+        ViewCompat.setOnApplyWindowInsetsListener(contentViewLayout, new OnApplyWindowInsetsListener() {
+            @Override
+            public WindowInsetsCompat onApplyWindowInsets(View v, WindowInsetsCompat insets) {
+                contentViewLayout.setPadding(0,0,0,insets.getSystemWindowInsetBottom());
+
+                return insets;
+            }
+        });
     }
 
     @Override
@@ -218,8 +227,6 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         contentViewLayout.addView(transitImageView);
         transitImageView.setTranslationX(locationInContentLayout.x);
         transitImageView.setTranslationY(locationInContentLayout.y);
-
-
     }
 
     /*** end - event bus ***/
