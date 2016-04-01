@@ -1,6 +1,9 @@
 package com.xkcn.gallery.activity;
 
+import android.graphics.Color;
 import android.graphics.PointF;
+import android.graphics.RectF;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
@@ -14,25 +17,33 @@ import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.transition.ChangeBounds;
+import android.transition.ChangeImageTransform;
+import android.transition.Transition;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.logging.L;
 import com.khoinguyen.ui.UiUtils;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoListItemAdapter;
 import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
+import com.xkcn.gallery.anim.ZoomToAnimation;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoListPagerView;
+import com.xkcn.gallery.view.custom.DashLineProgressDrawable;
 
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -74,6 +85,9 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     @Bind(R.id.toolbar_container)
     FrameLayout toolbarContainerLayout;
 
+    @Bind(R.id.drawee_transit)
+    SimpleDraweeView transitDraweeView;
+
     private SystemBarTintManager kitkatTintManager;
     private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
     private WindowInsetsCompat windowInsets;
@@ -105,6 +119,8 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         pagerPhotoPage.addOnPageChangeListener(onPhotoListPageChanged);
         pagerPhotoPage.setAdapter(adapterPhotoPages);
         pagerPhotoPage.setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
+
+//        transitDraweeView.setImageURI(Uri.parse("https://scontent-hkg3-1.xx.fbcdn.net/hphotos-xfa1/v/t1.0-9/12920407_536391959865990_5648965578918098818_n.jpg?oh=323d8fdd2b21166c056165b3af339b0f&oe=577D6664"));
     }
 
     private void initData() {
@@ -226,6 +242,8 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+        } else if (transitDraweeView.getVisibility() == View.VISIBLE) {
+            transitDraweeView.setVisibility(View.GONE);
         } else {
             super.onBackPressed();
         }
@@ -279,16 +297,30 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     }
 
     @Subscribe
-    public void handleOnPhotoItemClicked(OnPhotoListItemClicked event) {
-        PhotoListItemAdapter.ViewHolder vh = event.getItemViewHolder();
-        PointF locationInContentLayout = UiUtils.getViewLocationInAnotherView(mainCoordinatorLayout, vh.ivPhoto);
+    public void handleOnPhotoItemClicked(final OnPhotoListItemClicked event) {
+//        appBarLayout.setVisibility(View.INVISIBLE);
 
-        ImageView transitImageView = new ImageView(this);
-        transitImageView.setImageBitmap(vh.ivPhoto.getDrawingCache());
-        mainCoordinatorLayout.addView(transitImageView);
-        transitImageView.setTranslationX(locationInContentLayout.x);
-        transitImageView.setTranslationY(locationInContentLayout.y);
+//        PhotoListItemAdapter.ViewHolder vh = event.getItemViewHolder();
+//        pagerPhotoPage.setVisibility(View.GONE);
+        transitDraweeView.setVisibility(View.VISIBLE);
+        transitDraweeView.setImageURI(Uri.parse(event.getPhotoDetails().getLowResUrl()));
+//        transitDraweeView.setImageResource(R.drawable.avatar_xkcn);
+
+        L.get().d("clicked %s", event.getPhotoDetails().getLowResUrl());
+
+//        transitImageView.setImageResource(R.drawable.avatar_xkcn);
+
+//        RectF destRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
+//        RectF srcRect = new RectF(locationInContentLayout.x, locationInContentLayout.y, locationInContentLayout.x + vh.ivPhoto.getWidth(), locationInContentLayout.y + vh.ivPhoto.getHeight());
+//        new ZoomToAnimation()
+//                .rects(srcRect, destRect)
+//                .duration(175)
+//                .interpolator(new AccelerateDecelerateInterpolator())
+//                .target(transitImageView)
+//                .run();
     }
+
+
 
     /*** end - event bus ***/
 }

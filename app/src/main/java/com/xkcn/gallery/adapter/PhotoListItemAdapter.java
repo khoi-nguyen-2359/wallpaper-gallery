@@ -57,7 +57,7 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
     @Override
     public void onBindViewHolder(final ViewHolder viewHolder, final int i) {
         viewHolder.ivPhoto.setAspectRatio(1.5f);
-        viewHolder.ivPhoto.setImageURI(Uri.parse(dataPhotos.get(i).getPhoto500()));
+        viewHolder.ivPhoto.setImageURI(Uri.parse(dataPhotos.get(i).getLowResUrl()));
 
         viewHolder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -84,7 +84,7 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
         public ViewHolder(View itemView) {
             super(itemView);
             ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
-            ivPhoto.setDrawingCacheEnabled(true);
+//            ivPhoto.setDrawingCacheEnabled(true);
             PointF focusPoint = new PointF(0.5f, 0.4f);
             GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
                     .setActualImageFocusPoint(focusPoint)

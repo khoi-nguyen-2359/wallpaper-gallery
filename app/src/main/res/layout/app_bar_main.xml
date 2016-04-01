@@ -35,4 +35,11 @@
 
     <include layout="@layout/content_main" />
 
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:background="#000"
+        app:actualImageScaleType="focusCrop"
+        android:id="@+id/drawee_transit"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </android.support.design.widget.CoordinatorLayout>

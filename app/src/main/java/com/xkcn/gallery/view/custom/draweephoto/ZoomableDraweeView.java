@@ -13,35 +13,37 @@ import com.facebook.drawee.backends.pipeline.PipelineDraweeControllerBuilder;
 import com.facebook.drawee.controller.BaseControllerListener;
 import com.facebook.drawee.controller.ControllerListener;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.image.ImageInfo;
+import com.facebook.imagepipeline.request.ImageRequest;
 import com.xkcn.gallery.XkcnApp;
 import com.xkcn.gallery.di.ApplicationComponent;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
 
 import uk.co.senab.photoview.PhotoViewAttacher;
 
-public class XkcnPhotoView extends SimpleDraweeView implements IAttacher {
+public class ZoomableDraweeView extends SimpleDraweeView implements IAttacher {
 
     private Attacher mAttacher;
     private BaseControllerListener<ImageInfo> listener;
 
-    public XkcnPhotoView(Context context, GenericDraweeHierarchy hierarchy) {
+    public ZoomableDraweeView(Context context, GenericDraweeHierarchy hierarchy) {
         super(context, hierarchy);
         init();
     }
 
-    public XkcnPhotoView(Context context) {
+    public ZoomableDraweeView(Context context) {
         super(context);
         init();
     }
 
-    public XkcnPhotoView(Context context, AttributeSet attrs) {
+    public ZoomableDraweeView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public XkcnPhotoView(Context context, AttributeSet attrs, int defStyle) {
+    public ZoomableDraweeView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }

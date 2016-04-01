@@ -22,7 +22,7 @@ import com.xkcn.gallery.presenter.PhotoSinglePageViewPresenter;
 import com.xkcn.gallery.view.PhotoSinglePageView;
 import com.xkcn.gallery.view.PhotoSinglePagerView;
 import com.xkcn.gallery.view.custom.DashLineProgressDrawable;
-import com.xkcn.gallery.view.custom.draweephoto.XkcnPhotoView;
+import com.xkcn.gallery.view.custom.draweephoto.ZoomableDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -52,7 +52,7 @@ public class PhotoSinglePageFragment extends XkcnFragment implements PhotoSingle
     private PhotoDetails photoDetails;
 
     @Bind(R.id.iv_photo)
-    XkcnPhotoView ivPhoto;
+    ZoomableDraweeView ivPhoto;
 
     private PhotoSinglePageViewPresenter presenter;
 

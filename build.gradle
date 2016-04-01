@@ -3,10 +3,11 @@ apply from: 'configs.gradle'
 buildscript {
     repositories {
         jcenter()
+        mavenCentral()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.1.0-alpha4'
+        classpath 'com.android.tools.build:gradle:2.1.0-alpha5'
         classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
     }
 }

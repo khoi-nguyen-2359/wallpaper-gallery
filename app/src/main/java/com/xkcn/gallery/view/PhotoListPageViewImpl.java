@@ -3,11 +3,9 @@ package com.xkcn.gallery.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.support.annotation.Nullable;
-import android.support.v4.view.ViewPager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
-import android.view.MotionEvent;
 import android.view.View;
 
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
@@ -17,7 +15,6 @@ import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.util.List;
 
@@ -62,14 +59,25 @@ public class PhotoListPageViewImpl extends RecyclerView implements PhotoListPage
         adapterPhotos.notifyDataSetChanged();
     }
 
+    private PhotoDetails getPhotoDetails(int position) {
+        if (adapterPhotos == null) {
+            return null;
+        }
+
+        List<PhotoDetails> allPhotos = adapterPhotos.getDataPhotos();
+        if (allPhotos == null || allPhotos.isEmpty() || position < 0 || position >= allPhotos.size()) {
+            return null;
+        }
+
+        return allPhotos.get(position);
+    }
+
     private OnClickListener onItemViewClicked = new OnClickListener() {
         @Override
         public void onClick(View itemView) {
             PhotoListItemAdapter.ViewHolder viewHolder = (PhotoListItemAdapter.ViewHolder) getChildViewHolder(itemView);
-            viewHolder.ivPhoto.getTopLevelDrawable();
-
             int position = getChildAdapterPosition(itemView);
-            EventBus.getDefault().post(new OnPhotoListItemClicked(position, viewHolder));
+            EventBus.getDefault().post(new OnPhotoListItemClicked(position, viewHolder, getPhotoDetails(position)));
         }
     };
 }
