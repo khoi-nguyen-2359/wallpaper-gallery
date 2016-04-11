@@ -1,6 +1,6 @@
 package com.xkcn.gallery.presenter;
 
-import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
+import com.xkcn.gallery.adapter.PhotoListingPagerAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoSinglePagerView;
@@ -32,11 +32,11 @@ public class PhotoSinglePagerViewPresenter {
     public void loadPhotoListPage() {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
-            case PhotoListPagerAdapter.TYPE_HOTEST: {
+            case PhotoListingPagerAdapter.TYPE_HOTEST: {
                 photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(photoPage, perPage);
                 break;
             }
-            case PhotoListPagerAdapter.TYPE_LATEST: {
+            case PhotoListingPagerAdapter.TYPE_LATEST: {
                 photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(photoPage, perPage);
                 break;
             }

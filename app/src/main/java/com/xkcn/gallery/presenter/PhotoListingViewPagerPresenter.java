@@ -1,11 +1,11 @@
 package com.xkcn.gallery.presenter;
 
+import android.support.v4.view.WindowInsetsCompat;
+
+import com.xkcn.gallery.adapter.PhotoListingPagerAdapter;
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PreferenceRepository;
-import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
-import com.xkcn.gallery.view.PhotoListPagerView;
-
-import org.greenrobot.eventbus.EventBus;
+import com.xkcn.gallery.view.PhotoListingViewPager;
 
 import rx.Observable;
 import rx.Observer;
@@ -15,19 +15,20 @@ import rx.observers.Observers;
 import rx.schedulers.Schedulers;
 
 /**
- * Created by khoinguyen on 12/14/15.
+ * Created by khoinguyen on 4/11/16.
  */
-public class PhotoListPagerViewPresenter {
-    private PhotoListPagerView view;
-    private PhotoDetailsRepository photoDetailsRepository;
-    private PreferenceRepository prefDataStore;
-    private boolean hasSetLastWatchedPhotoListPage;
+public class PhotoListingViewPagerPresenter {
+    protected static final int PHOTO_TYPE_DEFAULT = PhotoListingPagerAdapter.TYPE_LATEST;
 
-    public PhotoListPagerViewPresenter(PhotoListPagerView view, PhotoDetailsRepository photoDetailsRepository, PreferenceRepository prefDataStore) {
-        this.view = view;
-        this.photoDetailsRepository = photoDetailsRepository;
+    private PhotoListingViewPager view;
+    private boolean hasSetLastWatchedPhotoListPage;
+    private PreferenceRepository prefDataStore;
+    private PhotoDetailsRepository photoDetailsRepository;
+    private int currentType = PHOTO_TYPE_DEFAULT;
+
+    public PhotoListingViewPagerPresenter(PreferenceRepository prefDataStore, PhotoDetailsRepository photoDetailsRepository) {
         this.prefDataStore = prefDataStore;
-        hasSetLastWatchedPhotoListPage = false;
+        this.photoDetailsRepository = photoDetailsRepository;
     }
 
     public void loadPageCount() {
@@ -52,15 +53,9 @@ public class PhotoListPagerViewPresenter {
 
                     @Override
                     public void onNext(Integer pageCount) {
-                        view.setupPagerAdapter(pageCount, view.getCurrentType());
+                        view.displayPhotoPages(pageCount, currentType);
                     }
                 });
-    }
-
-    public void checkToCrawlPhoto() {
-        if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - prefDataStore.getUpdatePeriod()) {
-            view.startActionUpdate();
-        }
     }
 
     /**
@@ -78,34 +73,44 @@ public class PhotoListPagerViewPresenter {
                 subscriber.onCompleted();
             }
         }).subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
+                .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Integer>() {
                     @Override
                     public void onCompleted() {
-
                     }
 
                     @Override
                     public void onError(Throwable e) {
-
                     }
 
                     @Override
                     public void onNext(Integer page) {
-                        view.setLastWatchedPhotoListPage(page);
+                        view.setCurrentPage(page);
                         hasSetLastWatchedPhotoListPage = true;
                     }
                 });
     }
 
-    public void saveLastWatchedPhotoListPage(final int currentItem) {
+    public void saveLastWatchedPhotoListPage() {
         Observable.create(new Observable.OnSubscribe<Object>() {
             @Override
             public void call(Subscriber<? super Object> subscriber) {
-                prefDataStore.setLastWatchedPhotoListPage(currentItem);
+                prefDataStore.setLastWatchedPhotoListPage(view.getCurrentPage());
             }
         }).subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Observers.empty());
+    }
+
+    public void setView(PhotoListingViewPager view) {
+        this.view = view;
+    }
+
+    public void onApplyWindowInsets(WindowInsetsCompat insets) {
+        view.onApplyWindowInsets(insets);
+    }
+
+    public void setCurrentType(int currentType) {
+        this.currentType = currentType;
     }
 }

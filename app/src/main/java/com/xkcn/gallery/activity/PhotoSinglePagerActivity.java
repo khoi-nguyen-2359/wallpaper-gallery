@@ -8,14 +8,15 @@ import android.os.Handler;
 import android.os.Message;
 import android.support.v4.view.ViewPager;
 import android.view.GestureDetector;
+import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
 import com.khoinguyen.logging.L;
 import com.khoinguyen.ui.UiUtils;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
-import com.xkcn.gallery.adapter.PhotoSinglePagerAdapter;
+import com.xkcn.gallery.adapter.PhotoListingPagerAdapter;
+import com.xkcn.gallery.adapter.PhotoDetailsPagerAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PagerSinglePhotoSelected;
 import com.xkcn.gallery.presenter.PhotoSinglePagerViewPresenter;
@@ -33,7 +34,7 @@ import butterknife.ButterKnife;
 /**
  * Created by khoinguyen on 1/21/15.
  */
-public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implements PhotoSinglePagerView {
+public abstract class PhotoSinglePagerActivity extends XkcnActivity {
     public static final String EXTRA_PHOTO_LIST_PAGE = "EXTRA_PHOTO_LIST_PAGE";
     private static final String EXTRA_SELECTED_POSITION = "EXTRA_SELECTED_POSITION";
     private static final String EXTRA_LISTING_TYPE = "EXTRA_LISTING_TYPE";
@@ -41,7 +42,7 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
 
     private boolean enabledToggleStatusBar;
     private L logger;
-    private PhotoPagerLoadingTracker photoPagerLoadingTracker;
+//    private PhotoPagerLoadingTracker photoPagerLoadingTracker;
 
     public static Intent intentViewSinglePhoto(Context context, int listingType, int page, int selectedPosition) {
         Intent i = new Intent(context, PhotoSinglePagerActivityImpl.class);
@@ -58,7 +59,7 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
 
     private PhotoSinglePagerViewPresenter presenter;
     private GestureDetector toggleStatusBarDetector;
-    private PhotoSinglePagerAdapter adapterPhotoSingles;
+    private PhotoDetailsPagerAdapter adapterPhotoSingles;
 
     private View viewDecor;
 
@@ -138,12 +139,12 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
 
     private void initData() {
         int page = getIntent().getIntExtra(EXTRA_PHOTO_LIST_PAGE, 0);
-        int listingType = getCurrentType();
+        int listingType = 0;//getCurrentType();
 
         int perPage = preferenceRepository.getListPagerPhotoPerPage();
         PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository);
         presenter = new PhotoSinglePagerViewPresenter(photoListingUsecase, listingType, page, perPage);
-        presenter.setView(this);
+//        presenter.setView(this);
 
         enabledToggleStatusBar = false;
         toggleStatusBarDetector = new StatusBarToggler(this);
@@ -166,7 +167,7 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
 
         @Override
         public void onPageSelected(int position) {
-            photoPagerLoadingTracker.changeCurrentPhotoPage(getPhotoDetails(position).getIdentifier());
+//            photoPagerLoadingTracker.changeCurrentPhotoPage(getPhotoDetails(position).getIdentifier());
             EventBus.getDefault().post(new PagerSinglePhotoSelected());
         }
 
@@ -193,37 +194,31 @@ public abstract class PhotoSinglePagerActivity extends PhotoPagerActivity implem
         viewPhotoActions.bind(getPhotoDetails(position));
     }
 
-    @Override
-    public void setupPagerAdapter(List<PhotoDetails> photoListPage) {
-        if (adapterPhotoSingles == null) {
-            photoPagerLoadingTracker = new PhotoPagerLoadingTracker();
-            adapterPhotoSingles = new PhotoSinglePagerAdapter(getSupportFragmentManager());
-            pagerPhotoSingle.addOnPageChangeListener(onPageChanged);
-            pagerPhotoSingle.setAdapter(adapterPhotoSingles);
-        }
+//    @Override
+//    public void setupPagerAdapter(List<PhotoDetails> photoListPage) {
+//        if (adapterPhotoSingles == null) {
+////            photoPagerLoadingTracker = new PhotoPagerLoadingTracker();
+//            adapterPhotoSingles = new PhotoDetailsPagerAdapter(LayoutInflater.from(this));
+//            pagerPhotoSingle.addOnPageChangeListener(onPageChanged);
+//            pagerPhotoSingle.setAdapter(adapterPhotoSingles);
+//        }
+//
+//        int selectedPosition = getSelectedPosition();
+//
+//        adapterPhotoSingles.setPhotoDatas(photoListPage);
+////        photoPagerLoadingTracker.setup(photoListPage, selectedPosition);
+//        adapterPhotoSingles.notifyDataSetChanged();
+//        pagerPhotoSingle.setCurrentItem(selectedPosition);
+//        logger.d("displayPhotoData %d, select %d", photoListPage != null ? photoListPage.size() : 0, selectedPosition);
+//    }
 
-        int selectedPosition = getSelectedPosition();
-
-        adapterPhotoSingles.setPhotoDatas(photoListPage);
-        photoPagerLoadingTracker.setup(photoListPage, selectedPosition);
-        adapterPhotoSingles.notifyDataSetChanged();
-        pagerPhotoSingle.setCurrentItem(selectedPosition);
-        logger.d("setupPagerAdapter %d, select %d", photoListPage != null ? photoListPage.size() : 0, selectedPosition);
-    }
-
-    @Override
-    public PhotoPagerLoadingTracker getPhotoPagerLoadingTracker() {
-        return photoPagerLoadingTracker;
-    }
+//    @Override
+//    public PhotoPagerLoadingTracker getPhotoPagerLoadingTracker() {
+//        return photoPagerLoadingTracker;
+//    }
 
     public int getSelectedPosition() {
         return getIntent().getIntExtra(EXTRA_SELECTED_POSITION, 0);
-    }
-
-    @Override
-    public int getCurrentType() {
-        Intent intent = getIntent();
-        return intent != null ? intent.getIntExtra(EXTRA_LISTING_TYPE, 0) : PhotoListPagerAdapter.TYPE_INVALID;
     }
 
     class StatusBarToggler extends GestureDetector {

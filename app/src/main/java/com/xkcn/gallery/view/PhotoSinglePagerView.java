@@ -8,7 +8,7 @@ import java.util.List;
 /**
  * Created by khoinguyen on 12/14/15.
  */
-public interface PhotoSinglePagerView extends PhotoListingView {
+public interface PhotoSinglePagerView extends ActivityView {
     void setupPagerAdapter(List<PhotoDetails> photoDetailses);
     PhotoPagerLoadingTracker getPhotoPagerLoadingTracker();
 

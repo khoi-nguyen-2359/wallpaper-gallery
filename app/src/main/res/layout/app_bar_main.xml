@@ -5,7 +5,7 @@
     android:id="@+id/main_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.PhotoListPagerActivityImpl">
+    tools:context=".activity.MainActivityImpl">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -47,5 +47,11 @@
         android:id="@+id/drawee_transit"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
+
+    <android.support.v4.view.ViewPager
+        android:visibility="gone"
+        android:id="@+id/pager_photo_details"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
 </android.support.design.widget.CoordinatorLayout>

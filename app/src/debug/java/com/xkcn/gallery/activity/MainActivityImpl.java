@@ -4,7 +4,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.adapter.PhotoListPagerAdapter;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.fragment.DebugOptionsDialog;
 
@@ -15,7 +14,7 @@ import org.greenrobot.eventbus.ThreadMode;
 /**
  * Created by khoinguyen on 1/14/16.
  */
-public class PhotoListPagerActivityImpl extends PhotoListPagerActivity {
+public class MainActivityImpl extends MainActivity {
     private DebugEventListener debugEventListener;
 
     @Override
@@ -61,7 +60,7 @@ public class PhotoListPagerActivityImpl extends PhotoListPagerActivity {
     private class DebugEventListener {
         @Subscribe(threadMode = ThreadMode.MAIN)
         public void onEventMainThread(RefreshPhotoListingPager event) {
-            presenter.loadPageCount();
+            listingPagerPresenter.loadPageCount();
         }
     }
 

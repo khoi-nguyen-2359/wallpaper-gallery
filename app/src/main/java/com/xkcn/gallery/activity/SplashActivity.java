@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.xkcn.gallery.presenter.SplashViewPresenter;
-import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.view.SplashView;
 
 /**
@@ -19,6 +18,6 @@ public class SplashActivity extends XkcnActivity implements SplashView {
         super.onCreate(savedInstanceState);
 
         finish();
-        startActivity(new Intent(this, PhotoListPagerActivityImpl.class));
+        startActivity(new Intent(this, MainActivityImpl.class));
     }
 }

@@ -1,24 +1,19 @@
 package com.xkcn.gallery.adapter;
 
-import android.os.Build;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.view.PagerAdapter;
-import android.support.v4.view.WindowInsetsCompat;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.khoinguyen.logging.L;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.presenter.PhotoListPageViewPresenter;
+import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.view.PhotoListPageViewImpl;
+import com.xkcn.gallery.view.PhotoListingRecyclerView;
 
 /**
  * Created by khoinguyen on 12/23/14.
  */
-public class PhotoListPagerAdapter extends PagerAdapter {
+public class PhotoListingPagerAdapter extends PagerAdapter {
     public static final int TYPE_HOTEST = 1;
     public static final int TYPE_LATEST = 2;
     public static final int TYPE_INVALID = -1;
@@ -30,17 +25,17 @@ public class PhotoListPagerAdapter extends PagerAdapter {
     private int perPage;
     private int windowInsetsBottom;
 
-    public PhotoListPagerAdapter(LayoutInflater inflater, PhotoListingUsecase photoListingUsecase) {
+    public PhotoListingPagerAdapter(LayoutInflater inflater, PhotoListingUsecase photoListingUsecase) {
         this.inflater = inflater;
         this.photoListingUsecase = photoListingUsecase;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
-        PhotoListPageViewImpl itemView = (PhotoListPageViewImpl) inflater.inflate(R.layout.photo_list_page_view, container, false);
-        itemView.setPadding(0,0,0,windowInsetsBottom);
+        PhotoListingRecyclerView itemView = (PhotoListingRecyclerView) inflater.inflate(R.layout.photo_list_page_view, container, false);
+        itemView.setPadding(0, 0, 0, windowInsetsBottom);
 
-        PhotoListPageViewPresenter presenter = new PhotoListPageViewPresenter(photoListingUsecase, type, position + 1, perPage);
+        PhotoListingViewPresenter presenter = new PhotoListingViewPresenter(photoListingUsecase, type, position + 1, perPage);
         presenter.setView(itemView);
 
         presenter.loadPhotoListPage();

@@ -7,12 +7,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".activity.PhotoListPagerActivityImpl"
+    tools:context=".activity.MainActivityImpl"
     tools:showIn="@layout/app_bar_main"
     >
 
-    <android.support.v4.view.ViewPager
-        android:id="@+id/pager_photo_page"
+    <com.xkcn.gallery.view.PhotoListingViewPagerImpl
+        android:id="@+id/pager_photo_listing"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 

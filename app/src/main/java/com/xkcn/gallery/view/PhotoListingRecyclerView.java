@@ -10,7 +10,7 @@ import android.view.View;
 
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.adapter.PhotoListItemAdapter;
+import com.xkcn.gallery.adapter.PhotoListingItemAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 
@@ -21,20 +21,20 @@ import java.util.List;
 /**
  * Created by khoinguyen on 3/29/16.
  */
-public class PhotoListPageViewImpl extends RecyclerView implements PhotoListPageView {
-    private PhotoListItemAdapter adapterPhotos;
+public class PhotoListingRecyclerView extends RecyclerView implements PhotoListingView {
+    private PhotoListingItemAdapter adapterPhotos;
 
-    public PhotoListPageViewImpl(Context context) {
+    public PhotoListingRecyclerView(Context context) {
         super(context);
         init();
     }
 
-    public PhotoListPageViewImpl(Context context, @Nullable AttributeSet attrs) {
+    public PhotoListingRecyclerView(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
-    public PhotoListPageViewImpl(Context context, @Nullable AttributeSet attrs, int defStyle) {
+    public PhotoListingRecyclerView(Context context, @Nullable AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
@@ -48,9 +48,9 @@ public class PhotoListPageViewImpl extends RecyclerView implements PhotoListPage
     }
 
     @Override
-    public void setupPagerAdapter(List<PhotoDetails> photos) {
+    public void displayPhotoData(List<PhotoDetails> photos) {
         if (adapterPhotos == null) {
-            adapterPhotos = new PhotoListItemAdapter(getContext());
+            adapterPhotos = new PhotoListingItemAdapter(getContext());
             adapterPhotos.setOnItemViewClicked(onItemViewClicked);
             setAdapter(adapterPhotos);
         }
@@ -75,7 +75,7 @@ public class PhotoListPageViewImpl extends RecyclerView implements PhotoListPage
     private OnClickListener onItemViewClicked = new OnClickListener() {
         @Override
         public void onClick(View itemView) {
-            PhotoListItemAdapter.ViewHolder viewHolder = (PhotoListItemAdapter.ViewHolder) getChildViewHolder(itemView);
+            PhotoListingItemAdapter.ViewHolder viewHolder = (PhotoListingItemAdapter.ViewHolder) getChildViewHolder(itemView);
             int position = getChildAdapterPosition(itemView);
             EventBus.getDefault().post(new OnPhotoListItemClicked(position, viewHolder, getPhotoDetails(position)));
         }

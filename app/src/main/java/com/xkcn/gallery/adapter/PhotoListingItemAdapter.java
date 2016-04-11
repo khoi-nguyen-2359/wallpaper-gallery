@@ -1,13 +1,11 @@
 package com.xkcn.gallery.adapter;
 
 import android.content.Context;
-import android.graphics.PointF;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
 
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -16,9 +14,6 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.logging.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.event.OnPhotoListItemClicked;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,7 +21,7 @@ import java.util.List;
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdapter.ViewHolder> {
+public class PhotoListingItemAdapter extends RecyclerView.Adapter<PhotoListingItemAdapter.ViewHolder> {
 
     public static final float RATIO_SCALE = 1.0f;
     private L logger;
@@ -35,7 +30,7 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
     private List<PhotoDetails> dataPhotos;
     private View.OnClickListener onItemViewClicked;
 
-    public PhotoListItemAdapter(Context context) {
+    public PhotoListingItemAdapter(Context context) {
         inflater = LayoutInflater.from(context);
         dataPhotos = new ArrayList<>();
         logger = L.get(getClass().getSimpleName());

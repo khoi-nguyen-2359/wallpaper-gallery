@@ -12,12 +12,11 @@ import android.view.ViewGroup;
 import com.khoinguyen.logging.L;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.adapter.PhotoListItemAdapter;
+import com.xkcn.gallery.adapter.PhotoListingItemAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
-import com.xkcn.gallery.presenter.PhotoListPageViewPresenter;
-import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.view.PhotoListPageView;
+import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
+import com.xkcn.gallery.view.PhotoListingView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -28,16 +27,16 @@ import java.util.List;
 /**
  * Created by khoinguyen on 12/22/14.
  */
-public abstract class PhotoListPageFragment extends XkcnFragment implements PhotoListPageView {
+public abstract class PhotoListPageFragment extends XkcnFragment implements PhotoListingView {
     protected static final String ARG_PAGE = "ARG_PAGE";
     protected static final String ARG_TYPE = "ARG_TYPE";
 
     protected RecyclerView listPhoto;
-    protected PhotoListItemAdapter adapterPhotos;
+    protected PhotoListingItemAdapter adapterPhotos;
     protected View root;
     protected int nPhotoCol;
     protected int type;
-    protected PhotoListPageViewPresenter presenter;
+    protected PhotoListingViewPresenter presenter;
     private L logger;
 
     public static PhotoListPageFragment instantiate(int page, int type) {
@@ -80,16 +79,16 @@ public abstract class PhotoListPageFragment extends XkcnFragment implements Phot
 //        nPhotoCol = getResources().getInteger(R.integer.photo_page_col);
 //        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository, preferenceRepository.getListPagerPhotoPerPage());
 //
-//        presenter = new PhotoListPageViewPresenter(photoListingUsecase, getListingType(), getPage(), perPage);
+//        presenter = new PhotoListingViewPresenter(photoListingUsecase, getListingType(), getPage(), perPage);
 //        presenter.setView(this);
 //
 //        logger = L.get(getClass().getSimpleName());
     }
 
     @Override
-    public void setupPagerAdapter(List<PhotoDetails> photos) {
+    public void displayPhotoData(List<PhotoDetails> photos) {
         if (adapterPhotos == null) {
-            adapterPhotos = new PhotoListItemAdapter(getActivity());
+            adapterPhotos = new PhotoListingItemAdapter(getActivity());
             listPhoto.setAdapter(adapterPhotos);
         }
 

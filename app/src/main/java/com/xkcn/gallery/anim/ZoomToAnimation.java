@@ -22,8 +22,6 @@ public class ZoomToAnimation extends CompoundViewAnimation {
 
     @Override
     public void run() {
-        float scaleToX = endRect.width() / startRect.width(),
-        scaleToY = endRect.height() / startRect.height();
         addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
