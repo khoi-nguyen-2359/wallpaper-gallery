@@ -35,9 +35,15 @@
 
     <include layout="@layout/content_main" />
 
-    <com.facebook.drawee.view.SimpleDraweeView
+    <View
+        android:id="@+id/drawee_transit_backdrop"
+        android:alpha="0"
         android:background="#000"
-        app:actualImageScaleType="focusCrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.xkcn.gallery.view.custom.ClippingRevealDraweeView
+        android:visibility="gone"
         android:id="@+id/drawee_transit"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />

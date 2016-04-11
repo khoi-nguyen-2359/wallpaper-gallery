@@ -1,5 +1,6 @@
 package com.xkcn.gallery.data.model;
 
+import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -198,5 +199,13 @@ public class PhotoDetails implements Parcelable {
 
     public String getHighResUrl() {
         return getPhotoHigh();
+    }
+
+    public Uri getLowResUri() {
+        return Uri.parse(getLowResUrl());
+    }
+
+    public Uri getHighResUri() {
+        return Uri.parse(getHighResUrl());
     }
 }

@@ -1,5 +1,7 @@
 package com.xkcn.gallery.activity;
 
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.graphics.Color;
 import android.graphics.PointF;
 import android.graphics.RectF;
@@ -25,6 +27,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
+import android.view.animation.DecelerateInterpolator;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -43,6 +46,7 @@ import com.xkcn.gallery.presenter.PhotoListPagerViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoListPagerView;
+import com.xkcn.gallery.view.custom.ClippingRevealDraweeView;
 import com.xkcn.gallery.view.custom.DashLineProgressDrawable;
 
 import org.greenrobot.eventbus.Subscribe;
@@ -60,7 +64,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         implements NavigationView.OnNavigationItemSelectedListener, PhotoListPagerView {
 
     protected static final int PHOTO_TYPE_DEFAULT = PhotoListPagerAdapter.TYPE_LATEST;
-    private static final int DEF_OFFSCREEN_PAGE = 4;
+    private static final int DEF_OFFSCREEN_PAGE = 1;
 
     protected PhotoListPagerAdapter adapterPhotoPages;
 
@@ -86,7 +90,10 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
     FrameLayout toolbarContainerLayout;
 
     @Bind(R.id.drawee_transit)
-    SimpleDraweeView transitDraweeView;
+    ClippingRevealDraweeView transitDraweeView;
+
+    @Bind(R.id.drawee_transit_backdrop)
+    View transitBackdrop;
 
     private SystemBarTintManager kitkatTintManager;
     private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
@@ -94,7 +101,6 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-
         super.onCreate(savedInstanceState);
         initData();
         initTemplateViews();
@@ -120,7 +126,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
         pagerPhotoPage.setAdapter(adapterPhotoPages);
         pagerPhotoPage.setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
 
-//        transitDraweeView.setImageURI(Uri.parse("https://scontent-hkg3-1.xx.fbcdn.net/hphotos-xfa1/v/t1.0-9/12920407_536391959865990_5648965578918098818_n.jpg?oh=323d8fdd2b21166c056165b3af339b0f&oe=577D6664"));
+        transitDraweeView.getHierarchy().setFadeDuration(0);
     }
 
     private void initData() {
@@ -244,6 +250,7 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
             drawer.closeDrawer(GravityCompat.START);
         } else if (transitDraweeView.getVisibility() == View.VISIBLE) {
             transitDraweeView.setVisibility(View.GONE);
+            transitBackdrop.setAlpha(0);
         } else {
             super.onBackPressed();
         }
@@ -298,29 +305,25 @@ public abstract class PhotoListPagerActivity extends PhotoPagerActivity
 
     @Subscribe
     public void handleOnPhotoItemClicked(final OnPhotoListItemClicked event) {
-//        appBarLayout.setVisibility(View.INVISIBLE);
+        appBarLayout.setExpanded(false, false);
 
-//        PhotoListItemAdapter.ViewHolder vh = event.getItemViewHolder();
-//        pagerPhotoPage.setVisibility(View.GONE);
+        PhotoListItemAdapter.ViewHolder vh = event.getItemViewHolder();
+        ViewGroup.LayoutParams lp = transitDraweeView.getLayoutParams();
+        lp.width = vh.ivPhoto.getWidth();
+        lp.height = vh.ivPhoto.getHeight();
+        transitDraweeView.setLayoutParams(lp);
+        transitDraweeView.requestLayout();
+
+        PointF startLoc = UiUtils.getViewLocationInAnotherView(mainCoordinatorLayout, vh.ivPhoto);
+        RectF startRect = new RectF(startLoc.x, startLoc.y, startLoc.x + vh.ivPhoto.getWidth(), startLoc.y + vh.ivPhoto.getHeight());
+        RectF endRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
+
         transitDraweeView.setVisibility(View.VISIBLE);
-        transitDraweeView.setImageURI(Uri.parse(event.getPhotoDetails().getLowResUrl()));
-//        transitDraweeView.setImageResource(R.drawable.avatar_xkcn);
+        transitDraweeView.setImageUris(event.getPhotoDetails().getLowResUri(), event.getPhotoDetails().getHighResUri());
 
-        L.get().d("clicked %s", event.getPhotoDetails().getLowResUrl());
-
-//        transitImageView.setImageResource(R.drawable.avatar_xkcn);
-
-//        RectF destRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
-//        RectF srcRect = new RectF(locationInContentLayout.x, locationInContentLayout.y, locationInContentLayout.x + vh.ivPhoto.getWidth(), locationInContentLayout.y + vh.ivPhoto.getHeight());
-//        new ZoomToAnimation()
-//                .rects(srcRect, destRect)
-//                .duration(175)
-//                .interpolator(new AccelerateDecelerateInterpolator())
-//                .target(transitImageView)
-//                .run();
+        transitDraweeView.createRevealAnimation(transitBackdrop, startRect, endRect)
+                .run();
     }
-
-
 
     /*** end - event bus ***/
 }

@@ -10,8 +10,6 @@
         android:id="@+id/iv_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:actualImageScaleType="fitCenter"
-        app:failureImage="@drawable/photo_load_failed"
         />
 
 </FrameLayout>

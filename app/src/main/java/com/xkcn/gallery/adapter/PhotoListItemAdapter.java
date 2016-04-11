@@ -85,11 +85,9 @@ public class PhotoListItemAdapter extends RecyclerView.Adapter<PhotoListItemAdap
             super(itemView);
             ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
 //            ivPhoto.setDrawingCacheEnabled(true);
-            PointF focusPoint = new PointF(0.5f, 0.4f);
             GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
-                    .setActualImageFocusPoint(focusPoint)
 //                    .setOverlay(itemView.getResources().getDrawable(R.drawable.photo_list_pager_photo_item_border))
-                    .setActualImageScaleType(ScalingUtils.ScaleType.FOCUS_CROP)
+                    .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
                     .build();
             ivPhoto.setHierarchy(photoHierarchy);
         }

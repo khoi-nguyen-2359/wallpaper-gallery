@@ -1,40 +1,43 @@
 package com.xkcn.gallery.anim;
 
+import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.graphics.RectF;
+import android.view.ViewGroup;
 
 /**
- * Created by khoi2359 on 4/1/16.
+ * Created by khoinguyen on 4/10/16.
  */
 public class ZoomToAnimation extends CompoundViewAnimation {
+    private RectF startRect;
+    private RectF endRect;
 
-    private RectF srcRect;
-    private RectF destRect;
+    public ZoomToAnimation rects(RectF start, RectF end) {
+        startRect = start;
+        endRect = end;
 
-    public ZoomToAnimation rects(RectF srcRect, RectF dest) {
-        this.srcRect = srcRect;
-        destRect = dest;
         return this;
     }
 
     @Override
     public void run() {
-        float scale = 1;
-        if (destRect.width() / destRect.height() > srcRect.width() / srcRect.height()) {
-            scale = srcRect.height() / destRect.height();
-        } else {
-            scale = srcRect.width() / destRect.width();
-        }
+        float scaleToX = endRect.width() / startRect.width(),
+        scaleToY = endRect.height() / startRect.height();
+        addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                ViewGroup.LayoutParams lp = target.getLayoutParams();
+                lp.width = (int) (startRect.width() * (1 - animation.getAnimatedFraction()) + endRect.width() * animation.getAnimatedFraction());
+                lp.height = (int) (startRect.height() * (1 - animation.getAnimatedFraction()) + endRect.height() * animation.getAnimatedFraction());
+                target.requestLayout();
+            }
+        });
 
-        target.setPivotX(0);
-        target.setPivotY(0);
-
-        animatorSet = createAnimatorSet();
+        AnimatorSet animatorSet = buildBaseAnimatorSet();
         animatorSet.playTogether(
-                ObjectAnimator.ofFloat(target, "scaleX", scale, 1f),
-                ObjectAnimator.ofFloat(target, "scaleY", scale, 1f),
-                ObjectAnimator.ofFloat(target, "x", srcRect.left, destRect.left),
-                ObjectAnimator.ofFloat(target, "y", srcRect.top, destRect.top)
+                ObjectAnimator.ofFloat(target, "X", startRect.left, endRect.left),
+                ObjectAnimator.ofFloat(target, "Y", startRect.top, endRect.top)
         );
 
         animatorSet.start();

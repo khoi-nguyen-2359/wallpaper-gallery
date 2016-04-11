@@ -6,4 +6,5 @@ ext {
     androidSupportLibVersion = "23.2.1"
     applicationId = "com.xkcn.gallery"
     gmsVersion = "8.4.0"
+    frescoVersion = "1bdf4a386233a21042cd56b66489f7eabf1d8209"
 }

@@ -37,6 +37,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeHolder;
+import com.facebook.drawee.view.SimpleDraweeView;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.facebook.imagepipeline.image.CloseableImage;
 import com.facebook.imagepipeline.image.CloseableStaticBitmap;
@@ -75,6 +76,7 @@ public class DraweePhotoView extends ImageView implements IPhotoView {
         super(context, attr, defStyle);
         super.setScaleType(ScaleType.MATRIX);
         init();
+        SimpleDraweeView s;
     }
 
     protected void init() {

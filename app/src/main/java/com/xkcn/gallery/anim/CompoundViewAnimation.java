@@ -1,19 +1,25 @@
 package com.xkcn.gallery.anim;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.AnimatorSet;
+import android.animation.TimeInterpolator;
+import android.animation.ValueAnimator;
 import android.view.View;
 import android.view.animation.Interpolator;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Created by khoi2359 on 4/1/16.
+ * Created by khoinguyen on 4/10/16.
  */
 public abstract class CompoundViewAnimation {
-    static final int DURATION_UNSET = -1;
-
-    AnimatorSet animatorSet;
-    View target;
-    int duration = DURATION_UNSET;
-    Interpolator interpolator = null;
+    protected View target;
+    protected ValueAnimator updateAnimator;
+    protected List<AnimatorListenerAdapter> animatorListeners;
+    protected Long duration;
+    protected TimeInterpolator interpolator;
 
     public abstract void run();
 
@@ -22,7 +28,7 @@ public abstract class CompoundViewAnimation {
         return this;
     }
 
-    public CompoundViewAnimation duration(int duration) {
+    public CompoundViewAnimation duration(long duration) {
         this.duration = duration;
         return this;
     }
@@ -32,16 +38,49 @@ public abstract class CompoundViewAnimation {
         return this;
     }
 
-    AnimatorSet createAnimatorSet() {
-        AnimatorSet animator = new AnimatorSet();
-        if (duration != DURATION_UNSET) {
-            animator.setDuration(duration);
+    public CompoundViewAnimation addAnimatorListener(AnimatorListenerAdapter listener) {
+        if (animatorListeners == null) {
+            animatorListeners = new ArrayList<>();
+        }
+
+        animatorListeners.add(listener);
+        return this;
+    }
+
+    public CompoundViewAnimation addUpdateListener(ValueAnimator.AnimatorUpdateListener updateListener) {
+        if (updateAnimator == null) {
+            updateAnimator = ValueAnimator.ofFloat(0f, 1f);
+        }
+
+        updateAnimator.addUpdateListener(updateListener);
+        return this;
+    }
+
+    protected AnimatorSet buildBaseAnimatorSet() {
+        AnimatorSet coreAnimator = new AnimatorSet();
+
+        if (target != null) {
+            coreAnimator.setTarget(target);
+        }
+
+        if (duration != null) {
+            coreAnimator.setDuration(duration);
         }
 
         if (interpolator != null) {
-            animator.setInterpolator(interpolator);
+            coreAnimator.setInterpolator(interpolator);
         }
 
-        return animator;
+        if (updateAnimator != null) {
+            coreAnimator.play(updateAnimator);
+        }
+
+        if (animatorListeners != null) {
+            for (AnimatorListenerAdapter listener : animatorListeners) {
+                coreAnimator.addListener(listener);
+            }
+        }
+
+        return coreAnimator;
     }
 }

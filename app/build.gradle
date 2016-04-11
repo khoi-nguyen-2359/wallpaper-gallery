@@ -75,13 +75,14 @@ dependencies {
         transitive = true;
     }
 
-    compile 'com.facebook.fresco:fresco:1bdf4a386233a21042cd56b66489f7eabf1d8209@aar'
-    compile 'com.facebook.fresco:fbcore:1bdf4a386233a21042cd56b66489f7eabf1d8209@aar'
-    compile 'com.facebook.fresco:drawee:1bdf4a386233a21042cd56b66489f7eabf1d8209@aar'
-    compile "com.facebook.fresco:imagepipeline:1bdf4a386233a21042cd56b66489f7eabf1d8209@aar"
-    compile "com.facebook.fresco:imagepipeline-base:1bdf4a386233a21042cd56b66489f7eabf1d8209@aar"
-    compile "com.facebook.fresco:imagepipeline-okhttp3:1bdf4a386233a21042cd56b66489f7eabf1d8209@aar"
+    compile "com.facebook.fresco:fresco:${configs.frescoVersion}@aar"
+    compile "com.facebook.fresco:fbcore:${configs.frescoVersion}@aar"
+    compile "com.facebook.fresco:drawee:${configs.frescoVersion}@aar"
+    compile "com.facebook.fresco:imagepipeline:${configs.frescoVersion}@aar"
+    compile "com.facebook.fresco:imagepipeline-base:${configs.frescoVersion}@aar"
+    compile "com.facebook.fresco:imagepipeline-okhttp3:${configs.frescoVersion}@aar"
 
+    compile 'com.parse.bolts:bolts-tasks:1.4.0'
     compile 'com.squareup.okhttp3:okhttp:3.2.0'
 
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
