@@ -35,10 +35,10 @@ public class PhotoListingPagerAdapter extends PagerAdapter {
         PhotoListingRecyclerView itemView = (PhotoListingRecyclerView) inflater.inflate(R.layout.photo_list_page_view, container, false);
         itemView.setPadding(0, 0, 0, windowInsetsBottom);
 
-        PhotoListingViewPresenter presenter = new PhotoListingViewPresenter(photoListingUsecase, type, position + 1, perPage);
+        PhotoListingViewPresenter presenter = new PhotoListingViewPresenter(photoListingUsecase, perPage);
         presenter.setView(itemView);
 
-        presenter.loadPhotoListPage();
+        presenter.loadPhotoListPage(position + 1, type);
 
         container.addView(itemView);
 

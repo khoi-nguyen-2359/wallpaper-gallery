@@ -24,12 +24,12 @@ public class PhotoDetailsPagerAdapter extends PagerAdapter {
     private List<PhotoDetails> photoListPage;
     private LayoutInflater layoutInflater;
 
-    public PhotoDetailsPagerAdapter(LayoutInflater layoutInflater) {
-        this.layoutInflater = layoutInflater;
-    }
-
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        if (layoutInflater == null) {
+            layoutInflater = LayoutInflater.from(container.getContext());
+        }
+
         ZoomableDraweeView itemView = (ZoomableDraweeView) layoutInflater.inflate(R.layout.photo_details_pager_item, container, false);
         GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(container.getResources())
                 .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)

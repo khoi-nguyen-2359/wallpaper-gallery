@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 
 import com.xkcn.gallery.adapter.PhotoDetailsPagerAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.view.PhotoListingView;
 
 import java.util.List;
@@ -16,6 +17,7 @@ import java.util.List;
  */
 public class PhotoDetailsViewPager extends ViewPager implements PhotoListingView {
     private PhotoDetailsPagerAdapter adapterPhotoDetails;
+    private PhotoListingViewPresenter presenter;
 
     public PhotoDetailsViewPager(Context context) {
         super(context);
@@ -28,11 +30,19 @@ public class PhotoDetailsViewPager extends ViewPager implements PhotoListingView
     @Override
     public void displayPhotoData(List<PhotoDetails> photos) {
         if (adapterPhotoDetails == null) {
-            adapterPhotoDetails = new PhotoDetailsPagerAdapter(LayoutInflater.from(getContext()));
+            adapterPhotoDetails = new PhotoDetailsPagerAdapter();
             setAdapter(adapterPhotoDetails);
         }
 
         adapterPhotoDetails.setPhotoDatas(photos);
         adapterPhotoDetails.notifyDataSetChanged();
+    }
+
+    public void setPresenter(PhotoListingViewPresenter presenter) {
+        this.presenter = presenter;
+    }
+
+    public PhotoListingViewPresenter getPresenter() {
+        return presenter;
     }
 }

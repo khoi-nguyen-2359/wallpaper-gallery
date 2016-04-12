@@ -13,4 +13,6 @@ public interface PhotoListingViewPager {
     int getCurrentPage();
 
     void onApplyWindowInsets(WindowInsetsCompat insets);
+
+    void changeListingType(int type);
 }

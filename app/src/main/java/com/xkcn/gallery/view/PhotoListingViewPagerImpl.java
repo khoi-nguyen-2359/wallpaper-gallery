@@ -41,7 +41,6 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
     }
 
     private void init() {
-        addOnPageChangeListener(onPhotoListPageChanged);
         setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
     }
 
@@ -49,23 +48,6 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
         super(context, attrs);
         init();
     }
-
-    private OnPageChangeListener onPhotoListPageChanged = new OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-    };
 
     @Override
     public void displayPhotoPages(final int pageCount, final int type) {
@@ -142,6 +124,7 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
         this.photoDetailsRepository = photoDetailsRepository;
     }
 
+    @Override
     public void changeListingType(int type) {
         adapterPhotoPages.setType(type);
         adapterPhotoPages.notifyDataSetChanged();

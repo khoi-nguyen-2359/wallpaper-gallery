@@ -18,14 +18,10 @@ import rx.schedulers.Schedulers;
 public class PhotoListingViewPresenter {
     private PhotoListingView view;
     private PhotoListingUsecase photoListingUsecase;
-    private int listingType;
-    private int photoPage;
     private int perPage;
 
-    public PhotoListingViewPresenter(PhotoListingUsecase photoListingUsecase, int listingType, int photoPage, int perPage) {
+    public PhotoListingViewPresenter(PhotoListingUsecase photoListingUsecase, int perPage) {
         this.photoListingUsecase = photoListingUsecase;
-        this.listingType = listingType;
-        this.photoPage = photoPage;
         this.perPage = perPage;
     }
 
@@ -33,7 +29,7 @@ public class PhotoListingViewPresenter {
         this.view = view;
     }
 
-    public void loadPhotoListPage() {
+    public void loadPhotoListPage(int photoPage, int listingType) {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
             case PhotoListingPagerAdapter.TYPE_HOTEST: {

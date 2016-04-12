@@ -38,9 +38,12 @@ import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPagerPresenter;
+import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
+import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.util.AndroidUtils;
 import com.xkcn.gallery.view.MainView;
+import com.xkcn.gallery.view.PhotoDetailsViewPager;
 import com.xkcn.gallery.view.PhotoListingViewPagerImpl;
 import com.xkcn.gallery.view.custom.ClippingRevealDraweeView;
 
@@ -58,6 +61,7 @@ public abstract class MainActivity extends XkcnActivity
 
     protected MainViewPresenter presenter;
     protected PhotoListingViewPagerPresenter listingPagerPresenter;
+    protected PhotoListingViewPresenter detailsPagerPresenter;
 
     @Bind(R.id.pager_photo_listing)
     PhotoListingViewPagerImpl pagerPhotoListing;
@@ -87,7 +91,7 @@ public abstract class MainActivity extends XkcnActivity
     View transitBackdrop;
 
     @Bind(R.id.pager_photo_details)
-    ViewPager pagerPhotoDetails;
+    PhotoDetailsViewPager pagerPhotoDetails;
 
     private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
 
@@ -123,7 +127,11 @@ public abstract class MainActivity extends XkcnActivity
         pagerPhotoListing.setKitkatSystemBarConfig(kitkatSystemBarConfig);
         pagerPhotoListing.setPhotoDetailsRepository(photoDetailsRepository);
         pagerPhotoListing.setPreferenceRepository(preferenceRepository);
+        pagerPhotoListing.addOnPageChangeListener(onPhotoListPageChanged);
         listingPagerPresenter.setView(pagerPhotoListing);
+
+        pagerPhotoDetails.setPresenter(detailsPagerPresenter);
+        detailsPagerPresenter.setView(pagerPhotoDetails);
     }
 
     private void initData() {
@@ -134,6 +142,9 @@ public abstract class MainActivity extends XkcnActivity
 
         listingPagerPresenter = new PhotoListingViewPagerPresenter(preferenceRepository, photoDetailsRepository);
         listingPagerPresenter.setView(pagerPhotoListing);
+
+        PhotoListingUsecase photoListingUsecase = new PhotoListingUsecase(photoDetailsRepository);
+        detailsPagerPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferenceRepository.getListPagerPhotoPerPage());
     }
 
     protected void initTemplateViews() {
@@ -176,6 +187,7 @@ public abstract class MainActivity extends XkcnActivity
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else if (transitDraweeView.getVisibility() == View.VISIBLE) {
+            pagerPhotoDetails.setVisibility(View.GONE);
             transitDraweeView.setVisibility(View.GONE);
             transitBackdrop.setAlpha(0);
         } else {
@@ -190,9 +202,9 @@ public abstract class MainActivity extends XkcnActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_hotest) {
-            pagerPhotoListing.changeListingType(PhotoListingPagerAdapter.TYPE_HOTEST);
+            listingPagerPresenter.setCurrentType(PhotoListingPagerAdapter.TYPE_HOTEST);
         } else if (id == R.id.nav_latest) {
-            pagerPhotoListing.changeListingType(PhotoListingPagerAdapter.TYPE_LATEST);
+            listingPagerPresenter.setCurrentType(PhotoListingPagerAdapter.TYPE_LATEST);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -204,6 +216,25 @@ public abstract class MainActivity extends XkcnActivity
     public void startActionUpdate() {
         UpdateService.startActionUpdate(this);
     }
+
+    private ViewPager.OnPageChangeListener onPhotoListPageChanged = new ViewPager.OnPageChangeListener() {
+        @Override
+        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+            if (positionOffset == 0) {
+                detailsPagerPresenter.loadPhotoListPage(position + 1, listingPagerPresenter.getCurrentType());
+            }
+        }
+
+        @Override
+        public void onPageSelected(int position) {
+
+        }
+
+        @Override
+        public void onPageScrollStateChanged(int state) {
+
+        }
+    };
 
     /***
      * event bus
@@ -230,12 +261,13 @@ public abstract class MainActivity extends XkcnActivity
         RectF endRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
 
         transitDraweeView.setVisibility(View.VISIBLE);
-        transitDraweeView.setImageUris(event.getPhotoDetails().getLowResUri(), event.getPhotoDetails().getHighResUri());
+        transitDraweeView.setImageUris(event.getPhotoDetails().getLowResUri());
 
         transitDraweeView.createRevealAnimation(transitBackdrop, startRect, endRect)
                 .addAnimatorListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
+                        pagerPhotoDetails.setCurrentItem(event.getItemPosition(), false);
                         pagerPhotoDetails.setVisibility(View.VISIBLE);
                     }
                 })

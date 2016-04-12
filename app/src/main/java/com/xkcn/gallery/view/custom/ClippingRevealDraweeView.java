@@ -62,11 +62,10 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
         hierarchy.setActualImageScaleType(revealScaleType);
     }
 
-    public void setImageUris(Uri lowRes, Uri highRes) {
+    public void setImageUris(Uri photoUri) {
         DraweeController controller = Fresco.newDraweeControllerBuilder()
-                .setLowResImageRequest(ImageRequest.fromUri(lowRes))
                 .setCallerContext(null)
-                .setImageRequest(ImageRequest.fromUri(highRes))
+                .setUri(photoUri)
                 .setOldController(getController())
                 .build();
         setController(controller);

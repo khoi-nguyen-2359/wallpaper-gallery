@@ -112,5 +112,10 @@ public class PhotoListingViewPagerPresenter {
 
     public void setCurrentType(int currentType) {
         this.currentType = currentType;
+        view.changeListingType(currentType);
+    }
+
+    public int getCurrentType() {
+        return currentType;
     }
 }
