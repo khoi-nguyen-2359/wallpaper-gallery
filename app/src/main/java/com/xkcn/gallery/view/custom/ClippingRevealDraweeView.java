@@ -71,14 +71,6 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
         setController(controller);
     }
 
-    public void setRevealProgress(float revealProgress) {
-        if (revealScaleType != null) {
-            revealScaleType.setValue(revealProgress);
-            invalidate();
-            L.get(this).d("revealProgress %f", revealProgress);
-        }
-    }
-
     public CompoundViewAnimation createRevealAnimation(final View backdrop, RectF startRect, RectF endRect) {
         return new ZoomToAnimation()
                 .rects(startRect, endRect)
@@ -88,7 +80,9 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
                 .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
                     @Override
                     public void onAnimationUpdate(ValueAnimator animation) {
-                        setRevealProgress(animation.getAnimatedFraction());
+                        revealScaleType.setValue(animation.getAnimatedFraction());
+                        // this animation includes requestLayout() calls, no need invalidate()
+                        
                         if (backdrop != null) {
                             backdrop.setAlpha(animation.getAnimatedFraction());
                         }
