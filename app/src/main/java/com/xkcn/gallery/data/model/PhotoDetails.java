@@ -194,11 +194,11 @@ public class PhotoDetails implements Parcelable {
     }
 
     public String getLowResUrl() {
-        return getPhoto500();
+        return getPhoto250();
     }
 
     public String getHighResUrl() {
-        return getPhotoHigh();
+        return getPhoto500();
     }
 
     public Uri getLowResUri() {

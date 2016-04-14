@@ -2,6 +2,7 @@ package com.xkcn.gallery.activity;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.graphics.PointF;
@@ -96,6 +97,7 @@ public abstract class MainActivity extends XkcnActivity
     private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
 
     protected Dialog proDlg;
+    private RectF startRect;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +134,8 @@ public abstract class MainActivity extends XkcnActivity
 
         pagerPhotoDetails.setPresenter(detailsPagerPresenter);
         detailsPagerPresenter.setView(pagerPhotoDetails);
+
+        pagerPhotoDetails.setDraggingListener(detailsPagerDraggingListener);
     }
 
     private void initData() {
@@ -186,10 +190,10 @@ public abstract class MainActivity extends XkcnActivity
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-        } else if (transitDraweeView.getVisibility() == View.VISIBLE) {
+        } else if (pagerPhotoDetails.getVisibility() == View.VISIBLE) {
             pagerPhotoDetails.setVisibility(View.GONE);
-            transitDraweeView.setVisibility(View.GONE);
             transitBackdrop.setAlpha(0);
+            transitDraweeView.setVisibility(View.GONE);
         } else {
             super.onBackPressed();
         }
@@ -257,18 +261,27 @@ public abstract class MainActivity extends XkcnActivity
         transitDraweeView.requestLayout();
 
         PointF startLoc = UiUtils.getViewLocationInAnotherView(mainCoordinatorLayout, vh.ivPhoto);
-        RectF startRect = new RectF(startLoc.x, startLoc.y, startLoc.x + vh.ivPhoto.getWidth(), startLoc.y + vh.ivPhoto.getHeight());
+        startRect = new RectF(startLoc.x, startLoc.y, startLoc.x + vh.ivPhoto.getWidth(), startLoc.y + vh.ivPhoto.getHeight());
         RectF endRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
 
         transitDraweeView.setVisibility(View.VISIBLE);
         transitDraweeView.setImageUris(event.getPhotoDetails().getLowResUri());
 
-        transitDraweeView.createRevealAnimation(transitBackdrop, startRect, endRect)
+        transitDraweeView.createExpanseAnimation(startRect, endRect)
                 .addAnimatorListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationEnd(Animator animation) {
                         pagerPhotoDetails.setCurrentItem(event.getItemPosition(), false);
+                        pagerPhotoDetails.setTranslationX(0);
+                        pagerPhotoDetails.setTranslationY(0);
                         pagerPhotoDetails.setVisibility(View.VISIBLE);
+                        transitDraweeView.setVisibility(View.GONE);
+                    }
+                })
+                .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                    @Override
+                    public void onAnimationUpdate(ValueAnimator animation) {
+                        transitBackdrop.setAlpha(animation.getAnimatedFraction());
                     }
                 })
                 .run();
@@ -302,4 +315,36 @@ public abstract class MainActivity extends XkcnActivity
         Uri uri = Uri.fromFile(photoFile);
         AndroidUtils.startSetWallpaperChooser(this, uri);
     }
+
+    private PhotoDetailsViewPager.DraggingListener detailsPagerDraggingListener = new PhotoDetailsViewPager.DraggingListener() {
+        @Override
+        public void onStartDragging(PhotoDetailsViewPager detailsPager) {
+            transitBackdrop.setAlpha(0.75f);
+        }
+
+        @Override
+        public void onEndDragging(PhotoDetailsViewPager detailsPager) {
+            RectF endRect = new RectF(pagerPhotoDetails.getX(), pagerPhotoDetails.getY(), pagerPhotoDetails.getX() + pagerPhotoDetails.getWidth(), pagerPhotoDetails.getY() + pagerPhotoDetails.getHeight());
+            transitDraweeView.createShrinkAnimation(endRect, startRect)
+                    .addAnimatorListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationStart(Animator animation) {
+                            transitDraweeView.setVisibility(View.VISIBLE);
+                            pagerPhotoDetails.setVisibility(View.GONE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+                            transitDraweeView.setVisibility(View.GONE);
+                        }
+                    })
+                    .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+                        @Override
+                        public void onAnimationUpdate(ValueAnimator animation) {
+                            transitBackdrop.setAlpha(1 - animation.getAnimatedFraction());
+                        }
+                    })
+                    .run();
+        }
+    };
 }

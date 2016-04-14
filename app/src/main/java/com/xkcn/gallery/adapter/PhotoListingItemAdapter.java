@@ -79,10 +79,9 @@ public class PhotoListingItemAdapter extends RecyclerView.Adapter<PhotoListingIt
         public ViewHolder(View itemView) {
             super(itemView);
             ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
-//            ivPhoto.setDrawingCacheEnabled(true);
             GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
-//                    .setOverlay(itemView.getResources().getDrawable(R.drawable.photo_list_pager_photo_item_border))
                     .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
+                    .setFadeDuration(0)
                     .build();
             ivPhoto.setHierarchy(photoHierarchy);
         }

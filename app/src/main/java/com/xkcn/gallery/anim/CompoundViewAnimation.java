@@ -17,7 +17,6 @@ import java.util.List;
 public abstract class CompoundViewAnimation {
     protected View target;
     protected ValueAnimator updateAnimator;
-    protected List<AnimatorListenerAdapter> animatorListeners;
     protected Long duration;
     protected TimeInterpolator interpolator;
 
@@ -39,21 +38,21 @@ public abstract class CompoundViewAnimation {
     }
 
     public CompoundViewAnimation addAnimatorListener(AnimatorListenerAdapter listener) {
-        if (animatorListeners == null) {
-            animatorListeners = new ArrayList<>();
-        }
-
-        animatorListeners.add(listener);
+        getUpdateAnimator().addListener(listener);
         return this;
     }
 
     public CompoundViewAnimation addUpdateListener(ValueAnimator.AnimatorUpdateListener updateListener) {
+        getUpdateAnimator().addUpdateListener(updateListener);
+        return this;
+    }
+
+    private ValueAnimator getUpdateAnimator() {
         if (updateAnimator == null) {
             updateAnimator = ValueAnimator.ofFloat(0f, 1f);
         }
 
-        updateAnimator.addUpdateListener(updateListener);
-        return this;
+        return updateAnimator;
     }
 
     protected AnimatorSet buildBaseAnimatorSet() {
@@ -73,12 +72,6 @@ public abstract class CompoundViewAnimation {
 
         if (updateAnimator != null) {
             coreAnimator.play(updateAnimator);
-        }
-
-        if (animatorListeners != null) {
-            for (AnimatorListenerAdapter listener : animatorListeners) {
-                coreAnimator.addListener(listener);
-            }
         }
 
         return coreAnimator;
