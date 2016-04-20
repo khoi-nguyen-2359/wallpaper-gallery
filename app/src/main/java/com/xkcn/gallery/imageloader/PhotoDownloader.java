@@ -14,7 +14,7 @@ import com.facebook.imagepipeline.memory.PooledByteBufferInputStream;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.khoinguyen.logging.L;
-import com.xkcn.gallery.XkcnApp;
+import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.util.AndroidUtils;
 
@@ -42,9 +42,9 @@ public final class PhotoDownloader {
 
     private Map<String, Observable<File>> mapDownloadObservables;
 
-    public PhotoDownloader(XkcnApp xkcnApp) {
-        externalFileDirPath = xkcnApp.getExternalFilesDir(null).getAbsolutePath();
-        photoDirPath = xkcnApp.getDir("photo", Context.MODE_PRIVATE).getAbsolutePath();
+    public PhotoDownloader(BaseApp baseApp) {
+        externalFileDirPath = baseApp.getExternalFilesDir(null).getAbsolutePath();
+        photoDirPath = baseApp.getDir("photo", Context.MODE_PRIVATE).getAbsolutePath();
         logger = L.get(this);
         mapDownloadObservables = new HashMap<>();
     }

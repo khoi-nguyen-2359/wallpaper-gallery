@@ -1,9 +1,10 @@
-package com.xkcn.gallery.activity;
+package com.xkcn.gallery.fragment;
 
 import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 
-import com.xkcn.gallery.XkcnApp;
+import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PhotoTagRepository;
 import com.xkcn.gallery.data.PreferenceRepository;
@@ -15,7 +16,7 @@ import javax.inject.Inject;
 /**
  * Created by khoinguyen on 2/1/16.
  */
-public abstract class XkcnActivity extends AppCompatActivity {
+public abstract class BaseFragment extends Fragment {
     @Inject
     PhotoDetailsRepository photoDetailsRepository;
     @Inject
@@ -26,12 +27,12 @@ public abstract class XkcnActivity extends AppCompatActivity {
     PhotoDownloader photoDownloader;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getApplicationComponent().inject(this);
     }
 
     protected ApplicationComponent getApplicationComponent() {
-        return ((XkcnApp) getApplication()).getApplicationComponent();
+        return ((BaseApp) getActivity().getApplication()).getApplicationComponent();
     }
 }

@@ -7,6 +7,8 @@ import com.xkcn.gallery.view.PhotoListingView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -17,11 +19,11 @@ import rx.schedulers.Schedulers;
  */
 public class PhotoListingViewPresenter {
     private PhotoListingView view;
-    private PhotoListingUsecase photoListingUsecase;
     private int perPage;
 
-    public PhotoListingViewPresenter(PhotoListingUsecase photoListingUsecase, int perPage) {
-        this.photoListingUsecase = photoListingUsecase;
+    @Inject PhotoListingUsecase photoListingUsecase;
+
+    public PhotoListingViewPresenter(int perPage) {
         this.perPage = perPage;
     }
 

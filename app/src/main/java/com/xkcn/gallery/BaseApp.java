@@ -17,7 +17,7 @@ import okhttp3.OkHttpClient;
 /**
  * Created by khoinguyen on 12/25/14.
  */
-public class XkcnApp extends Application {
+public class BaseApp extends Application {
     private ApplicationComponent applicationComponent;
 
     @Override

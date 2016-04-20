@@ -1,5 +1,7 @@
 package com.xkcn.gallery.event;
 
+import android.graphics.RectF;
+
 import com.xkcn.gallery.adapter.PhotoListingItemAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 
@@ -8,24 +10,24 @@ import com.xkcn.gallery.data.model.PhotoDetails;
  */
 public class OnPhotoListItemClicked {
     private int clickedPosition;
-    private PhotoListingItemAdapter.ViewHolder clickedView;
     private PhotoDetails photoDetails;
+    private RectF startRect;
 
-    public OnPhotoListItemClicked(int clickedPosition, PhotoListingItemAdapter.ViewHolder v, PhotoDetails photoDetails) {
+    public OnPhotoListItemClicked(int clickedPosition, PhotoDetails photoDetails, RectF startRect) {
         this.clickedPosition = clickedPosition;
-        clickedView = v;
         this.photoDetails = photoDetails;
+        this.startRect = startRect;
     }
 
     public int getItemPosition() {
         return clickedPosition;
     }
 
-    public PhotoListingItemAdapter.ViewHolder getItemViewHolder() {
-        return clickedView;
-    }
-
     public PhotoDetails getPhotoDetails() {
         return photoDetails;
+    }
+
+    public RectF getStartRect() {
+        return startRect;
     }
 }

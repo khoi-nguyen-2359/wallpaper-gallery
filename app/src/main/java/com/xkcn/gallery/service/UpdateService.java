@@ -11,7 +11,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
 import com.khoinguyen.logging.L;
-import com.xkcn.gallery.XkcnApp;
+import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PhotoTagRepository;
 import com.xkcn.gallery.data.PreferenceRepository;
@@ -66,7 +66,7 @@ public class UpdateService extends Service {
     public void onCreate() {
         super.onCreate();
 
-        ((XkcnApp)getApplication()).getApplicationComponent().inject(this);
+        ((BaseApp)getApplication()).getApplicationComponent().inject(this);
 
         createWebBrowser();
 

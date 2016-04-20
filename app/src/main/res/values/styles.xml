@@ -21,8 +21,6 @@
         <item name="android:gravity">center</item>
     </style>
 
-    <color name="sidebar_tagcloud_text">#fff</color>
-
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />

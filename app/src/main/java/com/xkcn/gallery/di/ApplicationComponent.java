@@ -2,12 +2,13 @@ package com.xkcn.gallery.di;
 
 import android.content.Context;
 
-import com.xkcn.gallery.activity.XkcnActivity;
+import com.xkcn.gallery.activity.BaseActivity;
 import com.xkcn.gallery.data.PhotoDetailsRepository;
 import com.xkcn.gallery.data.PhotoTagRepository;
 import com.xkcn.gallery.data.PreferenceRepository;
-import com.xkcn.gallery.fragment.XkcnFragment;
+import com.xkcn.gallery.fragment.BaseFragment;
 import com.xkcn.gallery.service.UpdateService;
+import com.xkcn.gallery.usecase.PhotoDetailsUsecase;
 
 import javax.inject.Singleton;
 
@@ -19,13 +20,12 @@ import dagger.Component;
 @Singleton
 @Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
-    void inject(XkcnActivity activity);
-    void inject(XkcnFragment xkcnFragment);
-
+    void inject(BaseActivity activity);
+    void inject(BaseFragment baseFragment);
     void inject(UpdateService updateService);
 
     Context context();
-    PhotoDetailsRepository photoDetailsDataStore();
-    PreferenceRepository preferenceDataStore();
+    PhotoDetailsRepository photoDetailsReposiroty();
+    PreferenceRepository preferenceReposiroty();
     PhotoTagRepository photoTagRepository();
 }

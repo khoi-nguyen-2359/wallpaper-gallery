@@ -10,7 +10,7 @@ import com.xkcn.gallery.view.SplashView;
 /**
  * Created by khoinguyen on 12/14/15.
  */
-public class SplashActivity extends XkcnActivity implements SplashView {
+public class SplashActivity extends BaseActivity implements SplashView {
     private SplashViewPresenter presenter;
 
     @Override

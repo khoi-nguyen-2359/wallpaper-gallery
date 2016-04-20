@@ -75,9 +75,9 @@ public class PhotoListingRecyclerView extends RecyclerView implements PhotoListi
     private OnClickListener onItemViewClicked = new OnClickListener() {
         @Override
         public void onClick(View itemView) {
-            PhotoListingItemAdapter.ViewHolder viewHolder = (PhotoListingItemAdapter.ViewHolder) getChildViewHolder(itemView);
-            int position = getChildAdapterPosition(itemView);
-            EventBus.getDefault().post(new OnPhotoListItemClicked(position, viewHolder, getPhotoDetails(position)));
+//            PhotoListingItemAdapter.ViewHolder viewHolder = (PhotoListingItemAdapter.ViewHolder) getChildViewHolder(itemView);
+//            int position = getChildAdapterPosition(itemView);
+//            EventBus.getDefault().post(new OnPhotoListItemClicked(position, viewHolder, getPhotoDetails(position), startRect));
         }
     };
 }

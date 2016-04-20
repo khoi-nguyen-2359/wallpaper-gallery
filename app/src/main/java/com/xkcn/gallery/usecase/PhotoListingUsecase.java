@@ -5,6 +5,8 @@ import com.xkcn.gallery.data.model.PhotoDetails;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Subscriber;
 
@@ -14,6 +16,7 @@ import rx.Subscriber;
 public class PhotoListingUsecase {
     private PhotoDetailsRepository photoDetailsRepository;
 
+    @Inject
     public PhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
         this.photoDetailsRepository = photoDetailsRepository;
     }

@@ -102,7 +102,7 @@ public class PhotoActionsView extends FrameLayout {
             sendText = resources.getString(R.string.send_to_trailing_text, photo.getPermalink());
         } else {
             Spanned spanned = Html.fromHtml(photo.getPermalinkMeta());
-            sendText = resources.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());;
+            sendText = resources.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());
         }
 
         Intent i = new Intent();

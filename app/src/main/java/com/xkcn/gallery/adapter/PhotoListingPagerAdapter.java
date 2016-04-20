@@ -6,9 +6,12 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.di.PhotoComponent;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoListingRecyclerView;
+
+import javax.inject.Inject;
 
 /**
  * Created by khoinguyen on 12/23/14.
@@ -21,21 +24,27 @@ public class PhotoListingPagerAdapter extends PagerAdapter {
     protected int type;
     protected int pageCount;
     private LayoutInflater inflater;
-    private PhotoListingUsecase photoListingUsecase;
+
+    private PhotoComponent photoComponent;
+
     private int perPage;
     private int windowInsetsBottom;
 
-    public PhotoListingPagerAdapter(LayoutInflater inflater, PhotoListingUsecase photoListingUsecase) {
-        this.inflater = inflater;
-        this.photoListingUsecase = photoListingUsecase;
+    public PhotoListingPagerAdapter(PhotoComponent photoComponent) {
+        this.photoComponent = photoComponent;
     }
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        if (inflater == null) {
+            inflater = LayoutInflater.from(container.getContext());
+        }
+
         PhotoListingRecyclerView itemView = (PhotoListingRecyclerView) inflater.inflate(R.layout.photo_list_page_view, container, false);
         itemView.setPadding(0, 0, 0, windowInsetsBottom);
 
-        PhotoListingViewPresenter presenter = new PhotoListingViewPresenter(photoListingUsecase, perPage);
+        PhotoListingViewPresenter presenter = new PhotoListingViewPresenter(perPage);
+        photoComponent.inject(presenter);
         presenter.setView(itemView);
 
         presenter.loadPhotoListPage(position + 1, type);
