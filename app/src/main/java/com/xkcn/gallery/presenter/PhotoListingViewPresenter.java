@@ -22,6 +22,7 @@ public class PhotoListingViewPresenter {
     private int perPage;
 
     @Inject PhotoListingUsecase photoListingUsecase;
+    private List<PhotoDetails> cachedPhotos;
 
     public PhotoListingViewPresenter(int perPage) {
         this.perPage = perPage;
@@ -31,7 +32,7 @@ public class PhotoListingViewPresenter {
         this.view = view;
     }
 
-    public void loadPhotoListPage(int photoPage, int listingType) {
+    public void loadPhotoListPage(final int photoPage, int listingType) {
         Observable<List<PhotoDetails>> photoQueryObservable = null;
         switch (listingType) {
             case PhotoListingPagerAdapter.TYPE_HOTEST: {
@@ -61,8 +62,18 @@ public class PhotoListingViewPresenter {
 
                     @Override
                     public void onNext(List<PhotoDetails> photos) {
-                        view.displayPhotoData(photos);
+                        cachedPhotos = photos;
+                        view.populatePhotoData(photos);
                     }
         });
     }
+
+    public PhotoDetails getCachedPhotoDetails(int position) {
+        if (cachedPhotos == null || position >= cachedPhotos.size()) {
+            return null;
+        }
+
+        return cachedPhotos.get(position);
+    }
+
 }

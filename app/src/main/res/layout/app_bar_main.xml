@@ -5,14 +5,14 @@
     android:id="@+id/main_coordinator_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MainActivityImpl">
+    tools:context=".activity.MainActivityImpl"
+    >
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:theme="@style/AppTheme.AppBarOverlay"
-        android:background="#0000"
         >
         
         <FrameLayout
@@ -33,7 +33,13 @@
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <include layout="@layout/content_main" />
+    <com.xkcn.gallery.view.PhotoListingViewPagerImpl
+        android:clipChildren="false"
+        android:clipToPadding="false"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        android:id="@+id/pager_photo_listing"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 
     <View
         android:id="@+id/drawee_transit_backdrop"

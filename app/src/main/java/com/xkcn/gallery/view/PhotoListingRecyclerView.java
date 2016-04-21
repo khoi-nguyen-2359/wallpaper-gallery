@@ -2,6 +2,7 @@ package com.xkcn.gallery.view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
@@ -23,6 +24,7 @@ import java.util.List;
  */
 public class PhotoListingRecyclerView extends RecyclerView implements PhotoListingView {
     private PhotoListingItemAdapter adapterPhotos;
+    private LayoutManager rcvLayoutMan;
 
     public PhotoListingRecyclerView(Context context) {
         super(context);
@@ -42,13 +44,13 @@ public class PhotoListingRecyclerView extends RecyclerView implements PhotoListi
     private void init() {
         Resources resources = getResources();
         int nLayoutCol = resources.getInteger(R.integer.photo_page_col);
-        StaggeredGridLayoutManager rcvLayoutMan = new StaggeredGridLayoutManager(nLayoutCol, StaggeredGridLayoutManager.VERTICAL);
+        rcvLayoutMan = new StaggeredGridLayoutManager(nLayoutCol, StaggeredGridLayoutManager.VERTICAL);
         setLayoutManager(rcvLayoutMan);
         addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
     }
 
     @Override
-    public void displayPhotoData(List<PhotoDetails> photos) {
+    public void populatePhotoData(List<PhotoDetails> photos) {
         if (adapterPhotos == null) {
             adapterPhotos = new PhotoListingItemAdapter(getContext());
             adapterPhotos.setOnItemViewClicked(onItemViewClicked);
@@ -57,6 +59,16 @@ public class PhotoListingRecyclerView extends RecyclerView implements PhotoListi
 
         adapterPhotos.setDataPhotos(photos);
         adapterPhotos.notifyDataSetChanged();
+    }
+
+    @Override
+    public void displayPhotoItem(int position) {
+        scrollToPosition(position);
+    }
+
+    @Override
+    public View getPhotoItemView(int position) {
+        return rcvLayoutMan.findViewByPosition(position);
     }
 
     private PhotoDetails getPhotoDetails(int position) {
@@ -75,9 +87,12 @@ public class PhotoListingRecyclerView extends RecyclerView implements PhotoListi
     private OnClickListener onItemViewClicked = new OnClickListener() {
         @Override
         public void onClick(View itemView) {
-//            PhotoListingItemAdapter.ViewHolder viewHolder = (PhotoListingItemAdapter.ViewHolder) getChildViewHolder(itemView);
-//            int position = getChildAdapterPosition(itemView);
-//            EventBus.getDefault().post(new OnPhotoListItemClicked(position, viewHolder, getPhotoDetails(position), startRect));
+            PhotoListingItemAdapter.ViewHolder viewHolder = (PhotoListingItemAdapter.ViewHolder) getChildViewHolder(itemView);
+            int position = getChildAdapterPosition(itemView);
+            int[] location = new int[2];
+            itemView.getLocationInWindow(location);
+            RectF startRect = new RectF(location[0], location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+            EventBus.getDefault().post(new OnPhotoListItemClicked(position, getPhotoDetails(position), startRect));
         }
     };
 }

@@ -8,10 +8,8 @@ import android.view.ViewGroup;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.di.PhotoComponent;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
-import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.PhotoListingRecyclerView;
-
-import javax.inject.Inject;
+import com.xkcn.gallery.view.PhotoListingView;
 
 /**
  * Created by khoinguyen on 12/23/14.
@@ -28,7 +26,7 @@ public class PhotoListingPagerAdapter extends PagerAdapter {
     private PhotoComponent photoComponent;
 
     private int perPage;
-    private int windowInsetsBottom;
+    private PhotoListingView primaryPage;
 
     public PhotoListingPagerAdapter(PhotoComponent photoComponent) {
         this.photoComponent = photoComponent;
@@ -41,7 +39,6 @@ public class PhotoListingPagerAdapter extends PagerAdapter {
         }
 
         PhotoListingRecyclerView itemView = (PhotoListingRecyclerView) inflater.inflate(R.layout.photo_list_page_view, container, false);
-        itemView.setPadding(0, 0, 0, windowInsetsBottom);
 
         PhotoListingViewPresenter presenter = new PhotoListingViewPresenter(perPage);
         photoComponent.inject(presenter);
@@ -69,6 +66,11 @@ public class PhotoListingPagerAdapter extends PagerAdapter {
         return view == object;
     }
 
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+        primaryPage = (PhotoListingView) object;
+    }
+
     public int getType() {
         return type;
     }
@@ -85,7 +87,11 @@ public class PhotoListingPagerAdapter extends PagerAdapter {
         this.perPage = perPage;
     }
 
-    public void setWindowInsetsBottom(int windowInsetsBottom) {
-        this.windowInsetsBottom = windowInsetsBottom;
+    public PhotoListingView getPrimaryPage() {
+        return primaryPage;
+    }
+
+    public void setPrimaryPage(PhotoListingView primaryPage) {
+        this.primaryPage = primaryPage;
     }
 }

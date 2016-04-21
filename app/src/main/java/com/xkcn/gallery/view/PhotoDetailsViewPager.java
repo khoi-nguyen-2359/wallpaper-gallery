@@ -124,7 +124,7 @@ public class PhotoDetailsViewPager extends ViewPager implements PhotoListingView
     }
 
     @Override
-    public void displayPhotoData(List<PhotoDetails> photos) {
+    public void populatePhotoData(List<PhotoDetails> photos) {
         if (adapterPhotoDetails == null) {
             adapterPhotoDetails = new PhotoDetailsPagerAdapter();
             setAdapter(adapterPhotoDetails);
@@ -132,6 +132,16 @@ public class PhotoDetailsViewPager extends ViewPager implements PhotoListingView
 
         adapterPhotoDetails.setPhotoDatas(photos);
         adapterPhotoDetails.notifyDataSetChanged();
+    }
+
+    @Override
+    public void displayPhotoItem(int position) {
+        setCurrentItem(position);
+    }
+
+    @Override
+    public View getPhotoItemView(int position) {
+        throw new UnsupportedOperationException();
     }
 
     public void setPresenter(PhotoListingViewPresenter presenter) {

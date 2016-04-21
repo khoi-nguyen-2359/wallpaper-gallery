@@ -1,8 +1,12 @@
 package com.xkcn.gallery.view;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Rect;
+import android.os.Build;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.WindowInsets;
 
 import com.xkcn.gallery.adapter.PhotoListingPagerAdapter;
 import com.xkcn.gallery.di.PhotoComponent;
@@ -35,7 +39,7 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
     }
 
     @Override
-    public void displayPhotoPages(int count, int botInset, final int listingPerPage, final int type) {
+    public void populatePhotoData(int count, final int listingPerPage, final int type) {
         if (adapterPhotoPages == null) {
             adapterPhotoPages = new PhotoListingPagerAdapter(photoComponent);
             setAdapter(adapterPhotoPages);
@@ -43,7 +47,6 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
 
         adapterPhotoPages.setPageCount(count);
         adapterPhotoPages.setType(type);
-        adapterPhotoPages.setWindowInsetsBottom(botInset);
         adapterPhotoPages.setPerPage(listingPerPage);
         adapterPhotoPages.notifyDataSetChanged();
 
@@ -51,13 +54,18 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
     }
 
     @Override
-    public void setCurrentPage(int page) {
+    public void displayPage(int page) {
         setCurrentItem(page, false);
     }
 
     @Override
-    public int getCurrentPage() {
+    public int getCurrentPagePosition() {
         return getCurrentItem();
+    }
+
+    @Override
+    public PhotoListingView getCurrentPageView() {
+        return adapterPhotoPages.getPrimaryPage();
     }
 
     @Override
@@ -73,5 +81,10 @@ public class PhotoListingViewPagerImpl extends ViewPager implements PhotoListing
 
     public void setPhotoComponent(PhotoComponent photoComponent) {
         this.photoComponent = photoComponent;
+    }
+
+    @Override
+    public WindowInsets computeSystemWindowInsets(WindowInsets in, Rect outLocalInsets) {
+        return super.computeSystemWindowInsets(in, outLocalInsets);
     }
 }

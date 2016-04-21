@@ -10,11 +10,13 @@ import com.xkcn.gallery.presenter.PhotoListingViewPagerPresenter;
 public interface PhotoListingViewPager {
     void setPresenter(PhotoListingViewPagerPresenter presenter);
 
-    void displayPhotoPages(int pageCount, int botInset, int listingPerPage, int type);
+    void populatePhotoData(int pageCount, int listingPerPage, int type);
 
-    void setCurrentPage(int page);
+    void displayPage(int page);
 
-    int getCurrentPage();
+    int getCurrentPagePosition();
+
+    PhotoListingView getCurrentPageView();
 
     void changeListingType(int type);
 }

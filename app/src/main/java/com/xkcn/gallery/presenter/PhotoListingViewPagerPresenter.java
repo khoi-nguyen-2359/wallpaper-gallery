@@ -38,37 +38,8 @@ public class PhotoListingViewPagerPresenter {
     @Inject PreferencesUsecase prefUsecase;
     @Inject PhotoDetailsUsecase photoDetailsUsecase;
 
-    private WindowInsetsCompat windowInsets;
-    private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
     private Observable<Integer> getListingPhotoPerPage;
     private L log = L.get(this);
-
-    public void setWindowInsets(WindowInsetsCompat insets) {
-        windowInsets = insets;
-    }
-
-    private Observable<Integer> waitWindowInsets() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-            return Observable.create(new Observable.OnSubscribe<Integer>() {
-                @Override
-                public void call(Subscriber<? super Integer> subscriber) {
-                    log.d("waitWindowInsets call in thread %s", Thread.currentThread().getName());
-                    while (windowInsets == null) {
-
-                    }
-
-                    subscriber.onNext(windowInsets.getSystemWindowInsetBottom());
-                    subscriber.onCompleted();
-                }
-            });
-        }
-
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
-            return Observable.just(kitkatSystemBarConfig.getPixelInsetBottom());
-        }
-
-        return Observable.just(0);
-    }
 
     public void loadPageCount() {
         Observable.zip(getListingPhotoPerPage()
@@ -78,11 +49,11 @@ public class PhotoListingViewPagerPresenter {
                         log.d("getPageCount call in thread %s", Thread.currentThread().getName());
                         return photoDetailsUsecase.getPageCount(perPage);
                     }
-                }), waitWindowInsets(), getListingPhotoPerPage().cache(), new Func3<Integer, Integer, Integer, List<Integer>>() {
+                }), getListingPhotoPerPage().cache(), new Func2<Integer, Integer, List<Integer>>() {
             @Override
-            public List<Integer> call(Integer pageCount, Integer windowBotInset, Integer listingPerPage) {
+            public List<Integer> call(Integer pageCount, Integer listingPerPage) {
                 log.d("zip function call in thread %s", Thread.currentThread().getName());
-                return Arrays.asList(pageCount, windowBotInset, listingPerPage);
+                return Arrays.asList(pageCount, listingPerPage);
             }
         })
                 .subscribeOn(Schedulers.newThread())
@@ -98,7 +69,7 @@ public class PhotoListingViewPagerPresenter {
 
                     @Override
                     public void onNext(List<Integer> results) {
-                        view.displayPhotoPages(results.get(0), results.get(1), results.get(2), currentType);
+                        view.populatePhotoData(results.get(0), results.get(1), currentType);
                     }
                 });
     }
@@ -125,14 +96,14 @@ public class PhotoListingViewPagerPresenter {
 
                     @Override
                     public void onNext(Integer page) {
-                        view.setCurrentPage(page);
+                        view.displayPage(page);
                         hasSetLastWatchedPhotoListPage = true;
                     }
                 });
     }
 
     public void saveLastWatchedPhotoListPage() {
-        prefUsecase.setLastWatchedPhotoListingPage(view.getCurrentPage())
+        prefUsecase.setLastWatchedPhotoListingPage(view.getCurrentPagePosition())
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(Observers.empty());
@@ -157,9 +128,5 @@ public class PhotoListingViewPagerPresenter {
         }
 
         return getListingPhotoPerPage;
-    }
-
-    public void setKitkatSystemBarConfig(SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig) {
-        this.kitkatSystemBarConfig = kitkatSystemBarConfig;
     }
 }

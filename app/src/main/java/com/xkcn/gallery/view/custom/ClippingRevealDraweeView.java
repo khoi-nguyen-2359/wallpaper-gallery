@@ -64,7 +64,7 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
         return super.onTouchEvent(event);
     }
 
-    public void setImageUris(Uri photoUri) {
+    public void setImageUri(Uri photoUri) {
         DraweeController controller = Fresco.newDraweeControllerBuilder()
                 .setCallerContext(null)
                 .setUri(photoUri)

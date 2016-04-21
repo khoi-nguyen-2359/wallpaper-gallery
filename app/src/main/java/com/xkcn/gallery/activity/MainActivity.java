@@ -5,6 +5,8 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
@@ -20,8 +22,10 @@ import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.WindowInsets;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
@@ -38,12 +42,10 @@ import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPagerPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
-import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.util.AndroidUtils;
 import com.xkcn.gallery.view.MainView;
 import com.xkcn.gallery.view.PhotoDetailsViewPager;
-import com.xkcn.gallery.view.PhotoListingViewPager;
+import com.xkcn.gallery.view.PhotoListingView;
 import com.xkcn.gallery.view.PhotoListingViewPagerImpl;
 import com.xkcn.gallery.view.custom.ClippingRevealDraweeView;
 
@@ -61,7 +63,6 @@ public abstract class MainActivity extends BaseActivity
 
     @Bind(R.id.pager_photo_listing) PhotoListingViewPagerImpl pagerPhotoListing;
     @Bind(R.id.nav_view) NavigationView viewNavigation;
-    @Bind(R.id.content_view) RelativeLayout contentViewLayout;
     @Bind(R.id.main_coordinator_layout) CoordinatorLayout mainCoordinatorLayout;
     @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Bind(R.id.toolbar) Toolbar toolbar;
@@ -111,7 +112,6 @@ public abstract class MainActivity extends BaseActivity
 
         pagerPhotoDetails.setPresenter(detailsPagerPresenter);
         detailsPagerPresenter.setView(pagerPhotoDetails);
-
         pagerPhotoDetails.setDraggingListener(detailsPagerDraggingListener);
         pagerPhotoDetails.addOnPageChangeListener(onPhotoDetailsPageChanged);
     }
@@ -126,7 +126,6 @@ public abstract class MainActivity extends BaseActivity
         listingPagerPresenter = new PhotoListingViewPagerPresenter();
         getPhotoComponent().inject(listingPagerPresenter);
         getPreferencesComponent().inject(listingPagerPresenter);
-        listingPagerPresenter.setKitkatSystemBarConfig(kitkatSystemBarConfig);
         listingPagerPresenter.setView(pagerPhotoListing);
 
         detailsPagerPresenter = new PhotoListingViewPresenter(preferenceRepository.getListPagerPhotoPerPage());
@@ -152,11 +151,11 @@ public abstract class MainActivity extends BaseActivity
     }
 
     private void applyWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(mainCoordinatorLayout, new OnApplyWindowInsetsListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(pagerPhotoListing, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, final WindowInsetsCompat insets) {
                 toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
-                listingPagerPresenter.setWindowInsets(insets);
+                pagerPhotoListing.setPadding(0,0,0,insets.getSystemWindowInsetBottom());
 
                 return insets;
             }
@@ -164,6 +163,7 @@ public abstract class MainActivity extends BaseActivity
 
         if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
             toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
+            pagerPhotoListing.setPadding(0,0,0,kitkatSystemBarConfig.getPixelInsetBottom());
         }
     }
 
@@ -240,7 +240,7 @@ public abstract class MainActivity extends BaseActivity
         RectF endRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
 
         transitDraweeView.setVisibility(View.VISIBLE);
-        transitDraweeView.setImageUris(event.getPhotoDetails().getLowResUri());
+        transitDraweeView.setImageUri(event.getPhotoDetails().getLowResUri());
 
         transitDraweeView.createExpanseAnimation(photoViewRevealInfo.startRect, endRect)
                 .addAnimatorListener(new AnimatorListenerAdapter() {
@@ -300,8 +300,14 @@ public abstract class MainActivity extends BaseActivity
 
         @Override
         public void onEndDragging(PhotoDetailsViewPager detailsPager) {
+            PhotoListingView currentPageView = pagerPhotoListing.getCurrentPageView();
+            View itemView = currentPageView.getPhotoItemView(pagerPhotoDetails.getCurrentItem());
+            int[] location = new int[2];
+            itemView.getLocationInWindow(location);
+            RectF endRect = new RectF(location[0], location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+
             RectF startRect = new RectF(pagerPhotoDetails.getX(), pagerPhotoDetails.getY(), pagerPhotoDetails.getX() + pagerPhotoDetails.getWidth(), pagerPhotoDetails.getY() + pagerPhotoDetails.getHeight());
-            transitDraweeView.createShrinkAnimation(startRect, photoViewRevealInfo.startRect)
+            transitDraweeView.createShrinkAnimation(startRect, endRect)
                     .addAnimatorListener(new AnimatorListenerAdapter() {
                         @Override
                         public void onAnimationStart(Animator animation) {
@@ -349,7 +355,12 @@ public abstract class MainActivity extends BaseActivity
             return;
         }
 
-        pagerPhotoListing.getCurrentPage();
+        int currentDetailsItem = pagerPhotoDetails.getCurrentItem();
+        PhotoListingView currentPageView = pagerPhotoListing.getCurrentPageView();
+        currentPageView.displayPhotoItem(currentDetailsItem);
+
+        PhotoDetails photoDetails = detailsPagerPresenter.getCachedPhotoDetails(currentDetailsItem);
+        transitDraweeView.setImageUri(photoDetails.getLowResUri());
     }
 
     private static class PhotoViewRevealInfo {
