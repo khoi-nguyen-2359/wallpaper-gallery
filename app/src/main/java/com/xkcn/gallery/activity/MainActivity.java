@@ -5,8 +5,6 @@ import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.content.Context;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
@@ -22,31 +20,28 @@ import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.AttributeSet;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.WindowInsets;
 import android.widget.FrameLayout;
-import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import com.khoinguyen.photokit.presenter.PhotoListingViewPagerPresenter;
+import com.khoinguyen.photokit.view.PhotoListingViewPagerImpl;
 import com.khoinguyen.ui.UiUtils;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.adapter.PhotoListingPagerAdapter;
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.khoinguyen.photokit.adapter.PhotoListingPagerAdapter;
+import com.khoinguyen.photokit.data.model.PhotoDetails;
 import com.xkcn.gallery.event.OnPhotoListItemClicked;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.presenter.MainViewPresenter;
-import com.xkcn.gallery.presenter.PhotoListingViewPagerPresenter;
-import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
+import com.khoinguyen.photokit.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.util.AndroidUtils;
 import com.xkcn.gallery.view.MainView;
-import com.xkcn.gallery.view.PhotoDetailsViewPager;
-import com.xkcn.gallery.view.PhotoListingView;
-import com.xkcn.gallery.view.PhotoListingViewPagerImpl;
+import com.khoinguyen.photokit.view.PhotoDetailsViewPager;
+import com.khoinguyen.photokit.view.PhotoListingView;
 import com.xkcn.gallery.view.custom.ClippingRevealDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -107,7 +102,6 @@ public abstract class MainActivity extends BaseActivity
 
         pagerPhotoListing.setPresenter(listingPagerPresenter);
         pagerPhotoListing.addOnPageChangeListener(onPhotoListPageChanged);
-        pagerPhotoListing.setPhotoComponent(getPhotoComponent());
         listingPagerPresenter.setView(pagerPhotoListing);
 
         pagerPhotoDetails.setPresenter(detailsPagerPresenter);
@@ -123,13 +117,10 @@ public abstract class MainActivity extends BaseActivity
         SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
         kitkatSystemBarConfig = kitkatTintManager.getConfig();
 
-        listingPagerPresenter = new PhotoListingViewPagerPresenter();
-        getPhotoComponent().inject(listingPagerPresenter);
-        getPreferencesComponent().inject(listingPagerPresenter);
+        listingPagerPresenter = new PhotoListingViewPagerPresenter(preferencesUsecase, photoListingUsecase);
         listingPagerPresenter.setView(pagerPhotoListing);
 
-        detailsPagerPresenter = new PhotoListingViewPresenter(preferenceRepository.getListPagerPhotoPerPage());
-        getPhotoComponent().inject(detailsPagerPresenter);
+        detailsPagerPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
     }
 
     protected void initTemplateViews() {

@@ -15,7 +15,7 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.khoinguyen.photokit.data.model.PhotoDetails;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 
 import org.greenrobot.eventbus.EventBus;

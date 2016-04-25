@@ -1,0 +1,46 @@
+apply plugin: 'com.android.library'
+
+def configs = rootProject.extensions.getByName("ext")
+
+repositories {
+    maven { url 'https://dl.bintray.com/akhoi90/maven' }
+}
+
+android {
+    compileSdkVersion configs.androidCompileSdk
+    buildToolsVersion configs.androidBuildToolVersion
+
+    defaultConfig {
+        minSdkVersion configs.androidMinSdk
+        targetSdkVersion configs.androidMaxSdk
+        versionCode 1
+        versionName "1.0"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:appcompat-v7:${configs.androidSupportLibVersion}"
+    compile "com.android.support:cardview-v7:${configs.androidSupportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${configs.androidSupportLibVersion}"
+    compile "com.android.support:support-annotations:${configs.androidSupportLibVersion}"
+
+    compile "com.khoinguyen.util:log:${configs.knUtilsVersion}"
+    compile "com.khoinguyen.util:recyclerview:${configs.knUtilsVersion}"
+    compile "com.khoinguyen.util:ui:${configs.knUtilsVersion}"
+
+    compile "com.facebook.fresco:fresco:${configs.frescoVersion}"
+    compile "com.facebook.fresco:imagepipeline-okhttp3:${configs.frescoVersion}"
+
+    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'io.reactivex:rxjava:1.1.1'
+
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+}

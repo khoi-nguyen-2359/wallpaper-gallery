@@ -5,7 +5,7 @@ import android.app.Application;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.backends.okhttp3.OkHttpImagePipelineConfigFactory;
 import com.facebook.imagepipeline.core.ImagePipelineConfig;
-import com.khoinguyen.logging.L;
+import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.di.ApplicationComponent;
 import com.xkcn.gallery.di.ApplicationModule;
 import com.xkcn.gallery.di.DaggerApplicationComponent;

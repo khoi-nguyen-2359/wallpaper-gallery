@@ -5,9 +5,9 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.PhotoDetailsRepository;
-import com.xkcn.gallery.data.PhotoTagRepository;
-import com.xkcn.gallery.data.PreferenceRepository;
+import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
+import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
+import com.khoinguyen.photokit.data.repo.PreferenceRepository;
 import com.xkcn.gallery.di.ApplicationComponent;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
 

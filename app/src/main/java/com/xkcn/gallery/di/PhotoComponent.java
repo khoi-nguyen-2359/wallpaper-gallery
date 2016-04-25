@@ -1,8 +1,8 @@
 package com.xkcn.gallery.di;
 
-import com.xkcn.gallery.adapter.PhotoListingPagerAdapter;
-import com.xkcn.gallery.presenter.PhotoListingViewPagerPresenter;
-import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
+import com.khoinguyen.photokit.adapter.PhotoListingPagerAdapter;
+import com.khoinguyen.photokit.presenter.PhotoListingViewPagerPresenter;
+import com.khoinguyen.photokit.presenter.PhotoListingViewPresenter;
 
 import dagger.Component;
 

@@ -2,13 +2,15 @@ package com.xkcn.gallery.di;
 
 import android.content.Context;
 
+import com.khoinguyen.photokit.usecase.PhotoListingUsecase;
+import com.khoinguyen.photokit.usecase.PreferencesUsecase;
 import com.xkcn.gallery.activity.BaseActivity;
-import com.xkcn.gallery.data.PhotoDetailsRepository;
-import com.xkcn.gallery.data.PhotoTagRepository;
-import com.xkcn.gallery.data.PreferenceRepository;
+import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
+import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
+import com.khoinguyen.photokit.data.repo.PreferenceRepository;
+import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.fragment.BaseFragment;
 import com.xkcn.gallery.service.UpdateService;
-import com.xkcn.gallery.usecase.PhotoDetailsUsecase;
 
 import javax.inject.Singleton;
 
@@ -25,7 +27,9 @@ public interface ApplicationComponent {
     void inject(UpdateService updateService);
 
     Context context();
-    PhotoDetailsRepository photoDetailsReposiroty();
-    PreferenceRepository preferenceReposiroty();
+    PhotoDetailsRepository photoDetailsRepository();
+    PreferenceRepository preferenceRepository();
     PhotoTagRepository photoTagRepository();
+    PhotoListingUsecase photoListingUsecase();
+    PreferencesUsecase preferencesUsecase();
 }

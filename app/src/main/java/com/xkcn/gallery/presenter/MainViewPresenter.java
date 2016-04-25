@@ -1,19 +1,14 @@
 package com.xkcn.gallery.presenter;
 
-import com.xkcn.gallery.data.PhotoDetailsRepository;
-import com.xkcn.gallery.data.PreferenceRepository;
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.khoinguyen.photokit.data.repo.PreferenceRepository;
+import com.khoinguyen.photokit.data.model.PhotoDetails;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
-import com.xkcn.gallery.view.ActivityView;
 import com.xkcn.gallery.view.MainView;
 
 import java.io.File;
 
-import rx.Observable;
 import rx.Observer;
-import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.observers.Observers;
 import rx.schedulers.Schedulers;
 
 /**

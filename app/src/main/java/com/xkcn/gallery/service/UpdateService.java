@@ -10,14 +10,14 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.khoinguyen.logging.L;
+import com.khoinguyen.photokit.data.model.ModelConstants;
+import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.PhotoDetailsRepository;
-import com.xkcn.gallery.data.PhotoTagRepository;
-import com.xkcn.gallery.data.PreferenceRepository;
-import com.xkcn.gallery.data.model.ModelConstants;
-import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.model.PhotoTag;
+import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
+import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
+import com.khoinguyen.photokit.data.repo.PreferenceRepository;
+import com.khoinguyen.photokit.data.model.PhotoDetails;
+import com.khoinguyen.photokit.data.model.PhotoTag;
 import com.xkcn.gallery.event.CrawlNextPageEvent;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 

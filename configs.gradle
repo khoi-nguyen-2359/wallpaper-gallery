@@ -3,8 +3,9 @@ ext {
     androidMinSdk = 16
     androidMaxSdk = 23
     androidBuildToolVersion = "23.0.3"
-    androidSupportLibVersion = "23.2.1"
+    androidSupportLibVersion = "23.3.0"
     applicationId = "com.xkcn.gallery"
     gmsVersion = "8.4.0"
-    frescoVersion = "1bdf4a386233a21042cd56b66489f7eabf1d8209"
+    frescoVersion = "0.10.0"
+    knUtilsVersion = "0.1.1"
 }

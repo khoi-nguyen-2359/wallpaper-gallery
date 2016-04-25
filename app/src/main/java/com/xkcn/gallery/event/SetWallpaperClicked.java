@@ -1,6 +1,6 @@
 package com.xkcn.gallery.event;
 
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.khoinguyen.photokit.data.model.PhotoDetails;
 
 /**
  * Created by khoinguyen on 2/11/15.

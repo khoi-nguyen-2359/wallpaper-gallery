@@ -2,13 +2,16 @@ package com.xkcn.gallery.di;
 
 import android.content.Context;
 
+import com.khoinguyen.photokit.usecase.PhotoListingUsecase;
+import com.khoinguyen.photokit.usecase.PreferencesUsecase;
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.PhotoDetailsRepository;
-import com.xkcn.gallery.data.PhotoDetailsSqliteRepository;
-import com.xkcn.gallery.data.PhotoTagRepository;
-import com.xkcn.gallery.data.PhotoTagSqliteRepository;
-import com.xkcn.gallery.data.PreferenceRepository;
-import com.xkcn.gallery.data.PreferenceRepositoryImpl;
+import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
+import com.khoinguyen.photokit.data.repo.PhotoDetailsSqliteRepository;
+import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
+import com.khoinguyen.photokit.data.repo.PhotoTagSqliteRepository;
+import com.khoinguyen.photokit.data.repo.PreferenceRepository;
+import com.khoinguyen.photokit.data.repo.PreferenceRepositoryImpl;
+import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
 
 import javax.inject.Singleton;
@@ -22,9 +25,23 @@ import dagger.Provides;
 @Module
 public class ApplicationModule {
     private final BaseApp baseApp;
+    private final DbHelper dbHelper;
 
     public ApplicationModule(BaseApp app) {
         this.baseApp = app;
+        dbHelper = new DbHelper(app);
+    }
+
+    @Provides
+    @Singleton
+    PreferencesUsecase providePreferencesUsecase(PreferenceRepository preferenceRepository) {
+        return new PreferencesUsecase(preferenceRepository);
+    }
+
+    @Provides
+    @Singleton
+    PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
+        return new PhotoListingUsecase(photoDetailsRepository);
     }
 
     @Provides
@@ -36,7 +53,7 @@ public class ApplicationModule {
     @Provides
     @Singleton
     PhotoDetailsRepository providePhotoDetailsDataStore() {
-        return new PhotoDetailsSqliteRepository(baseApp);
+        return new PhotoDetailsSqliteRepository(dbHelper);
     }
 
     @Provides
@@ -54,6 +71,6 @@ public class ApplicationModule {
     @Provides
     @Singleton
     PhotoTagRepository providePhotoTagRepository() {
-        return new PhotoTagSqliteRepository(baseApp);
+        return new PhotoTagSqliteRepository(dbHelper);
     }
 }

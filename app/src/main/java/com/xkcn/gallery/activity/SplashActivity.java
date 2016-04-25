@@ -17,7 +17,7 @@ public class SplashActivity extends BaseActivity implements SplashView {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        finish();
         startActivity(new Intent(this, MainActivityImpl.class));
+        finish();
     }
 }

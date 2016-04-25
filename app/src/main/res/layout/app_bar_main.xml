@@ -33,7 +33,7 @@
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <com.xkcn.gallery.view.PhotoListingViewPagerImpl
+    <com.khoinguyen.photokit.view.PhotoListingViewPagerImpl
         android:clipChildren="false"
         android:clipToPadding="false"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.xkcn.gallery.view.PhotoDetailsViewPager
+    <com.khoinguyen.photokit.view.PhotoDetailsViewPager
         android:visibility="gone"
         android:id="@+id/pager_photo_details"
         android:layout_width="match_parent"

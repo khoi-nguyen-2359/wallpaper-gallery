@@ -3,10 +3,12 @@ package com.xkcn.gallery.activity;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.khoinguyen.photokit.usecase.PhotoListingUsecase;
+import com.khoinguyen.photokit.usecase.PreferencesUsecase;
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.PhotoDetailsRepository;
-import com.xkcn.gallery.data.PhotoTagRepository;
-import com.xkcn.gallery.data.PreferenceRepository;
+import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
+import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
+import com.khoinguyen.photokit.data.repo.PreferenceRepository;
 import com.xkcn.gallery.di.ActivityModule;
 import com.xkcn.gallery.di.ApplicationComponent;
 import com.xkcn.gallery.di.DaggerPhotoComponent;
@@ -14,8 +16,6 @@ import com.xkcn.gallery.di.DaggerPreferencesComponent;
 import com.xkcn.gallery.di.PhotoComponent;
 import com.xkcn.gallery.di.PreferencesComponent;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
-import com.xkcn.gallery.usecase.PhotoDetailsUsecase;
-import com.xkcn.gallery.usecase.PreferencesUsecase;
 
 import javax.inject.Inject;
 
@@ -31,43 +31,19 @@ public abstract class BaseActivity extends AppCompatActivity {
     PhotoTagRepository photoTagRepository;
     @Inject
     PhotoDownloader photoDownloader;
-
-    protected PhotoComponent photoComponent;
-    protected PreferencesComponent preferencesComponent;
+    @Inject
+    PhotoListingUsecase photoListingUsecase;
+    @Inject
+    PreferencesUsecase preferencesUsecase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        initInjectors();
 
         getApplicationComponent().inject(this);
     }
 
-    protected void initInjectors() {
-        photoComponent = DaggerPhotoComponent.builder()
-                .applicationComponent(getApplicationComponent())
-                .activityModule(getActivityModule())
-                .build();
-
-        preferencesComponent = DaggerPreferencesComponent.builder()
-                .applicationComponent(getApplicationComponent())
-                .activityModule(getActivityModule())
-                .build();
-    }
-
     protected ApplicationComponent getApplicationComponent() {
         return ((BaseApp) getApplication()).getApplicationComponent();
-    }
-
-    protected PreferencesComponent getPreferencesComponent() {
-        return preferencesComponent;
-    }
-
-    protected PhotoComponent getPhotoComponent() {
-        return photoComponent;
-    }
-
-    protected ActivityModule getActivityModule() {
-        return new ActivityModule(this);
     }
 }
