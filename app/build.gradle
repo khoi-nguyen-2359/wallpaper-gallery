@@ -15,8 +15,11 @@ apply plugin: 'com.neenbedankt.android-apt'
 def configs = rootProject.extensions.getByName("ext")
 
 repositories {
+    jcenter()
     maven { url 'https://maven.fabric.io/public' }
     maven { url 'https://dl.bintray.com/akhoi90/maven' }
+
+    flatDir { dirs '../aars'}
 }
 
 android {
@@ -64,24 +67,36 @@ dependencies {
     compile "com.android.support:support-annotations:${configs.androidSupportLibVersion}"
     compile "com.android.support:design:${configs.androidSupportLibVersion}"
     compile "com.android.support:support-v4:${configs.androidSupportLibVersion}"
-
     compile project(':photokit')
 
-    compile "com.khoinguyen.util:log:${configs.knUtilsVersion}"
-    compile "com.khoinguyen.util:recyclerview:${configs.knUtilsVersion}"
-    compile "com.khoinguyen.util:ui:${configs.knUtilsVersion}"
-
-    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar')
+    {
         transitive = true;
     }
-
     compile 'com.readystatesoftware.systembartint:systembartint:1.0.3'
 
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'joda-time:joda-time:2.9'
 
+    compile 'joda-time:joda-time:2.9'
     apt 'com.google.dagger:dagger-compiler:2.0'
     compile 'com.google.dagger:dagger:2.0'
     provided 'javax.annotation:jsr250-api:1.0'
+
+    compile 'io.reactivex:rxandroid:1.1.0'
+    compile 'io.reactivex:rxjava:1.1.3'
+
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+    compile 'com.jakewharton:butterknife:7.0.1'
+
+    compile "com.facebook.fresco:fresco:${configs.frescoVersion}"
+    compile "com.facebook.fresco:imagepipeline-okhttp3:${configs.frescoVersion}"
+
+    compile(name:'ui', ext:'aar')
+    compile(name:'recyclerview', ext:'aar')
+    compile(name:'log', ext:'aar')
+
+//    compile "com.khoinguyen.util:log:${configs.knUtilsVersion}@aar"
+//    compile "com.khoinguyen.util:recyclerview:${configs.knUtilsVersion}@aar"
+//    compile "com.khoinguyen.util:ui:${configs.knUtilsVersion}@aar"
 }

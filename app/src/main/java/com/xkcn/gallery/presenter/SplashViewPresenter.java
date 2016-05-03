@@ -1,6 +1,6 @@
 package com.xkcn.gallery.presenter;
 
-import com.khoinguyen.photokit.data.repo.PreferenceRepository;
+import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.view.SplashView;
 
 /**

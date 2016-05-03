@@ -2,13 +2,12 @@ package com.xkcn.gallery.di;
 
 import android.content.Context;
 
-import com.khoinguyen.photokit.usecase.PhotoListingUsecase;
-import com.khoinguyen.photokit.usecase.PreferencesUsecase;
+import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
+import com.xkcn.gallery.data.repo.PhotoTagRepository;
+import com.xkcn.gallery.data.repo.PreferenceRepository;
+import com.xkcn.gallery.usecase.PhotoListingUsecase;
+import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.activity.BaseActivity;
-import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
-import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
-import com.khoinguyen.photokit.data.repo.PreferenceRepository;
-import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.fragment.BaseFragment;
 import com.xkcn.gallery.service.UpdateService;
 

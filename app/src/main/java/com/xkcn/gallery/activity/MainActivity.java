@@ -1,11 +1,7 @@
 package com.xkcn.gallery.activity;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.animation.ValueAnimator;
 import android.app.Dialog;
 import android.app.ProgressDialog;
-import android.graphics.RectF;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,7 +11,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.OnApplyWindowInsetsListener;
 import android.support.v4.view.ViewCompat;
-import android.support.v4.view.ViewPager;
 import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -25,30 +20,34 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
-import com.khoinguyen.photokit.presenter.PhotoListingViewPagerPresenter;
-import com.khoinguyen.photokit.view.PhotoListingViewPagerImpl;
+import com.khoinguyen.photokit.PhotoKitWidget;
+import com.khoinguyen.photokit.PhotoListingView;
+import com.khoinguyen.photokit.PhotoListingViewBinder;
+import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.sample.binder.DefaultPhotoGalleryViewBinder;
+import com.khoinguyen.photokit.sample.binder.DefaultPhotoListingViewBinder;
+import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
+import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 import com.khoinguyen.ui.UiUtils;
+import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
-import com.khoinguyen.photokit.adapter.PhotoListingPagerAdapter;
-import com.khoinguyen.photokit.data.model.PhotoDetails;
-import com.xkcn.gallery.event.OnPhotoListItemClicked;
+import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.presenter.MainViewPresenter;
-import com.khoinguyen.photokit.presenter.PhotoListingViewPresenter;
+import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.util.AndroidUtils;
 import com.xkcn.gallery.view.MainView;
-import com.khoinguyen.photokit.view.PhotoDetailsViewPager;
-import com.khoinguyen.photokit.view.PhotoListingView;
-import com.xkcn.gallery.view.custom.ClippingRevealDraweeView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -56,23 +55,64 @@ import butterknife.ButterKnife;
 public abstract class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainView {
 
-    @Bind(R.id.pager_photo_listing) PhotoListingViewPagerImpl pagerPhotoListing;
-    @Bind(R.id.nav_view) NavigationView viewNavigation;
     @Bind(R.id.main_coordinator_layout) CoordinatorLayout mainCoordinatorLayout;
+    @Bind(R.id.nav_view) NavigationView viewNavigation;
     @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.toolbar_container) FrameLayout toolbarContainerLayout;
-    @Bind(R.id.drawee_transit) ClippingRevealDraweeView transitDraweeView;
-    @Bind(R.id.drawee_transit_backdrop) View transitBackdrop;
-    @Bind(R.id.pager_photo_details) PhotoDetailsViewPager pagerPhotoDetails;
+    @Bind(R.id.photokit_widget) PhotoKitWidget photoKitWidget;
+
+    @Bind(R.id.view_photo_listing) PhotoListingView photoListingView;
 
     protected MainViewPresenter presenter;
-    protected PhotoListingViewPagerPresenter listingPagerPresenter;
-    protected PhotoListingViewPresenter detailsPagerPresenter;
     private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
     protected Dialog proDlg;
 
-    private PhotoViewRevealInfo photoViewRevealInfo;
+    L log = L.get(this);
+
+    protected PhotoListingViewPresenter photoListingPresenter;
+
+    private List<PhotoDetails> allPhotos;
+
+    protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+
+    private PhotoListingViewBinder photoListingBinder = new DefaultPhotoListingViewBinder() {
+        @Override
+        protected PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex) {
+            if (itemIndex >= allPhotos.size()) {
+                return null;
+            }
+
+            PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
+            photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex).getHighResUrl());
+            photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex).getLowResUrl());
+            return photoDisplayInfo;
+        }
+
+        @Override
+        public int getItemCount() {
+            return allPhotos.size();
+        }
+    };
+
+    private PhotoListingViewBinder photoGalleryBinder = new DefaultPhotoGalleryViewBinder() {
+        @Override
+        protected PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex) {
+            if (itemIndex >= allPhotos.size()) {
+                return null;
+            }
+
+            PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
+            photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex).getHighResUrl());
+            photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex).getLowResUrl());
+            return photoDisplayInfo;
+        }
+
+        @Override
+        public int getItemCount() {
+            return allPhotos.size();
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +120,7 @@ public abstract class MainActivity extends BaseActivity
         initData();
         initTemplateViews();
         initViews();
-        listingPagerPresenter.loadPageCount();
+        photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
     }
 
     @Override
@@ -88,39 +128,39 @@ public abstract class MainActivity extends BaseActivity
         super.onStart();
         presenter.checkToCrawlPhoto();
         EventBus.getDefault().register(this);
+        eventEmitter.register(photoKitEventListener);
     }
 
     @Override
     protected void onStop() {
         EventBus.getDefault().unregister(this);
+        eventEmitter.unregister(photoKitEventListener);
         super.onStop();
-        listingPagerPresenter.saveLastWatchedPhotoListPage();
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else if (!photoKitWidget.handleBackPressed()) {
+            super.onBackPressed();
+        }
     }
 
     private void initViews() {
-        transitDraweeView.getHierarchy().setFadeDuration(0);
-
-        pagerPhotoListing.setPresenter(listingPagerPresenter);
-        pagerPhotoListing.addOnPageChangeListener(onPhotoListPageChanged);
-        listingPagerPresenter.setView(pagerPhotoListing);
-
-        pagerPhotoDetails.setPresenter(detailsPagerPresenter);
-        detailsPagerPresenter.setView(pagerPhotoDetails);
-        pagerPhotoDetails.setDraggingListener(detailsPagerDraggingListener);
-        pagerPhotoDetails.addOnPageChangeListener(onPhotoDetailsPageChanged);
+        photoKitWidget.setBinders(photoListingBinder, photoGalleryBinder);
     }
 
     private void initData() {
-        photoViewRevealInfo = new PhotoViewRevealInfo();
+        allPhotos = new ArrayList<>();
+
         presenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
+        photoListingPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
+        photoListingPresenter.setView(this);
 
         SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
         kitkatSystemBarConfig = kitkatTintManager.getConfig();
-
-        listingPagerPresenter = new PhotoListingViewPagerPresenter(preferencesUsecase, photoListingUsecase);
-        listingPagerPresenter.setView(pagerPhotoListing);
-
-        detailsPagerPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
     }
 
     protected void initTemplateViews() {
@@ -142,33 +182,19 @@ public abstract class MainActivity extends BaseActivity
     }
 
     private void applyWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(pagerPhotoListing, new OnApplyWindowInsetsListener() {
+        ViewCompat.setOnApplyWindowInsetsListener(toolbarContainerLayout, new OnApplyWindowInsetsListener() {
             @Override
             public WindowInsetsCompat onApplyWindowInsets(View v, final WindowInsetsCompat insets) {
                 toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
-                pagerPhotoListing.setPadding(0,0,0,insets.getSystemWindowInsetBottom());
+                ((View)photoListingView).setPadding(0,0,0,insets.getSystemWindowInsetBottom());
 
                 return insets;
             }
         });
 
-        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.KITKAT) {
+        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
             toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
-            pagerPhotoListing.setPadding(0,0,0,kitkatSystemBarConfig.getPixelInsetBottom());
-        }
-    }
-
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else if (pagerPhotoDetails.getVisibility() == View.VISIBLE) {
-            pagerPhotoDetails.setVisibility(View.GONE);
-            transitBackdrop.setAlpha(0);
-            transitDraweeView.setVisibility(View.GONE);
-        } else {
-            super.onBackPressed();
+            ((View)photoListingView).setPadding(0,0,0,kitkatSystemBarConfig.getPixelInsetBottom());
         }
     }
 
@@ -179,9 +205,9 @@ public abstract class MainActivity extends BaseActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_hotest) {
-            listingPagerPresenter.setCurrentType(PhotoListingPagerAdapter.TYPE_HOTEST);
+            photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_HOTEST);
         } else if (id == R.id.nav_latest) {
-            listingPagerPresenter.setCurrentType(PhotoListingPagerAdapter.TYPE_LATEST);
+            photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -194,24 +220,16 @@ public abstract class MainActivity extends BaseActivity
         UpdateService.startActionUpdate(this);
     }
 
-    private ViewPager.OnPageChangeListener onPhotoListPageChanged = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            if (positionOffset == 0) {
-                detailsPagerPresenter.loadPhotoListPage(position + 1, listingPagerPresenter.getCurrentType());
-            }
+    @Override
+    public void appendPhotoData(int page, List<PhotoDetails> photos) {
+        log.d("page=%d, photos=%d", page, photos != null ? photos.size() : 0);
+        if (page == 1) {
+            allPhotos.clear();
         }
 
-        @Override
-        public void onPageSelected(int position) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-    };
+        allPhotos.addAll(photos);
+        photoKitWidget.notifyDataSetChanged();
+    }
 
     /***
      * event bus
@@ -219,39 +237,7 @@ public abstract class MainActivity extends BaseActivity
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
-        listingPagerPresenter.loadPageCount();
-    }
-
-    @Subscribe
-    public void handleOnPhotoItemClicked(final OnPhotoListItemClicked event) {
-        appBarLayout.setExpanded(false, false);
-
-        photoViewRevealInfo.itemPosition = event.getItemPosition();
-        photoViewRevealInfo.startRect = event.getStartRect();
-        RectF endRect = new RectF(0, 0, mainCoordinatorLayout.getWidth(), mainCoordinatorLayout.getHeight());
-
-        transitDraweeView.setVisibility(View.VISIBLE);
-        transitDraweeView.setImageUri(event.getPhotoDetails().getLowResUri());
-
-        transitDraweeView.createExpanseAnimation(photoViewRevealInfo.startRect, endRect)
-                .addAnimatorListener(new AnimatorListenerAdapter() {
-                    @Override
-                    public void onAnimationEnd(Animator animation) {
-                        pagerPhotoDetails.setCurrentItem(photoViewRevealInfo.itemPosition, false);
-                        pagerPhotoDetails.setTranslationX(0);
-                        pagerPhotoDetails.setTranslationY(0);
-                        pagerPhotoDetails.setVisibility(View.VISIBLE);
-                        transitDraweeView.setVisibility(View.GONE);
-                        photoViewRevealInfo.isExpanded = true;
-                    }
-                })
-                .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                    @Override
-                    public void onAnimationUpdate(ValueAnimator animation) {
-                        transitBackdrop.setAlpha(animation.getAnimatedFraction());
-                    }
-                })
-                .run();
+        photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
@@ -283,80 +269,10 @@ public abstract class MainActivity extends BaseActivity
         AndroidUtils.startSetWallpaperChooser(this, uri);
     }
 
-    private PhotoDetailsViewPager.DraggingListener detailsPagerDraggingListener = new PhotoDetailsViewPager.DraggingListener() {
-        @Override
-        public void onStartDragging(PhotoDetailsViewPager detailsPager) {
-            transitBackdrop.setAlpha(0.75f);
-        }
-
-        @Override
-        public void onEndDragging(PhotoDetailsViewPager detailsPager) {
-            PhotoListingView currentPageView = pagerPhotoListing.getCurrentPageView();
-            View itemView = currentPageView.getPhotoItemView(pagerPhotoDetails.getCurrentItem());
-            int[] location = new int[2];
-            itemView.getLocationInWindow(location);
-            RectF endRect = new RectF(location[0], location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
-
-            RectF startRect = new RectF(pagerPhotoDetails.getX(), pagerPhotoDetails.getY(), pagerPhotoDetails.getX() + pagerPhotoDetails.getWidth(), pagerPhotoDetails.getY() + pagerPhotoDetails.getHeight());
-            transitDraweeView.createShrinkAnimation(startRect, endRect)
-                    .addAnimatorListener(new AnimatorListenerAdapter() {
-                        @Override
-                        public void onAnimationStart(Animator animation) {
-                            transitDraweeView.setVisibility(View.VISIBLE);
-                            pagerPhotoDetails.setVisibility(View.GONE);
-                        }
-
-                        @Override
-                        public void onAnimationEnd(Animator animation) {
-                            transitDraweeView.setVisibility(View.GONE);
-                            photoViewRevealInfo.isExpanded = false;
-                        }
-                    })
-                    .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-                        @Override
-                        public void onAnimationUpdate(ValueAnimator animation) {
-                            transitBackdrop.setAlpha(1 - animation.getAnimatedFraction());
-                        }
-                    })
-                    .run();
+    protected Object photoKitEventListener = new Object() {
+        @com.khoinguyen.photokit.sample.event.Subscribe
+        public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
+            appBarLayout.setExpanded(false, false);
         }
     };
-
-    private ViewPager.OnPageChangeListener onPhotoDetailsPageChanged = new ViewPager.OnPageChangeListener() {
-        @Override
-        public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-            if (positionOffset == 0) {
-                setCurrentListingItemByCurrentDetailsItem();
-            }
-        }
-
-        @Override
-        public void onPageSelected(int position) {
-
-        }
-
-        @Override
-        public void onPageScrollStateChanged(int state) {
-
-        }
-    };
-
-    private void setCurrentListingItemByCurrentDetailsItem() {
-        if (!photoViewRevealInfo.isExpanded) {
-            return;
-        }
-
-        int currentDetailsItem = pagerPhotoDetails.getCurrentItem();
-        PhotoListingView currentPageView = pagerPhotoListing.getCurrentPageView();
-        currentPageView.displayPhotoItem(currentDetailsItem);
-
-        PhotoDetails photoDetails = detailsPagerPresenter.getCachedPhotoDetails(currentDetailsItem);
-        transitDraweeView.setImageUri(photoDetails.getLowResUri());
-    }
-
-    private static class PhotoViewRevealInfo {
-        public boolean isExpanded = false;
-        public int itemPosition;
-        public RectF startRect;
-    }
 }

@@ -5,11 +5,9 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="AppTheme.PhotoListPagerActivity" parent="AppTheme"></style>
+    <style name="AppTheme.MainActivity" parent="AppTheme"></style>
 
     <style name="AppTheme.SplashActivity" parent="AppTheme"></style>
-
-    <style name="AppTheme.SinglePhotoActivity" parent="AppTheme"></style>
 
     <style name="AppTheme.PhotoActionText">
         <item name="android:textColor">@color/photo_action_bg_stroke</item>

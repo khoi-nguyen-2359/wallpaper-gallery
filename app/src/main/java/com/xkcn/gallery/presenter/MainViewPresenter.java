@@ -1,7 +1,7 @@
 package com.xkcn.gallery.presenter;
 
-import com.khoinguyen.photokit.data.repo.PreferenceRepository;
-import com.khoinguyen.photokit.data.model.PhotoDetails;
+import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
 import com.xkcn.gallery.view.MainView;
 

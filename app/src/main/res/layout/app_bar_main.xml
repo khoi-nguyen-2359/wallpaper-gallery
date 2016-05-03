@@ -33,31 +33,14 @@
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <com.khoinguyen.photokit.view.PhotoListingViewPagerImpl
-        android:clipChildren="false"
-        android:clipToPadding="false"
+    <com.khoinguyen.photokit.sample.view.DefaultPhotoKitWidget
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/pager_photo_listing"
+        android:id="@+id/photokit_widget"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        android:layout_height="match_parent">
 
-    <View
-        android:id="@+id/drawee_transit_backdrop"
-        android:alpha="0"
-        android:background="#000"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+        <include layout="@layout/photokit_main_view" />
 
-    <com.xkcn.gallery.view.custom.ClippingRevealDraweeView
-        android:visibility="gone"
-        android:id="@+id/drawee_transit"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <com.khoinguyen.photokit.view.PhotoDetailsViewPager
-        android:visibility="gone"
-        android:id="@+id/pager_photo_details"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+    </com.khoinguyen.photokit.sample.view.DefaultPhotoKitWidget>
 
 </android.support.design.widget.CoordinatorLayout>

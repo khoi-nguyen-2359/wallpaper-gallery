@@ -2,15 +2,15 @@ package com.xkcn.gallery.di;
 
 import android.content.Context;
 
-import com.khoinguyen.photokit.usecase.PhotoListingUsecase;
-import com.khoinguyen.photokit.usecase.PreferencesUsecase;
+import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
+import com.xkcn.gallery.data.repo.PhotoDetailsSqliteRepository;
+import com.xkcn.gallery.data.repo.PhotoTagRepository;
+import com.xkcn.gallery.data.repo.PhotoTagSqliteRepository;
+import com.xkcn.gallery.data.repo.PreferenceRepository;
+import com.xkcn.gallery.data.repo.PreferenceRepositoryImpl;
+import com.xkcn.gallery.usecase.PhotoListingUsecase;
+import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.BaseApp;
-import com.khoinguyen.photokit.data.repo.PhotoDetailsRepository;
-import com.khoinguyen.photokit.data.repo.PhotoDetailsSqliteRepository;
-import com.khoinguyen.photokit.data.repo.PhotoTagRepository;
-import com.khoinguyen.photokit.data.repo.PhotoTagSqliteRepository;
-import com.khoinguyen.photokit.data.repo.PreferenceRepository;
-import com.khoinguyen.photokit.data.repo.PreferenceRepositoryImpl;
 import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
 
