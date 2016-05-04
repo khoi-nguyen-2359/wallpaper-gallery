@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <item name="pager_photo_listing" type="id" />
-    <item name="pager_photo_details" type="id" />
-    <item name="view_transition_backdrop" type="id" />
-    <item name="view_transition_photo" type="id" />
+    <item name="photokit_pager_photo_gallery" type="id" />
+    <item name="photokit_transition_backdrop" type="id" />
+    <item name="photokit_transition_photo" type="id" />
+    <item name="photokit_listing_photo_item" type="id" />
 </resources>

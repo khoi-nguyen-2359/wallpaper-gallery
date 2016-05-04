@@ -88,9 +88,9 @@ public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWid
     }
 
     private void initViews() {
-        photoGalleryView = (PhotoGalleryView) findViewById(R.id.pager_photo_details);
-        transitDraweeView = (PhotoTransitionView) findViewById(R.id.view_transition_photo);
-        transitBackdrop = (PhotoBackdropView) findViewById(R.id.view_transition_backdrop);
+        photoGalleryView = (PhotoGalleryView) findViewById(R.id.photokit_pager_photo_gallery);
+        transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
+        transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_transition_backdrop);
         photoListingView = (PhotoListingView) findViewById(R.id.view_photo_listing);
     }
 

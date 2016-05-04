@@ -6,33 +6,27 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.ScalingUtils;
-import com.facebook.drawee.generic.GenericDraweeHierarchy;
-import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
 import com.khoinguyen.photokit.BasePhotoListingViewBinder;
 import com.khoinguyen.photokit.R;
-import com.khoinguyen.photokit.ViewHolder;
+import com.khoinguyen.photokit.ItemViewHolder;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 
 /**
  * Created by khoinguyen on 5/2/16.
  */
-public abstract class DefaultPhotoGalleryViewBinder<T> extends DefaultPhotoListingViewBinder<T> {
+public abstract class DefaultPhotoGalleryViewBinder extends BasePhotoListingViewBinder {
     private LayoutInflater layoutInflater;
 
     @Override
-    public View createItemView(ViewGroup container, int itemIndex) {
+    public View getItemView(ViewGroup container, int itemIndex) {
         if (layoutInflater == null) {
             layoutInflater = LayoutInflater.from(container.getContext());
         }
 
         ZoomableDraweeView itemView = (ZoomableDraweeView) layoutInflater.inflate(R.layout.photokit_photo_gallery_pager_item, container, false);
-//        GenericDraweeHierarchy hierarchy = new GenericDraweeHierarchyBuilder(container.getResources())
-//                .setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER)
-//                .setFadeDuration(0)
-//                .build();
         itemView.getHierarchy().setFadeDuration(0);
         itemView.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
 
@@ -40,19 +34,22 @@ public abstract class DefaultPhotoGalleryViewBinder<T> extends DefaultPhotoListi
     }
 
     @Override
-    public ViewHolder<PhotoDisplayInfo> createDefaultPhotoListingItemViewHolder(View itemView) {
-        return new PhotoGalleryItemViewHolder((ZoomableDraweeView) itemView);
+    public ItemViewHolder<PhotoDisplayInfo> createDefaultPhotoListingItemViewHolder(View itemView) {
+        return new PhotoGalleryItemItemViewHolder((ZoomableDraweeView) itemView);
     }
 
-    private static class PhotoGalleryItemViewHolder implements ViewHolder<PhotoDisplayInfo> {
+    private static class PhotoGalleryItemItemViewHolder extends ItemViewHolder<PhotoDisplayInfo> {
         private ZoomableDraweeView itemView;
 
-        private PhotoGalleryItemViewHolder(ZoomableDraweeView itemView) {
+        private PhotoGalleryItemItemViewHolder(ZoomableDraweeView itemView) {
+            super(itemView);
             this.itemView = itemView;
         }
 
         @Override
-        public void bind(PhotoDisplayInfo data) {
+        public void bindItemData(int itemIndex, PhotoDisplayInfo data) {
+            super.bindItemData(itemIndex, data);
+
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setLowResImageRequest(ImageRequest.fromUri(data.getLowResUri()))
                     .setImageRequest(ImageRequest.fromUri(data.getHighResUri()))

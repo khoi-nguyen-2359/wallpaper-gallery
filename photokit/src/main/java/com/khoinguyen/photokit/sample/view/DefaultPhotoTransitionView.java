@@ -6,7 +6,6 @@ import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.RectF;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.View;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
@@ -24,7 +23,6 @@ import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationUpdate;
 import com.khoinguyen.photokit.PhotoTransitionView;
 import com.khoinguyen.photokit.sample.event.Subscribe;
-import com.khoinguyen.ui.UiUtils;
 
 /**
  * Created by khoinguyen on 4/25/16.
@@ -126,7 +124,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
 
     @Subscribe
     public void handlePhotoGalleryPageSelected(OnPhotoGalleryPageSelect event) {
-        //todo: might affect loading speed of gallery view
+        //todo: might affect loading speed of gallery itemView
         setImageUri(event.getPhotoDisplayInfo().getLowResUri());
     }
 }

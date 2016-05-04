@@ -144,9 +144,6 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoGalleryVi
         return super.onTouchEvent(ev);
     }
 
-//    @Subscribe
-//    public void handlePhotoShrinkAnimationEnd(OnPhotoS)
-
     @Subscribe
     public void handlePhotoRevealAnimationEnd(OnPhotoRevealAnimationEnd event) {
         setCurrentItem(event.getItemPosition(), false);
@@ -170,7 +167,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoGalleryVi
     public class PhotoGalleryPagerAdapter extends PagerAdapter {
         @Override
         public Object instantiateItem(ViewGroup container, int position) {
-            View itemView = binder.createItemView(container, position);
+            View itemView = binder.getItemView(container, position);
             binder.bindItemData(itemView, position);
 
             container.addView(itemView);
