@@ -22,13 +22,11 @@ import android.widget.Toast;
 
 import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
-import com.khoinguyen.photokit.binder.PhotoListingViewBinder;
-import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.eventbus.LightEventBus;
 import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 import com.khoinguyen.photokit.sample.view.DefaultPhotoGalleryView;
-import com.khoinguyen.photokit.sample.view.DefaultPhotoKitWidget;
 import com.khoinguyen.photokit.sample.view.DefaultPhotoListingView;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
@@ -76,7 +74,7 @@ public abstract class MainActivity extends BaseActivity
 
     private List<PhotoDetails> allPhotos;
 
-    protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+    protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
     private DefaultBasePhotoListingViewBinder photoListingBinder = new DefaultPhotoListingView.Binder() {
         @Override

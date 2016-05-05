@@ -20,7 +20,7 @@ import com.khoinguyen.photokit.ItemViewHolder;
 import com.khoinguyen.photokit.PhotoListingView;
 import com.khoinguyen.photokit.binder.PhotoListingViewBinder;
 import com.khoinguyen.photokit.R;
-import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.eventbus.LightEventBus;
 import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragStart;
@@ -31,8 +31,6 @@ import com.khoinguyen.photokit.sample.event.Subscribe;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 import com.khoinguyen.photokit.sample.model.PhotoListingItemTrackingInfo;
 import com.khoinguyen.util.log.L;
-
-import java.util.Map;
 
 /**
  * Created by khoinguyen on 4/11/16.
@@ -48,7 +46,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
     private float lastScrollingX;
     private Binder binder;
 
-    private EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+    private LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
     private PhotoGalleryPagerAdapter adapterPhotoGallery;
 

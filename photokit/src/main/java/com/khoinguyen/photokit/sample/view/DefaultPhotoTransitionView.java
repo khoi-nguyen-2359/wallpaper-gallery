@@ -11,7 +11,7 @@ import android.view.View;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.khoinguyen.photokit.anim.CompoundViewAnimation;
 import com.khoinguyen.photokit.customview.ClippingRevealDraweeView;
-import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.eventbus.LightEventBus;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryPageSelect;
 import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
@@ -35,7 +35,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
 
     private PhotoListingItemTrackingInfo currentSelectedItemInfo;
 
-    private EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+    private LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
     public DefaultPhotoTransitionView(Context context, GenericDraweeHierarchy hierarchy) {
         super(context, hierarchy);

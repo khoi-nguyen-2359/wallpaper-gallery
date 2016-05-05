@@ -13,7 +13,7 @@ import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
 import com.khoinguyen.photokit.PhotoTransitionView;
 import com.khoinguyen.photokit.R;
-import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.eventbus.LightEventBus;
 import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationStart;
@@ -25,7 +25,7 @@ import com.khoinguyen.photokit.sample.event.Subscribe;
  * Created by khoinguyen on 4/25/16.
  */
 public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWidget<DefaultBasePhotoListingViewBinder> {
-    protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+    protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
     protected PhotoTransitionView transitDraweeView;
     protected PhotoBackdropView transitBackdrop;

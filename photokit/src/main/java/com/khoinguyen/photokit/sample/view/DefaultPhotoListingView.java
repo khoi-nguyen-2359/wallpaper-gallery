@@ -18,7 +18,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.photokit.ItemViewHolder;
 import com.khoinguyen.photokit.R;
-import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.eventbus.LightEventBus;
 import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryPageSelect;
@@ -38,7 +38,7 @@ public class DefaultPhotoListingView extends RecyclerView implements PhotoListin
     protected RecyclerView.LayoutManager rcvLayoutMan;
     protected DefaultBasePhotoListingViewBinder binder;
 
-    protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+    protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
     protected PhotoListingItemAdapter adapterPhotos;
 
     protected PhotoListingItemTrackingInfo currentSelectedItemInfo;

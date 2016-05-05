@@ -13,20 +13,22 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by khoinguyen on 5/2/16.
+ *
+ * Light version of EventBus, doesnt have advanced features: Threading, Sticky, Event's super class
  */
-public class EventEmitter {
+public class LightEventBus {
     /**
      * This instance is used for default implementations of photokit default views
      */
-    private static EventEmitter defaultInstance = null;
+    private static LightEventBus defaultInstance = null;
 
     private static Map<Class<?>, List<SubscriberMethod>> methodCache = new HashMap<>();
     private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> mapSubscriptionByEventType = new HashMap<>();
     private final Map<Object, List<Class<?>>> typesBySubscriber = new HashMap<>();
 
-    public static EventEmitter getDefaultInstance() {
+    public static LightEventBus getDefaultInstance() {
         if (defaultInstance == null) {
-            defaultInstance = new EventEmitter();
+            defaultInstance = new LightEventBus();
         }
 
         return defaultInstance;
