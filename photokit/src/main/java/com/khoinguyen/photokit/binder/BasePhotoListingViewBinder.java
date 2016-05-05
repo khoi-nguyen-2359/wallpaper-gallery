@@ -11,8 +11,8 @@ import java.util.Map;
  * Created by khoinguyen on 4/29/16.
  */
 public abstract class BasePhotoListingViewBinder implements PhotoListingViewBinder {
-    private Map<View, ItemViewHolder> mapViewHolder = new HashMap<>();
-    private Map<Integer, Object> mapDataCache = new HashMap<>();
+    protected Map<View, ItemViewHolder> mapViewHolder = new HashMap<>();
+    protected Map<Integer, Object> mapDataCache = new HashMap<>();
 
     protected abstract Object createItemData(int itemIndex);
     protected abstract ItemViewHolder createItemViewHolder(View itemView);
@@ -35,7 +35,9 @@ public abstract class BasePhotoListingViewBinder implements PhotoListingViewBind
         Object data = mapDataCache.get(itemIndex);
         if (data == null) {
             data = createItemData(itemIndex);
-            mapDataCache.put(itemIndex, data);
+            if (data != null) {
+                mapDataCache.put(itemIndex, data);
+            }
         }
 
         return data;
@@ -50,7 +52,9 @@ public abstract class BasePhotoListingViewBinder implements PhotoListingViewBind
         ItemViewHolder vh = mapViewHolder.get(itemView);
         if (vh == null) {
             vh = createItemViewHolder(itemView);
-            mapViewHolder.put(itemView, vh);
+            if (vh != null) {
+                mapViewHolder.put(itemView, vh);
+            }
         }
 
         return vh;

@@ -13,8 +13,8 @@ import java.util.Map;
  * Created by khoinguyen on 4/29/16.
  */
 public abstract class DefaultBasePhotoListingViewBinder extends BasePhotoListingViewBinder {
-    private Map<View, ItemViewHolder<PhotoDisplayInfo>> mapDefaultViewHolder = new HashMap<>();
-    private Map<Integer, PhotoDisplayInfo> cachePhotoDisplayInfo = new HashMap<>();
+    protected Map<View, ItemViewHolder<PhotoDisplayInfo>> mapDefaultViewHolder = new HashMap<>();
+    protected Map<Integer, PhotoDisplayInfo> cachePhotoDisplayInfo = new HashMap<>();
 
     protected abstract PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex);
     protected abstract ItemViewHolder<PhotoDisplayInfo> createPhotoDisplayItemViewHolder(View itemView);
@@ -48,7 +48,9 @@ public abstract class DefaultBasePhotoListingViewBinder extends BasePhotoListing
         PhotoDisplayInfo photoDisplayInfo = cachePhotoDisplayInfo.get(itemIndex);
         if (photoDisplayInfo == null) {
             photoDisplayInfo = createPhotoDisplayInfo(itemIndex);
-            cachePhotoDisplayInfo.put(itemIndex, photoDisplayInfo);
+            if (photoDisplayInfo != null) {
+                cachePhotoDisplayInfo.put(itemIndex, photoDisplayInfo);
+            }
         }
 
         return photoDisplayInfo;
@@ -62,7 +64,9 @@ public abstract class DefaultBasePhotoListingViewBinder extends BasePhotoListing
         ItemViewHolder<PhotoDisplayInfo> vhDefault = mapDefaultViewHolder.get(itemView);
         if (vhDefault == null) {
             vhDefault = createPhotoDisplayItemViewHolder(itemView);
-            mapDefaultViewHolder.put(itemView, vhDefault);
+            if (vhDefault != null) {
+                mapDefaultViewHolder.put(itemView, vhDefault);
+            }
         }
 
         return vhDefault;

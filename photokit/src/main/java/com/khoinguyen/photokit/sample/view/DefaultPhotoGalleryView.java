@@ -32,6 +32,8 @@ import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 import com.khoinguyen.photokit.sample.model.PhotoListingItemTrackingInfo;
 import com.khoinguyen.util.log.L;
 
+import java.util.Map;
+
 /**
  * Created by khoinguyen on 4/11/16.
  */
@@ -188,7 +190,10 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
 
         @Override
         public void destroyItem(ViewGroup container, int position, Object object) {
-            container.removeView((View) object);
+            if (object instanceof View) {
+                binder.destroyViewHolders((View) object);
+                container.removeView((View) object);
+            }
         }
 
         @Override
@@ -224,6 +229,11 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
         @Override
         public ItemViewHolder<PhotoDisplayInfo> createPhotoDisplayItemViewHolder(View itemView) {
             return new PhotoGalleryItemViewHolder((ZoomableDraweeView) itemView);
+        }
+
+        public void destroyViewHolders(View itemView) {
+            mapViewHolder.remove(itemView);
+            mapDefaultViewHolder.remove(itemView);
         }
     }
 
