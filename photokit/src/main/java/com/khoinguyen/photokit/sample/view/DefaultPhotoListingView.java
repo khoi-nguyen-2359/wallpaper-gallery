@@ -3,35 +3,46 @@ package com.khoinguyen.photokit.sample.view;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.RectF;
+import android.net.Uri;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.drawee.drawable.ScalingUtils;
+import com.facebook.drawee.generic.GenericDraweeHierarchy;
+import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
+import com.facebook.drawee.view.SimpleDraweeView;
+import com.khoinguyen.photokit.ItemViewHolder;
 import com.khoinguyen.photokit.R;
 import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryPageSelect;
 import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
 import com.khoinguyen.photokit.PhotoListingView;
-import com.khoinguyen.photokit.PhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationEnd;
+import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photokit.sample.event.Subscribe;
+import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
+import com.khoinguyen.photokit.sample.model.PhotoListingItemTrackingInfo;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 
 /**
  * Created by khoinguyen on 3/29/16.
  */
-public class DefaultPhotoListingView extends RecyclerView implements PhotoListingView {
-    private RecyclerView.LayoutManager rcvLayoutMan;
-    private RectF currentItemRect;
-    private PhotoListingViewBinder binder;
+public class DefaultPhotoListingView extends RecyclerView implements PhotoListingView<DefaultBasePhotoListingViewBinder> {
+    protected RecyclerView.LayoutManager rcvLayoutMan;
+    protected DefaultBasePhotoListingViewBinder binder;
 
-    private EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
-    private PhotoListingItemAdapter adapterPhotos;
-    private int lastHighlightedItemIndex;
+    protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
+    protected PhotoListingItemAdapter adapterPhotos;
+
+    protected PhotoListingItemTrackingInfo currentSelectedItemInfo;
+    protected PhotoListingItemTrackingInfo lastSelectedItemInfo;
 
     public DefaultPhotoListingView(Context context) {
         super(context);
@@ -55,12 +66,15 @@ public class DefaultPhotoListingView extends RecyclerView implements PhotoListin
         setLayoutManager(rcvLayoutMan);
         addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
+        currentSelectedItemInfo = new PhotoListingItemTrackingInfo();
+        lastSelectedItemInfo = new PhotoListingItemTrackingInfo();
+
         adapterPhotos = new PhotoListingItemAdapter();
         setAdapter(adapterPhotos);
     }
 
     @Override
-    public void setBinder(PhotoListingViewBinder binder) {
+    public void setBinder(DefaultBasePhotoListingViewBinder binder) {
         this.binder = binder;
     }
 
@@ -78,35 +92,35 @@ public class DefaultPhotoListingView extends RecyclerView implements PhotoListin
     @Subscribe
     public void handlePhotoGalleryPageSelected(OnPhotoGalleryPageSelect event) {
         scrollToPosition(event.getItemIndex());
-        changeSelectedItemHighlight(event.getItemIndex());
     }
 
-    private void changeSelectedItemHighlight(int currentSelectedItem) {
-        if (lastHighlightedItemIndex == currentSelectedItem) {
+    private void changeSelectedItemHighlight() {
+        if (lastSelectedItemInfo.getItemIndex() == currentSelectedItemInfo.getItemIndex()) {
             return;
         }
 
-        View lastSelectedItemView = rcvLayoutMan.findViewByPosition(lastHighlightedItemIndex);
-        unhighlightClickItemView(lastSelectedItemView);
-        View selectItemView = rcvLayoutMan.findViewByPosition(currentSelectedItem);
-        highlightClickItemView(selectItemView, currentSelectedItem);
+        unhighlightClickedItemView(lastSelectedItemInfo.getItemIndex());
+        highlightClickedItemView(currentSelectedItemInfo.getItemIndex());
+    }
+
+    @Subscribe
+    public void onPhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
+        onChangeSelectedItemHighlight();
+    }
+
+    @Subscribe
+    public void onPhotoShrinkAnimWillStart(OnPhotoShrinkAnimationWillStart event) {
+        onChangeSelectedItemHighlight();
+    }
+
+    private void onChangeSelectedItemHighlight() {
+        updateSelectedItemRect();
+        changeSelectedItemHighlight();
     }
 
     @Subscribe
     public void handlePhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
-        View itemView = rcvLayoutMan.findViewByPosition(lastHighlightedItemIndex);
-        unhighlightClickItemView(itemView);
-    }
-
-    @Subscribe
-    public void handlePhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
-        if (currentItemRect == null) {
-            return; //todo: might need an emergency item location
-        }
-
-        View currentItemView = rcvLayoutMan.findViewByPosition(event.getCurrentItem());
-        RectF currentItemViewLocation = createItemViewLocation(currentItemView);
-        currentItemRect.set(currentItemViewLocation);
+        unhighlightClickedItemView(currentSelectedItemInfo.getItemIndex());
     }
 
     /**
@@ -124,8 +138,9 @@ public class DefaultPhotoListingView extends RecyclerView implements PhotoListin
             viewHolder.itemView.setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    postPhotoListingItemClickEvent(v);
-                    highlightClickItemView(v, viewHolder.getAdapterPosition());
+                    resetItemSelectionInfo(viewHolder.getAdapterPosition());
+                    updateSelectedItemRect();
+                    postPhotoListingItemClickEvent();
                 }
             });
         }
@@ -136,36 +151,85 @@ public class DefaultPhotoListingView extends RecyclerView implements PhotoListin
         }
     }
 
-    private void highlightClickItemView(View v, int position) {
-        if (v == null) {
+    private void resetItemSelectionInfo(int clickedItemIndex) {
+        lastSelectedItemInfo.reset();
+
+        currentSelectedItemInfo.setItemIndex(clickedItemIndex);
+        currentSelectedItemInfo.setItemPhoto(binder.getPhotoDisplayInfo(clickedItemIndex));
+    }
+
+    private void updateSelectedItemRect() {
+        View v = rcvLayoutMan.findViewByPosition(currentSelectedItemInfo.getItemIndex());
+        RectF itemRect = createItemViewLocation(v);
+        currentSelectedItemInfo.updateItemRect(itemRect);
+    }
+
+    private void highlightClickedItemView(int itemIndex) {
+        View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
+        itemView.setVisibility(View.INVISIBLE);
+    }
+
+    private void unhighlightClickedItemView(int itemIndex) {
+        if (itemIndex < 0 || itemIndex >= adapterPhotos.getItemCount()) {
             return;
         }
 
-//        com.khoinguyen.photokit.ItemViewHolder viewHolder = binder.getDefaultPhotoListingItemViewHolder(v);
-//        viewHolder.getPhotoView().setVisibility(View.INVISIBLE);
-        lastHighlightedItemIndex = position;
+        View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
+        itemView.setVisibility(View.VISIBLE);
     }
 
-    private void unhighlightClickItemView(View v) {
-        if (v == null) {
-            return;
-        }
-
-//        DefaultPhotoListingViewBinder.DefaultPhotoListingItemItemViewHolder viewHolder = binder.getDefaultPhotoListingItemViewHolder(v);
-//        viewHolder.getPhotoView().setVisibility(View.VISIBLE);
-    }
-
-    private void postPhotoListingItemClickEvent(View v) {
-        int position = getChildAdapterPosition(v);
-        currentItemRect = createItemViewLocation(v);
+    private void postPhotoListingItemClickEvent() {
         RectF fullRect = new RectF(getX(), getY(), getWidth(), getHeight());   // stretch details itemView maximum at photokit size
 
-        eventEmitter.post(new OnPhotoListingItemClick(currentItemRect, fullRect, binder.getPhotoDisplayInfo(position), position));
+        eventEmitter.post(new OnPhotoListingItemClick(currentSelectedItemInfo, fullRect));
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         public ViewHolder(View itemView) {
             super(itemView);
+        }
+    }
+
+    /**
+     * Created by khoinguyen on 4/29/16.
+     */
+    public abstract static class Binder extends DefaultBasePhotoListingViewBinder {
+        protected LayoutInflater layoutInflater;
+
+        @Override
+        public View getItemView(ViewGroup container, int itemIndex) {
+            if (layoutInflater == null) {
+                layoutInflater = LayoutInflater.from(container.getContext());
+            }
+
+            return layoutInflater.inflate(R.layout.photokit_photo_listing_item, container, false);
+        }
+
+        @Override
+        public ItemViewHolder<PhotoDisplayInfo> createPhotoDisplayItemViewHolder(View itemView) {
+            return new PhotoListingItemViewHolder(itemView);
+        }
+    }
+
+    public static class PhotoListingItemViewHolder extends ItemViewHolder<PhotoDisplayInfo> {
+        protected final SimpleDraweeView ivPhoto;
+
+        public PhotoListingItemViewHolder(View itemView) {
+            super(itemView);
+            ivPhoto = (SimpleDraweeView) itemView.findViewById(R.id.iv_photo);
+            GenericDraweeHierarchy photoHierarchy = GenericDraweeHierarchyBuilder.newInstance(itemView.getResources())
+                    .setActualImageScaleType(ScalingUtils.ScaleType.CENTER_CROP)
+                    .setFadeDuration(0)
+                    .build();
+            ivPhoto.setHierarchy(photoHierarchy);
+        }
+
+        @Override
+        public void bindItemData(int itemIndex, PhotoDisplayInfo data) {
+            super.bindItemData(itemIndex, data);
+
+            ivPhoto.setAspectRatio(1.5f);
+            ivPhoto.setImageURI(Uri.parse(data.getLowResUrl()));
         }
     }
 }

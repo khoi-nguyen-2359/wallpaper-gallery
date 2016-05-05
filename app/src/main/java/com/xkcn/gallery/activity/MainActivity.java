@@ -22,12 +22,14 @@ import android.widget.Toast;
 
 import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
-import com.khoinguyen.photokit.PhotoListingViewBinder;
+import com.khoinguyen.photokit.binder.PhotoListingViewBinder;
 import com.khoinguyen.photokit.eventbus.EventEmitter;
-import com.khoinguyen.photokit.sample.binder.DefaultPhotoGalleryViewBinder;
-import com.khoinguyen.photokit.sample.binder.DefaultPhotoListingViewBinder;
+import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
+import com.khoinguyen.photokit.sample.view.DefaultPhotoGalleryView;
+import com.khoinguyen.photokit.sample.view.DefaultPhotoKitWidget;
+import com.khoinguyen.photokit.sample.view.DefaultPhotoListingView;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -60,9 +62,9 @@ public abstract class MainActivity extends BaseActivity
     @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.toolbar_container) FrameLayout toolbarContainerLayout;
-    @Bind(R.id.photokit_widget) PhotoKitWidget photoKitWidget;
+    @Bind(R.id.photokit_widget) PhotoKitWidget<DefaultBasePhotoListingViewBinder> photoKitWidget;
 
-    @Bind(R.id.view_photo_listing) PhotoListingView photoListingView;
+    @Bind(R.id.photokit_photo_listing) PhotoListingView photoListingView;
 
     protected MainViewPresenter presenter;
     private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
@@ -76,7 +78,7 @@ public abstract class MainActivity extends BaseActivity
 
     protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
 
-    private PhotoListingViewBinder photoListingBinder = new DefaultPhotoListingViewBinder() {
+    private DefaultBasePhotoListingViewBinder photoListingBinder = new DefaultPhotoListingView.Binder() {
         @Override
         protected PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex) {
             if (itemIndex >= allPhotos.size()) {
@@ -95,7 +97,7 @@ public abstract class MainActivity extends BaseActivity
         }
     };
 
-    private PhotoListingViewBinder photoGalleryBinder = new DefaultPhotoGalleryViewBinder() {
+    private DefaultBasePhotoListingViewBinder photoGalleryBinder = new DefaultPhotoGalleryView.Binder() {
         @Override
         protected PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex) {
             if (itemIndex >= allPhotos.size()) {

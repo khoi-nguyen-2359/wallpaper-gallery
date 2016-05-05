@@ -1,10 +1,12 @@
 package com.khoinguyen.photokit;
 
+import com.khoinguyen.photokit.binder.PhotoListingViewBinder;
+
 /**
  * Created by khoinguyen on 5/3/16.
  */
-public interface PhotoKitWidget {
-    void setBinders(PhotoListingViewBinder listingBinder, PhotoListingViewBinder galleryBinder);
+public interface PhotoKitWidget<BINDER extends PhotoListingViewBinder> {
+    void setBinders(BINDER listingBinder, BINDER galleryBinder);
 
     boolean handleBackPressed();
 

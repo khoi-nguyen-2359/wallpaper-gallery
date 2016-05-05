@@ -1,7 +1,9 @@
-package com.khoinguyen.photokit;
+package com.khoinguyen.photokit.sample.binder;
 
 import android.view.View;
 
+import com.khoinguyen.photokit.binder.BasePhotoListingViewBinder;
+import com.khoinguyen.photokit.ItemViewHolder;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 
 import java.util.HashMap;
@@ -10,33 +12,29 @@ import java.util.Map;
 /**
  * Created by khoinguyen on 4/29/16.
  */
-public abstract class BasePhotoListingViewBinder implements PhotoListingViewBinder {
-    private Map<View, ItemViewHolder> mapViewHolder = new HashMap<>();
-    private Map<Integer, Object> mapDataCache = new HashMap<>();
+public abstract class DefaultBasePhotoListingViewBinder extends BasePhotoListingViewBinder {
     private Map<View, ItemViewHolder<PhotoDisplayInfo>> mapDefaultViewHolder = new HashMap<>();
     private Map<Integer, PhotoDisplayInfo> cachePhotoDisplayInfo = new HashMap<>();
 
     protected abstract PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex);
-    protected abstract ItemViewHolder<PhotoDisplayInfo> createDefaultPhotoListingItemViewHolder(View itemView);
+    protected abstract ItemViewHolder<PhotoDisplayInfo> createPhotoDisplayItemViewHolder(View itemView);
 
-    protected Object createItemData(int itemIndex) {
+    @Override
+    public ItemViewHolder createItemViewHolder(View itemView) {
         return null;
     }
 
-    protected ItemViewHolder createItemViewHolder(View itemView) {
+    @Override
+    protected Object createItemData(int itemIndex) {
         return null;
     }
 
     @Override
     public void bindItemData(View itemView, int itemIndex) {
+        super.bindItemData(itemView, itemIndex);
+
         if (itemView == null) {
             return;
-        }
-
-        ItemViewHolder vh = getItemViewHolder(itemView);
-        Object data = getItemData(itemIndex);
-        if (vh != null) {
-            vh.bindItemData(itemIndex, data);
         }
 
         ItemViewHolder<PhotoDisplayInfo> vhDefault = getDefaultPhotoListingItemViewHolder(itemView);
@@ -46,33 +44,6 @@ public abstract class BasePhotoListingViewBinder implements PhotoListingViewBind
         }
     }
 
-    @Override
-    public Object getItemData(int itemIndex) {
-        Object data = mapDataCache.get(itemIndex);
-        if (data == null) {
-            data = createItemData(itemIndex);
-            mapDataCache.put(itemIndex, data);
-        }
-
-        return data;
-    }
-
-    @Override
-    public ItemViewHolder getItemViewHolder(View itemView) {
-        if (itemView == null) {
-            return null;
-        }
-
-        ItemViewHolder vh = mapViewHolder.get(itemView);
-        if (vh == null) {
-            vh = createItemViewHolder(itemView);
-            mapViewHolder.put(itemView, vh);
-        }
-
-        return vh;
-    }
-
-    @Override
     public PhotoDisplayInfo getPhotoDisplayInfo(int itemIndex) {
         PhotoDisplayInfo photoDisplayInfo = cachePhotoDisplayInfo.get(itemIndex);
         if (photoDisplayInfo == null) {
@@ -83,7 +54,6 @@ public abstract class BasePhotoListingViewBinder implements PhotoListingViewBind
         return photoDisplayInfo;
     }
 
-    @Override
     public ItemViewHolder<PhotoDisplayInfo> getDefaultPhotoListingItemViewHolder(View itemView) {
         if (itemView == null) {
             return null;
@@ -91,7 +61,7 @@ public abstract class BasePhotoListingViewBinder implements PhotoListingViewBind
 
         ItemViewHolder<PhotoDisplayInfo> vhDefault = mapDefaultViewHolder.get(itemView);
         if (vhDefault == null) {
-            vhDefault = createDefaultPhotoListingItemViewHolder(itemView);
+            vhDefault = createPhotoDisplayItemViewHolder(itemView);
             mapDefaultViewHolder.put(itemView, vhDefault);
         }
 

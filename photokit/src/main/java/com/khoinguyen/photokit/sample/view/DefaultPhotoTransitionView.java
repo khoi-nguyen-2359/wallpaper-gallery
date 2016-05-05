@@ -22,7 +22,9 @@ import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationUpdate;
 import com.khoinguyen.photokit.PhotoTransitionView;
+import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photokit.sample.event.Subscribe;
+import com.khoinguyen.photokit.sample.model.PhotoListingItemTrackingInfo;
 
 /**
  * Created by khoinguyen on 4/25/16.
@@ -30,7 +32,8 @@ import com.khoinguyen.photokit.sample.event.Subscribe;
 public class DefaultPhotoTransitionView extends ClippingRevealDraweeView implements PhotoTransitionView {
     private CompoundViewAnimation revealAnim;
     private CompoundViewAnimation shrinkAnim;
-    private RectF currentItemRect;
+
+    private PhotoListingItemTrackingInfo currentSelectedItemInfo;
 
     private EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
 
@@ -65,11 +68,12 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
 
     @Subscribe
     public void handlePhotoListingItemClick(final OnPhotoListingItemClick event) {
-        setVisibility(View.VISIBLE);
-        setImageUri(event.getPhotoDisplayInfo().getLowResUri());
+        currentSelectedItemInfo = event.getCurrentItemInfo();
 
-        currentItemRect = event.getItemRect();
-        revealAnim = createExpanseAnimation(currentItemRect, event.getFullRect())
+        setVisibility(View.VISIBLE);
+        setImageUri(currentSelectedItemInfo.getItemPhoto().getLowResUri());
+
+        revealAnim = createExpanseAnimation(currentSelectedItemInfo.getItemRect(), event.getFullRect())
                 .addAnimatorListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animation) {
@@ -78,7 +82,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        eventEmitter.post(new OnPhotoRevealAnimationEnd(event.getPosition()));
+                        eventEmitter.post(new OnPhotoRevealAnimationEnd(currentSelectedItemInfo.getItemIndex()));
                         setVisibility(View.GONE);
                     }
                 })
@@ -93,7 +97,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
 
     @Override
     public void startShrinkAnimation(RectF fullRect) {
-        shrinkAnim = createShrinkAnimation(fullRect, currentItemRect)
+        shrinkAnim = createShrinkAnimation(fullRect, currentSelectedItemInfo.getItemRect())
                 .addAnimatorListener(new AnimatorListenerAdapter() {
                     @Override
                     public void onAnimationStart(Animator animation) {
@@ -114,6 +118,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
                     }
                 });
 
+        eventEmitter.post(new OnPhotoShrinkAnimationWillStart());
         shrinkAnim.run();
     }
 

@@ -9,13 +9,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.photokit.PhotoBackdropView;
-import com.khoinguyen.photokit.PhotoGalleryView;
 import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
-import com.khoinguyen.photokit.PhotoListingViewBinder;
 import com.khoinguyen.photokit.PhotoTransitionView;
 import com.khoinguyen.photokit.R;
 import com.khoinguyen.photokit.eventbus.EventEmitter;
+import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationEnd;
@@ -25,13 +24,13 @@ import com.khoinguyen.photokit.sample.event.Subscribe;
 /**
  * Created by khoinguyen on 4/25/16.
  */
-public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWidget {
+public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWidget<DefaultBasePhotoListingViewBinder> {
     protected EventEmitter eventEmitter = EventEmitter.getDefaultInstance();
 
     protected PhotoTransitionView transitDraweeView;
     protected PhotoBackdropView transitBackdrop;
-    protected PhotoGalleryView photoGalleryView;
-    protected PhotoListingView photoListingView;
+    protected PhotoListingView<DefaultBasePhotoListingViewBinder> photoGalleryView;
+    protected PhotoListingView<DefaultBasePhotoListingViewBinder> photoListingView;
     protected TransitionState currentTransitionState = TransitionState.LISTING;
 
     public DefaultPhotoKitWidget(Context context) {
@@ -57,7 +56,6 @@ public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWid
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-
         initViews();
     }
 
@@ -76,7 +74,7 @@ public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWid
     }
 
     @Override
-    public void setBinders(PhotoListingViewBinder listingBinder, PhotoListingViewBinder galleryBinder) {
+    public void setBinders(DefaultBasePhotoListingViewBinder listingBinder, DefaultBasePhotoListingViewBinder galleryBinder) {
         photoListingView.setBinder(listingBinder);
         photoGalleryView.setBinder(galleryBinder);
     }
@@ -88,10 +86,10 @@ public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWid
     }
 
     private void initViews() {
-        photoGalleryView = (PhotoGalleryView) findViewById(R.id.photokit_pager_photo_gallery);
+        photoGalleryView = (PhotoListingView) findViewById(R.id.photokit_pager_photo_gallery);
         transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
         transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_transition_backdrop);
-        photoListingView = (PhotoListingView) findViewById(R.id.view_photo_listing);
+        photoListingView = (PhotoListingView) findViewById(R.id.photokit_photo_listing);
     }
 
     /**

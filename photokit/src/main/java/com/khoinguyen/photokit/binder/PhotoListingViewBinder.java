@@ -1,8 +1,9 @@
-package com.khoinguyen.photokit;
+package com.khoinguyen.photokit.binder;
 
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.khoinguyen.photokit.ItemViewHolder;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 
 /**
@@ -16,7 +17,4 @@ public interface PhotoListingViewBinder {
 
     Object getItemData(int itemIndex);
     void bindItemData(View itemView, int itemIndex);
-
-    PhotoDisplayInfo getPhotoDisplayInfo(int itemIndex);
-    ItemViewHolder<PhotoDisplayInfo> getDefaultPhotoListingItemViewHolder(View itemView);
 }
