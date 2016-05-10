@@ -6,6 +6,7 @@ import android.net.Uri;
  * Created by khoinguyen on 4/29/16.
  */
 public class PhotoDisplayInfo {
+    private String photoId;
     private String highResUrl;
     private String lowResUrl;
     private float ratio;
@@ -40,5 +41,13 @@ public class PhotoDisplayInfo {
 
     public Uri getLowResUri() {
         return Uri.parse(getLowResUrl());
+    }
+
+    public String getPhotoId() {
+        return photoId;
+    }
+
+    public void setPhotoId(String photoId) {
+        this.photoId = photoId;
     }
 }

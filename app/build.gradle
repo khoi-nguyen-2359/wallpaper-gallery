@@ -95,8 +95,4 @@ dependencies {
     compile(name:'ui', ext:'aar')
     compile(name:'recyclerview', ext:'aar')
     compile(name:'log', ext:'aar')
-
-//    compile "com.khoinguyen.util:log:${configs.knUtilsVersion}@aar"
-//    compile "com.khoinguyen.util:recyclerview:${configs.knUtilsVersion}@aar"
-//    compile "com.khoinguyen.util:ui:${configs.knUtilsVersion}@aar"
 }

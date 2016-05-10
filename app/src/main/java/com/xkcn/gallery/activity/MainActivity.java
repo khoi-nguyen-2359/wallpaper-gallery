@@ -17,13 +17,18 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.khoinguyen.photokit.adapter.BaseListingViewAdapter;
 import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
+import com.khoinguyen.photokit.adapter.ListingViewHolder;
+import com.khoinguyen.photokit.adapter.RecycledListingViewAdapter;
+import com.khoinguyen.photokit.adapter.ViewCreator;
 import com.khoinguyen.photokit.eventbus.LightEventBus;
-import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 import com.khoinguyen.photokit.sample.view.DefaultPhotoGalleryView;
@@ -54,13 +59,12 @@ import butterknife.ButterKnife;
 
 public abstract class MainActivity extends BaseActivity
         implements NavigationView.OnNavigationItemSelectedListener, MainView {
-
     @Bind(R.id.main_coordinator_layout) CoordinatorLayout mainCoordinatorLayout;
     @Bind(R.id.nav_view) NavigationView viewNavigation;
     @Bind(R.id.app_bar) AppBarLayout appBarLayout;
     @Bind(R.id.toolbar) Toolbar toolbar;
     @Bind(R.id.toolbar_container) FrameLayout toolbarContainerLayout;
-    @Bind(R.id.photokit_widget) PhotoKitWidget<DefaultBasePhotoListingViewBinder> photoKitWidget;
+    @Bind(R.id.photokit_widget) PhotoKitWidget<BaseListingViewAdapter<PhotoDisplayInfo>> photoKitWidget;
 
     @Bind(R.id.photokit_photo_listing) PhotoListingView photoListingView;
 
@@ -76,40 +80,47 @@ public abstract class MainActivity extends BaseActivity
 
     protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
-    private DefaultBasePhotoListingViewBinder photoListingBinder = new DefaultPhotoListingView.Binder() {
+    private RecycledListingViewAdapter<PhotoDisplayInfo> photoListingAdapter = new RecycledListingViewAdapter<PhotoDisplayInfo>() {
         @Override
-        protected PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex) {
-            if (itemIndex >= allPhotos.size()) {
+        public PhotoDisplayInfo createData(int itemIndex) {
+            if (itemIndex == 0 || itemIndex >= getCount()) {
                 return null;
             }
 
             PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
-            photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex).getHighResUrl());
-            photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex).getLowResUrl());
+            photoDisplayInfo.setPhotoId(String.valueOf(allPhotos.get(itemIndex - 1).getIdentifier()));
+            photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex-1).getHighResUrl());
+            photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex-1).getLowResUrl());
             return photoDisplayInfo;
         }
 
         @Override
-        public int getItemCount() {
-            return allPhotos.size();
+        public int getCount() {
+            return allPhotos.size() > 0 ? allPhotos.size() + 1 : 0;
+        }
+
+        @Override
+        public Object getViewType(int itemIndex) {
+            return itemIndex == 0 ? ListingCaptionItemCreator.class : DefaultPhotoListingView.PhotoListingViewCreator.class;
         }
     };
 
-    private DefaultBasePhotoListingViewBinder photoGalleryBinder = new DefaultPhotoGalleryView.Binder() {
+    private BaseListingViewAdapter<PhotoDisplayInfo> photoGalleryAdapter = new BaseListingViewAdapter<PhotoDisplayInfo>() {
         @Override
-        protected PhotoDisplayInfo createPhotoDisplayInfo(int itemIndex) {
+        public PhotoDisplayInfo createData(int itemIndex) {
             if (itemIndex >= allPhotos.size()) {
                 return null;
             }
 
             PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
+            photoDisplayInfo.setPhotoId(String.valueOf(allPhotos.get(itemIndex).getIdentifier()));
             photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex).getHighResUrl());
             photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex).getLowResUrl());
             return photoDisplayInfo;
         }
 
         @Override
-        public int getItemCount() {
+        public int getCount() {
             return allPhotos.size();
         }
     };
@@ -149,7 +160,7 @@ public abstract class MainActivity extends BaseActivity
     }
 
     private void initViews() {
-        photoKitWidget.setBinders(photoListingBinder, photoGalleryBinder);
+        photoKitWidget.setAdapters(photoListingAdapter, photoGalleryAdapter);
     }
 
     private void initData() {
@@ -161,6 +172,28 @@ public abstract class MainActivity extends BaseActivity
 
         SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
         kitkatSystemBarConfig = kitkatTintManager.getConfig();
+
+        DefaultPhotoListingView.PhotoListingViewCreator listingPhotoItemCreator = new DefaultPhotoListingView.PhotoListingViewCreator();
+        ViewCreator listingCaptionItemCreator = new ListingCaptionItemCreator();
+        photoListingAdapter.registerViewCreator(listingPhotoItemCreator);
+        photoListingAdapter.registerViewCreator(listingCaptionItemCreator);
+
+        ViewCreator photoGalleryItemCreator = new DefaultPhotoGalleryView.PhotoGalleryItemViewCreator();
+        photoGalleryAdapter.registerViewCreator(photoGalleryItemCreator);
+    }
+
+    public static class ListingCaptionItemCreator implements ViewCreator {
+        @Override
+        public View createView(ViewGroup container) {
+            TextView itemView = new TextView(container.getContext());
+            itemView.setText("Caption");
+            return itemView;
+        }
+
+        @Override
+        public ListingViewHolder createViewHolder(View view) {
+            return null;
+        }
     }
 
     protected void initTemplateViews() {
@@ -270,7 +303,7 @@ public abstract class MainActivity extends BaseActivity
     }
 
     protected Object photoKitEventListener = new Object() {
-        @com.khoinguyen.photokit.sample.event.Subscribe
+        @com.khoinguyen.photokit.eventbus.Subscribe
         public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
             appBarLayout.setExpanded(false, false);
         }

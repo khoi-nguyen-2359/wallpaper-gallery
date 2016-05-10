@@ -23,8 +23,7 @@ import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationUpdate;
 import com.khoinguyen.photokit.PhotoTransitionView;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationWillStart;
-import com.khoinguyen.photokit.sample.event.Subscribe;
-import com.khoinguyen.photokit.sample.model.PhotoListingItemTrackingInfo;
+import com.khoinguyen.photokit.eventbus.Subscribe;
 
 /**
  * Created by khoinguyen on 4/25/16.
@@ -33,7 +32,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
     private CompoundViewAnimation revealAnim;
     private CompoundViewAnimation shrinkAnim;
 
-    private PhotoListingItemTrackingInfo currentSelectedItemInfo;
+    private DefaultPhotoListingView.PhotoListingItemTrackingInfo currentSelectedItemInfo;
 
     private LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
@@ -71,7 +70,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
         currentSelectedItemInfo = event.getCurrentItemInfo();
 
         setVisibility(View.VISIBLE);
-        setImageUri(currentSelectedItemInfo.getItemPhoto().getLowResUri());
+        setImageUri(event.getPhotoDisplayInfo().getLowResUri());
 
         revealAnim = createExpanseAnimation(currentSelectedItemInfo.getItemRect(), event.getFullRect())
                 .addAnimatorListener(new AnimatorListenerAdapter() {
@@ -82,7 +81,7 @@ public class DefaultPhotoTransitionView extends ClippingRevealDraweeView impleme
 
                     @Override
                     public void onAnimationEnd(Animator animation) {
-                        eventEmitter.post(new OnPhotoRevealAnimationEnd(currentSelectedItemInfo.getItemIndex()));
+                        eventEmitter.post(new OnPhotoRevealAnimationEnd());
                         setVisibility(View.GONE);
                     }
                 })

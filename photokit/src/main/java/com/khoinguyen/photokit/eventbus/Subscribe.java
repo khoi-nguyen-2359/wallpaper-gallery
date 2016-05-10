@@ -1,4 +1,4 @@
-package com.khoinguyen.photokit.sample.event;
+package com.khoinguyen.photokit.eventbus;
 
 
 import java.lang.annotation.Documented;

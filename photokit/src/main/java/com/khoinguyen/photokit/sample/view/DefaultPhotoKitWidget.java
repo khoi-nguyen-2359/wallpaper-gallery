@@ -13,24 +13,25 @@ import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
 import com.khoinguyen.photokit.PhotoTransitionView;
 import com.khoinguyen.photokit.R;
+import com.khoinguyen.photokit.adapter.ListingViewAdapter;
 import com.khoinguyen.photokit.eventbus.LightEventBus;
-import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationStart;
-import com.khoinguyen.photokit.sample.event.Subscribe;
+import com.khoinguyen.photokit.eventbus.Subscribe;
+import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
-public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWidget<DefaultBasePhotoListingViewBinder> {
+public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWidget<ListingViewAdapter<PhotoDisplayInfo>> {
     protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
     protected PhotoTransitionView transitDraweeView;
     protected PhotoBackdropView transitBackdrop;
-    protected PhotoListingView<DefaultBasePhotoListingViewBinder> photoGalleryView;
-    protected PhotoListingView<DefaultBasePhotoListingViewBinder> photoListingView;
+    protected PhotoListingView<ListingViewAdapter<PhotoDisplayInfo>> photoGalleryView;
+    protected PhotoListingView<ListingViewAdapter<PhotoDisplayInfo>> photoListingView;
     protected TransitionState currentTransitionState = TransitionState.LISTING;
 
     public DefaultPhotoKitWidget(Context context) {
@@ -74,9 +75,9 @@ public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWid
     }
 
     @Override
-    public void setBinders(DefaultBasePhotoListingViewBinder listingBinder, DefaultBasePhotoListingViewBinder galleryBinder) {
-        photoListingView.setBinder(listingBinder);
-        photoGalleryView.setBinder(galleryBinder);
+    public void setAdapters(ListingViewAdapter<PhotoDisplayInfo> listingBinder, ListingViewAdapter<PhotoDisplayInfo> galleryBinder) {
+        photoListingView.setAdapter(listingBinder);
+        photoGalleryView.setAdapter(galleryBinder);
     }
 
     private void readAttrs(AttributeSet attrs) {

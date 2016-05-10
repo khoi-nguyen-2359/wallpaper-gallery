@@ -8,12 +8,11 @@ import android.os.Build;
 import android.util.AttributeSet;
 import android.view.View;
 
-import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationUpdate;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationUpdate;
 import com.khoinguyen.photokit.PhotoBackdropView;
-import com.khoinguyen.photokit.sample.event.Subscribe;
+import com.khoinguyen.photokit.eventbus.Subscribe;
 
 /**
  * Created by khoinguyen on 4/25/16.

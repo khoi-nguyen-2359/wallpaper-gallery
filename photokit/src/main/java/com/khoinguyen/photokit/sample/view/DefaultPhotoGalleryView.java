@@ -2,9 +2,10 @@ package com.khoinguyen.photokit.sample.view;
 
 import android.content.Context;
 import android.graphics.RectF;
-import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -16,26 +17,27 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
-import com.khoinguyen.photokit.ItemViewHolder;
+import com.khoinguyen.photokit.adapter.BaseListingViewAdapter;
+import com.khoinguyen.photokit.adapter.ListingViewHolder;
 import com.khoinguyen.photokit.PhotoListingView;
-import com.khoinguyen.photokit.binder.PhotoListingViewBinder;
 import com.khoinguyen.photokit.R;
+import com.khoinguyen.photokit.adapter.ViewCreator;
 import com.khoinguyen.photokit.eventbus.LightEventBus;
-import com.khoinguyen.photokit.sample.binder.DefaultBasePhotoListingViewBinder;
+import com.khoinguyen.photokit.sample.adapter.AdapterPhotoFinder;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoGalleryPageSelect;
 import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationEnd;
-import com.khoinguyen.photokit.sample.event.Subscribe;
+import com.khoinguyen.photokit.eventbus.Subscribe;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
-import com.khoinguyen.photokit.sample.model.PhotoListingItemTrackingInfo;
+import com.khoinguyen.photokit.util.ListingPagerViewAdapter;
 import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/11/16.
  */
-public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingView {
+public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingView<BaseListingViewAdapter<PhotoDisplayInfo>> {
     private static final int DEF_OFFSCREEN_PAGE = 1;
 
     private L log;
@@ -44,29 +46,30 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
     private boolean isDragging;
     private float lastScrollingY;
     private float lastScrollingX;
-    private Binder binder;
+    private BaseListingViewAdapter<PhotoDisplayInfo> photoAdapter;
+    private AdapterPhotoFinder adapterPhotoFinder;
 
     private LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
-    private PhotoGalleryPagerAdapter adapterPhotoGallery;
+    private ListingPagerViewAdapter adapterPhotoGallery;
 
     private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
         @Override
         public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
             if (positionOffset == 0) {
-                PhotoDisplayInfo photoDisplayInfo = binder.getPhotoDisplayInfo(position);
-                updateCurrentSelectedItemInfo(position, photoDisplayInfo);
+                PhotoDisplayInfo photoDisplayInfo = photoAdapter.getData(position);
+                updateCurrentSelectedItemInfo(photoDisplayInfo);
                 eventEmitter.post(new OnPhotoGalleryPageSelect(position, photoDisplayInfo));
             }
         }
     };
+    private GestureDetectorCompat detector;
 
-    private void updateCurrentSelectedItemInfo(int position, PhotoDisplayInfo photoDisplayInfo) {
-        currentSelectedItemInfo.setItemIndex(position);
-        currentSelectedItemInfo.setItemPhoto(photoDisplayInfo);
+    private void updateCurrentSelectedItemInfo(PhotoDisplayInfo photoDisplayInfo) {
+        currentSelectedItemInfo.setPhotoId(photoDisplayInfo.getPhotoId());
     }
 
-    private PhotoListingItemTrackingInfo currentSelectedItemInfo;
+    private DefaultPhotoListingView.PhotoListingItemTrackingInfo currentSelectedItemInfo;
 
     public DefaultPhotoGalleryView(Context context) {
         super(context);
@@ -86,13 +89,64 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
         isDragging = false;
 
         addOnPageChangeListener(internalOnPageChangeListener);
-        adapterPhotoGallery = new PhotoGalleryPagerAdapter();
+        adapterPhotoGallery = new ListingPagerViewAdapter();
         setAdapter(adapterPhotoGallery);
+
+        detector = new GestureDetectorCompat(getContext(), new GestureDetector.OnGestureListener() {
+            @Override
+            public boolean onDown(MotionEvent e) {
+                log.d("onDown");
+                return false;
+            }
+
+            @Override
+            public void onShowPress(MotionEvent e) {
+                log.d("onShowPress");
+            }
+
+            @Override
+            public boolean onSingleTapUp(MotionEvent e) {
+                log.d("onSingleTapUp");
+                return false;
+            }
+
+            @Override
+            public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
+                if (isDragging) {
+                    float yTranslate = e2.getRawY() - lastScrollingY;
+                    float xTranslate = e2.getRawX() - lastScrollingX;
+
+                    setTranslationX(getTranslationX() + xTranslate);
+                    setTranslationY(getTranslationY() + yTranslate);
+
+                    lastScrollingX = e2.getRawX();
+                    lastScrollingY = e2.getRawY();
+                }
+                log.d("onScroll %f %f", distanceX, distanceY);
+                return true;
+            }
+
+            @Override
+            public void onLongPress(MotionEvent e) {
+                log.d("onLongPress");
+            }
+
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                log.d("onFling");
+                return false;
+            }
+        });
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
+        return interceptTouchToDrag(ev) || super.onInterceptTouchEvent(ev);
+    }
+
+    private boolean interceptTouchToDrag(MotionEvent ev) {
         log.d("onInterceptTouchEvent TRY");
+
         int action = ev.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
@@ -112,7 +166,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
                     lastScrollingY = ev.getRawY();
                     lastScrollingX = ev.getRawX();
 
-                    eventEmitter.post(new OnPhotoGalleryDragStart(getCurrentItem()));
+                    eventEmitter.post(new OnPhotoGalleryDragStart());
 
                     return true;
                 }
@@ -127,11 +181,13 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
             }
         }
 
-        return super.onInterceptTouchEvent(ev);
+        return false;
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent ev) {
+//        detector.onTouchEvent(ev);
+
         int action = ev.getActionMasked();
         switch (action) {
             case MotionEvent.ACTION_MOVE: {
@@ -163,8 +219,10 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
         return super.onTouchEvent(ev);
     }
 
-    public void setBinder(PhotoListingViewBinder binder) {
-        this.binder = (Binder) binder;
+    @Override
+    public void setAdapter(BaseListingViewAdapter<PhotoDisplayInfo> photoAdapter) {
+        this.photoAdapter = photoAdapter;
+        adapterPhotoGallery.setListingViewAdapter(photoAdapter);
     }
 
     @Override
@@ -172,47 +230,19 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
         adapterPhotoGallery.notifyDataSetChanged();
     }
 
-    /**
-     * Created by khoinguyen on 12/14/15.
-     */
-    public class PhotoGalleryPagerAdapter extends PagerAdapter {
-        @Override
-        public Object instantiateItem(ViewGroup container, int position) {
-            View itemView = binder.getItemView(container, position);
-            binder.bindItemData(itemView, position);
-
-            container.addView(itemView);
-
-            return itemView;
+    public AdapterPhotoFinder getPhotoFinder() {
+        if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
+            adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
         }
 
-        @Override
-        public void destroyItem(ViewGroup container, int position, Object object) {
-            if (object instanceof View) {
-                binder.destroyViewHolders((View) object);
-                container.removeView((View) object);
-            }
-        }
-
-        @Override
-        public int getCount() {
-            return binder == null ? 0 : binder.getItemCount();
-        }
-
-        @Override
-        public boolean isViewFromObject(View view, Object object) {
-            return view == object;
-        }
+        return adapterPhotoFinder;
     }
 
-    /**
-     * Created by khoinguyen on 5/2/16.
-     */
-    public abstract static class Binder extends DefaultBasePhotoListingViewBinder {
+    public static class PhotoGalleryItemViewCreator implements ViewCreator {
         private LayoutInflater layoutInflater;
 
         @Override
-        public View getItemView(ViewGroup container, int itemIndex) {
+        public View createView(ViewGroup container) {
             if (layoutInflater == null) {
                 layoutInflater = LayoutInflater.from(container.getContext());
             }
@@ -225,17 +255,12 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
         }
 
         @Override
-        public ItemViewHolder<PhotoDisplayInfo> createPhotoDisplayItemViewHolder(View itemView) {
-            return new PhotoGalleryItemViewHolder((ZoomableDraweeView) itemView);
-        }
-
-        public void destroyViewHolders(View itemView) {
-            mapViewHolder.remove(itemView);
-            mapDefaultViewHolder.remove(itemView);
+        public ListingViewHolder createViewHolder(View view) {
+            return new PhotoGalleryItemViewHolder((ZoomableDraweeView) view);
         }
     }
 
-    public static class PhotoGalleryItemViewHolder extends ItemViewHolder<PhotoDisplayInfo> {
+    public static class PhotoGalleryItemViewHolder extends ListingViewHolder<PhotoDisplayInfo> {
         private ZoomableDraweeView itemView;
 
         private PhotoGalleryItemViewHolder(ZoomableDraweeView itemView) {
@@ -244,9 +269,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
         }
 
         @Override
-        public void bindItemData(int itemIndex, PhotoDisplayInfo data) {
-            super.bindItemData(itemIndex, data);
-
+        public void bind(PhotoDisplayInfo data) {
             DraweeController controller = Fresco.newDraweeControllerBuilder()
                     .setLowResImageRequest(ImageRequest.fromUri(data.getLowResUri()))
                     .setImageRequest(ImageRequest.fromUri(data.getHighResUri()))
@@ -268,7 +291,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
 
     @Subscribe
     public void handlePhotoRevealAnimationEnd(OnPhotoRevealAnimationEnd event) {
-        setCurrentItem(event.getItemPosition(), false);
+        setCurrentItem(getPhotoFinder().indexOf(currentSelectedItemInfo.getPhotoId()), false);
         setTranslationX(0);
         setTranslationY(0);
         setVisibility(View.VISIBLE);
