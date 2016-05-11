@@ -9,6 +9,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.facebook.drawee.backends.pipeline.Fresco;
+import com.facebook.imagepipeline.core.ImagePipeline;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.service.UpdateService;
@@ -19,32 +21,41 @@ import org.greenrobot.eventbus.EventBus;
  * Created by khoinguyen on 1/14/16.
  */
 public class DebugOptionsDialog extends DialogFragment {
-    @Nullable
-    @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View root = inflater.inflate(R.layout.dialog_debug, container, false);
-        root.findViewById(R.id.bt_force_crawl).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                UpdateService.startActionUpdate(getContext());
-            }
-        });
+  @Nullable
+  @Override
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+    View root = inflater.inflate(R.layout.dialog_debug, container, false);
+    root.findViewById(R.id.bt_force_crawl).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        UpdateService.startActionUpdate(getContext());
+      }
+    });
 
-        root.findViewById(R.id.bt_refresh_photo_listing_pager).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EventBus.getDefault().post(new RefreshPhotoListingPager());
-            }
-        });
-        return root;
-    }
+    root.findViewById(R.id.bt_refresh_photo_listing_pager).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        EventBus.getDefault().post(new RefreshPhotoListingPager());
+      }
+    });
 
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(Bundle savedInstanceState) {
-        Dialog dialog = super.onCreateDialog(savedInstanceState);
-        dialog.setTitle("Debug Options");
+    root.findViewById(R.id.bt_clear_fresco_cache).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        ImagePipeline imgPipeline = Fresco.getImagePipeline();
+        imgPipeline.clearCaches();
+      }
+    });
 
-        return dialog;
-    }
+    return root;
+  }
+
+  @NonNull
+  @Override
+  public Dialog onCreateDialog(Bundle savedInstanceState) {
+    Dialog dialog = super.onCreateDialog(savedInstanceState);
+    dialog.setTitle("Debug Options");
+
+    return dialog;
+  }
 }

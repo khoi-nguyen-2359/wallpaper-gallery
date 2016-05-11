@@ -23,5 +23,6 @@
     <string name="nav_item_debug">Debug Options</string>
     <string name="debug_force_crawling">Force Crawling</string>
     <string name="debug_refresh_photo_list">Refresh photo listing pager</string>
+    <string name="debug_clear_fresco_cache">Clear Fresco cache</string>
 
 </resources>
