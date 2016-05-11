@@ -9,9 +9,9 @@ import java.util.List;
  * Created by khoinguyen on 12/13/15.
  */
 public interface MainView extends ScreenView {
-    void startActionUpdate();
+  void startActionUpdate();
 
-    void appendPhotoData(int page, List<PhotoDetails> photos);
+  void appendPhotoData(int page, List<PhotoDetails> photos);
 
-    void showWallpaperChooser(File photoFile);
+  void showWallpaperChooser(File photoFile);
 }

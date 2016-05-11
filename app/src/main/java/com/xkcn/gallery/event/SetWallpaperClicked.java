@@ -6,16 +6,17 @@ import com.xkcn.gallery.data.model.PhotoDetails;
  * Created by khoinguyen on 2/11/15.
  */
 public class SetWallpaperClicked {
-    private PhotoDetails photo;
-    public SetWallpaperClicked(PhotoDetails p) {
-        photo = p;
-    }
+  private PhotoDetails photo;
 
-    public PhotoDetails getPhoto() {
-        return photo;
-    }
+  public SetWallpaperClicked(PhotoDetails p) {
+    photo = p;
+  }
 
-    public void setPhoto(PhotoDetails photo) {
-        this.photo = photo;
-    }
+  public PhotoDetails getPhoto() {
+    return photo;
+  }
+
+  public void setPhoto(PhotoDetails photo) {
+    this.photo = photo;
+  }
 }

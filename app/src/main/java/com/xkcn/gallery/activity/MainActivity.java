@@ -22,9 +22,9 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.khoinguyen.photokit.adapter.BaseListingViewAdapter;
 import com.khoinguyen.photokit.PhotoKitWidget;
 import com.khoinguyen.photokit.PhotoListingView;
+import com.khoinguyen.photokit.adapter.BaseListingViewAdapter;
 import com.khoinguyen.photokit.adapter.ListingViewHolder;
 import com.khoinguyen.photokit.adapter.RecycledListingViewAdapter;
 import com.khoinguyen.photokit.adapter.ViewCreator;
@@ -58,254 +58,263 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 
 public abstract class MainActivity extends BaseActivity
-        implements NavigationView.OnNavigationItemSelectedListener, MainView {
-    @Bind(R.id.main_coordinator_layout) CoordinatorLayout mainCoordinatorLayout;
-    @Bind(R.id.nav_view) NavigationView viewNavigation;
-    @Bind(R.id.app_bar) AppBarLayout appBarLayout;
-    @Bind(R.id.toolbar) Toolbar toolbar;
-    @Bind(R.id.toolbar_container) FrameLayout toolbarContainerLayout;
-    @Bind(R.id.photokit_widget) PhotoKitWidget<BaseListingViewAdapter<PhotoDisplayInfo>> photoKitWidget;
+    implements NavigationView.OnNavigationItemSelectedListener, MainView {
+  @Bind(R.id.main_coordinator_layout)
+  CoordinatorLayout mainCoordinatorLayout;
+  @Bind(R.id.nav_view)
+  NavigationView viewNavigation;
+  @Bind(R.id.app_bar)
+  AppBarLayout appBarLayout;
+  @Bind(R.id.toolbar)
+  Toolbar toolbar;
+  @Bind(R.id.toolbar_container)
+  FrameLayout toolbarContainerLayout;
+  @Bind(R.id.photokit_widget)
+  PhotoKitWidget<BaseListingViewAdapter<PhotoDisplayInfo>> photoKitWidget;
 
-    @Bind(R.id.photokit_photo_listing) PhotoListingView photoListingView;
+  @Bind(R.id.photokit_photo_listing)
+  PhotoListingView photoListingView;
 
-    protected MainViewPresenter presenter;
-    private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
-    protected Dialog proDlg;
+  protected MainViewPresenter presenter;
+  private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
+  protected Dialog proDlg;
 
-    L log = L.get(this);
+  L log = L.get(this);
 
-    protected PhotoListingViewPresenter photoListingPresenter;
+  protected PhotoListingViewPresenter photoListingPresenter;
 
-    private List<PhotoDetails> allPhotos;
+  private List<PhotoDetails> allPhotos;
 
-    protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
+  protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
-    private RecycledListingViewAdapter<PhotoDisplayInfo> photoListingAdapter = new RecycledListingViewAdapter<PhotoDisplayInfo>() {
-        @Override
-        public PhotoDisplayInfo createData(int itemIndex) {
-            if (itemIndex == 0 || itemIndex >= getCount()) {
-                return null;
-            }
-
-            PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
-            photoDisplayInfo.setPhotoId(String.valueOf(allPhotos.get(itemIndex - 1).getIdentifier()));
-            photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex-1).getHighResUrl());
-            photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex-1).getLowResUrl());
-            return photoDisplayInfo;
-        }
-
-        @Override
-        public int getCount() {
-            return allPhotos.size() > 0 ? allPhotos.size() + 1 : 0;
-        }
-
-        @Override
-        public Object getViewType(int itemIndex) {
-            return itemIndex == 0 ? ListingCaptionItemCreator.class : DefaultPhotoListingView.PhotoListingViewCreator.class;
-        }
-    };
-
-    private BaseListingViewAdapter<PhotoDisplayInfo> photoGalleryAdapter = new BaseListingViewAdapter<PhotoDisplayInfo>() {
-        @Override
-        public PhotoDisplayInfo createData(int itemIndex) {
-            if (itemIndex >= allPhotos.size()) {
-                return null;
-            }
-
-            PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
-            photoDisplayInfo.setPhotoId(String.valueOf(allPhotos.get(itemIndex).getIdentifier()));
-            photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex).getHighResUrl());
-            photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex).getLowResUrl());
-            return photoDisplayInfo;
-        }
-
-        @Override
-        public int getCount() {
-            return allPhotos.size();
-        }
-    };
-
+  private RecycledListingViewAdapter<PhotoDisplayInfo> photoListingAdapter = new RecycledListingViewAdapter<PhotoDisplayInfo>() {
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initData();
-        initTemplateViews();
-        initViews();
-        photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+    public PhotoDisplayInfo createData(int itemIndex) {
+      if (itemIndex == 0 || itemIndex >= getCount()) {
+        return null;
+      }
+
+      PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
+      photoDisplayInfo.setPhotoId(String.valueOf(allPhotos.get(itemIndex - 1).getIdentifier()));
+      photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex - 1).getHighResUrl());
+      photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex - 1).getLowResUrl());
+      return photoDisplayInfo;
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-        presenter.checkToCrawlPhoto();
-        EventBus.getDefault().register(this);
-        eventEmitter.register(photoKitEventListener);
+    public int getCount() {
+      return allPhotos.size() > 0 ? allPhotos.size() + 1 : 0;
     }
 
     @Override
-    protected void onStop() {
-        EventBus.getDefault().unregister(this);
-        eventEmitter.unregister(photoKitEventListener);
-        super.onStop();
+    public Object getViewType(int itemIndex) {
+      return itemIndex == 0 ? ListingCaptionItemCreator.class : DefaultPhotoListingView.PhotoListingViewCreator.class;
+    }
+  };
+
+  private BaseListingViewAdapter<PhotoDisplayInfo> photoGalleryAdapter = new BaseListingViewAdapter<PhotoDisplayInfo>() {
+    @Override
+    public PhotoDisplayInfo createData(int itemIndex) {
+      if (itemIndex >= allPhotos.size()) {
+        return null;
+      }
+
+      PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
+      photoDisplayInfo.setPhotoId(String.valueOf(allPhotos.get(itemIndex).getIdentifier()));
+      photoDisplayInfo.setHighResUrl(allPhotos.get(itemIndex).getHighResUrl());
+      photoDisplayInfo.setLowResUrl(allPhotos.get(itemIndex).getLowResUrl());
+      return photoDisplayInfo;
     }
 
     @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else if (!photoKitWidget.handleBackPressed()) {
-            super.onBackPressed();
-        }
+    public int getCount() {
+      return allPhotos.size();
     }
+  };
 
-    private void initViews() {
-        photoKitWidget.setAdapters(photoListingAdapter, photoGalleryAdapter);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    initData();
+    initTemplateViews();
+    initViews();
+    photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    presenter.checkToCrawlPhoto();
+    EventBus.getDefault().register(this);
+    eventEmitter.register(photoKitEventListener);
+  }
+
+  @Override
+  protected void onStop() {
+    EventBus.getDefault().unregister(this);
+    eventEmitter.unregister(photoKitEventListener);
+    super.onStop();
+  }
+
+  @Override
+  public void onBackPressed() {
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    if (drawer.isDrawerOpen(GravityCompat.START)) {
+      drawer.closeDrawer(GravityCompat.START);
+    } else if (!photoKitWidget.handleBackPressed()) {
+      super.onBackPressed();
     }
+  }
 
-    private void initData() {
-        allPhotos = new ArrayList<>();
+  private void initViews() {
+    photoKitWidget.setAdapters(photoListingAdapter, photoGalleryAdapter);
+  }
 
-        presenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
-        photoListingPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
-        photoListingPresenter.setView(this);
+  private void initData() {
+    allPhotos = new ArrayList<>();
 
-        SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
-        kitkatSystemBarConfig = kitkatTintManager.getConfig();
+    presenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
+    photoListingPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
+    photoListingPresenter.setView(this);
 
-        DefaultPhotoListingView.PhotoListingViewCreator listingPhotoItemCreator = new DefaultPhotoListingView.PhotoListingViewCreator();
-        ViewCreator listingCaptionItemCreator = new ListingCaptionItemCreator();
-        photoListingAdapter.registerViewCreator(listingPhotoItemCreator);
-        photoListingAdapter.registerViewCreator(listingCaptionItemCreator);
+    SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
+    kitkatSystemBarConfig = kitkatTintManager.getConfig();
 
-        ViewCreator photoGalleryItemCreator = new DefaultPhotoGalleryView.PhotoGalleryItemViewCreator();
-        photoGalleryAdapter.registerViewCreator(photoGalleryItemCreator);
-    }
+    DefaultPhotoListingView.PhotoListingViewCreator listingPhotoItemCreator = new DefaultPhotoListingView.PhotoListingViewCreator();
+    ViewCreator listingCaptionItemCreator = new ListingCaptionItemCreator();
+    photoListingAdapter.registerViewCreator(listingPhotoItemCreator);
+    photoListingAdapter.registerViewCreator(listingCaptionItemCreator);
 
-    public static class ListingCaptionItemCreator implements ViewCreator {
-        @Override
-        public View createView(ViewGroup container) {
-            TextView itemView = new TextView(container.getContext());
-            itemView.setText("Caption");
-            return itemView;
-        }
+    ViewCreator photoGalleryItemCreator = new DefaultPhotoGalleryView.PhotoGalleryItemViewCreator();
+    photoGalleryAdapter.registerViewCreator(photoGalleryItemCreator);
+  }
 
-        @Override
-        public ListingViewHolder createViewHolder(View view) {
-            return null;
-        }
-    }
-
-    protected void initTemplateViews() {
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
-
-        toolbar.setTitle(getString(R.string.app_name));
-        setSupportActionBar(toolbar);
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        viewNavigation.setNavigationItemSelectedListener(this);
-
-        applyWindowInsets();
-    }
-
-    private void applyWindowInsets() {
-        ViewCompat.setOnApplyWindowInsetsListener(toolbarContainerLayout, new OnApplyWindowInsetsListener() {
-            @Override
-            public WindowInsetsCompat onApplyWindowInsets(View v, final WindowInsetsCompat insets) {
-                toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
-                ((View)photoListingView).setPadding(0,0,0,insets.getSystemWindowInsetBottom());
-
-                return insets;
-            }
-        });
-
-        if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-            toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
-            ((View)photoListingView).setPadding(0,0,0,kitkatSystemBarConfig.getPixelInsetBottom());
-        }
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
+  public static class ListingCaptionItemCreator implements ViewCreator {
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_hotest) {
-            photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_HOTEST);
-        } else if (id == R.id.nav_latest) {
-            photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
+    public View createView(ViewGroup container) {
+      TextView itemView = new TextView(container.getContext());
+      itemView.setText("Caption");
+      return itemView;
     }
 
     @Override
-    public void startActionUpdate() {
-        UpdateService.startActionUpdate(this);
+    public ListingViewHolder createViewHolder(View view) {
+      return null;
+    }
+  }
+
+  protected void initTemplateViews() {
+    setContentView(R.layout.activity_main);
+    ButterKnife.bind(this);
+
+    toolbar.setTitle(getString(R.string.app_name));
+    setSupportActionBar(toolbar);
+
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+        this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+    drawer.setDrawerListener(toggle);
+    toggle.syncState();
+
+    viewNavigation.setNavigationItemSelectedListener(this);
+
+    applyWindowInsets();
+  }
+
+  private void applyWindowInsets() {
+    ViewCompat.setOnApplyWindowInsetsListener(toolbarContainerLayout, new OnApplyWindowInsetsListener() {
+      @Override
+      public WindowInsetsCompat onApplyWindowInsets(View v, final WindowInsetsCompat insets) {
+        toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
+        ((View) photoListingView).setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
+
+        return insets;
+      }
+    });
+
+    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
+      toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
+      ((View) photoListingView).setPadding(0, 0, 0, kitkatSystemBarConfig.getPixelInsetBottom());
+    }
+  }
+
+  @SuppressWarnings("StatementWithEmptyBody")
+  @Override
+  public boolean onNavigationItemSelected(MenuItem item) {
+    // Handle navigation view item clicks here.
+    int id = item.getItemId();
+
+    if (id == R.id.nav_hotest) {
+      photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_HOTEST);
+    } else if (id == R.id.nav_latest) {
+      photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
     }
 
-    @Override
-    public void appendPhotoData(int page, List<PhotoDetails> photos) {
-        log.d("page=%d, photos=%d", page, photos != null ? photos.size() : 0);
-        if (page == 1) {
-            allPhotos.clear();
-        }
+    DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+    drawer.closeDrawer(GravityCompat.START);
+    return true;
+  }
 
-        allPhotos.addAll(photos);
-        photoKitWidget.notifyDataSetChanged();
+  @Override
+  public void startActionUpdate() {
+    UpdateService.startActionUpdate(this);
+  }
+
+  @Override
+  public void appendPhotoData(int page, List<PhotoDetails> photos) {
+    log.d("page=%d, photos=%d", page, photos != null ? photos.size() : 0);
+    if (page == 1) {
+      allPhotos.clear();
     }
 
-    /***
-     * event bus
-     ***/
+    allPhotos.addAll(photos);
+    photoKitWidget.notifyDataSetChanged();
+  }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
-        photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+  /***
+   * event bus
+   ***/
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
+    photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+  }
+
+  @Subscribe(threadMode = ThreadMode.MAIN)
+  public void onEventMainThread(SetWallpaperClicked event) {
+    PhotoDetails photoDetails = event.getPhoto();
+    presenter.loadWallpaperSetting(photoDetails);
+  }
+
+  /***
+   * end - event bus
+   ***/
+
+  @Override
+  public void showToast(String message) {
+    Toast.makeText(this, message, Toast.LENGTH_LONG).show();
+  }
+
+  @Override
+  public void showLoading() {
+    proDlg = ProgressDialog.show(this, null, getString(R.string.msg_wait_a_moment), true);
+  }
+
+  @Override
+  public void hideLoading() {
+    UiUtils.dismissDlg(proDlg);
+  }
+
+  @Override
+  public void showWallpaperChooser(File photoFile) {
+    Uri uri = Uri.fromFile(photoFile);
+    AndroidUtils.startSetWallpaperChooser(this, uri);
+  }
+
+  protected Object photoKitEventListener = new Object() {
+    @com.khoinguyen.photokit.eventbus.Subscribe
+    public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
+      appBarLayout.setExpanded(false, false);
     }
-
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    public void onEventMainThread(SetWallpaperClicked event) {
-        PhotoDetails photoDetails = event.getPhoto();
-        presenter.loadWallpaperSetting(photoDetails);
-    }
-
-    /*** end - event bus ***/
-
-    @Override
-    public void showToast(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_LONG).show();
-    }
-
-    @Override
-    public void showLoading() {
-        proDlg = ProgressDialog.show(this, null, getString(R.string.msg_wait_a_moment), true);
-    }
-
-    @Override
-    public void hideLoading() {
-        UiUtils.dismissDlg(proDlg);
-    }
-
-    @Override
-    public void showWallpaperChooser(File photoFile) {
-        Uri uri = Uri.fromFile(photoFile);
-        AndroidUtils.startSetWallpaperChooser(this, uri);
-    }
-
-    protected Object photoKitEventListener = new Object() {
-        @com.khoinguyen.photokit.eventbus.Subscribe
-        public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
-            appBarLayout.setExpanded(false, false);
-        }
-    };
+  };
 }

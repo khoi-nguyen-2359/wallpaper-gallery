@@ -11,150 +11,150 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * Created by khoinguyen on 5/2/16.
- *
+ * <p/>
  * Light version of EventBus, doesnt have advanced features: Threading, Sticky, Event's super class
  */
 public class LightEventBus {
-    /**
-     * This instance is used for default implementations of photokit default views
-     */
-    private static LightEventBus defaultInstance = null;
+  /**
+   * This instance is used for default implementations of photokit default views
+   */
+  private static LightEventBus defaultInstance = null;
 
-    private static Map<Class<?>, List<SubscriberMethod>> methodCache = new HashMap<>();
-    private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> mapSubscriptionByEventType = new HashMap<>();
-    private final Map<Object, List<Class<?>>> typesBySubscriber = new HashMap<>();
+  private static Map<Class<?>, List<SubscriberMethod>> methodCache = new HashMap<>();
+  private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> mapSubscriptionByEventType = new HashMap<>();
+  private final Map<Object, List<Class<?>>> typesBySubscriber = new HashMap<>();
 
-    public static LightEventBus getDefaultInstance() {
-        if (defaultInstance == null) {
-            defaultInstance = new LightEventBus();
-        }
-
-        return defaultInstance;
+  public static LightEventBus getDefaultInstance() {
+    if (defaultInstance == null) {
+      defaultInstance = new LightEventBus();
     }
 
-    public void register(Object subscriber) {
-        if (subscriber == null) {
-            return;
-        }
+    return defaultInstance;
+  }
 
-        List<SubscriberMethod> subscriberMethods = findEventMethods(subscriber.getClass());
-        for (SubscriberMethod method : subscriberMethods) {
-            Subscription subscription = new Subscription(subscriber, method);
-            CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(method.eventType);
-            if (subscriptionsByType == null) {
-                subscriptionsByType = new CopyOnWriteArrayList<>();
-                mapSubscriptionByEventType.put(method.eventType, subscriptionsByType);
-            }
-
-            subscriptionsByType.add(subscription);
-
-            List<Class<?>> subscribedEvents = typesBySubscriber.get(subscriber);
-            if (subscribedEvents == null) {
-                subscribedEvents = new ArrayList<>();
-                typesBySubscriber.put(subscriber, subscribedEvents);
-            }
-            subscribedEvents.add(method.eventType);
-        }
+  public void register(Object subscriber) {
+    if (subscriber == null) {
+      return;
     }
 
-    public void unregister(Object subscriber) {
-        List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
-        if (subscribedTypes != null) {
-            for (Class<?> type : subscribedTypes) {
-                CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(type);
-                int subscriptionSize = subscriptionsByType.size();
-                for (int i = 0; i < subscriptionSize; ++i) {
-                    Subscription subscription = subscriptionsByType.get(i);
-                    if (subscription.subscriber == subscriber) {
-                        subscriptionsByType.remove(subscription);
-                        --i;
-                        --subscriptionSize;
-                    }
-                }
-            }
-        }
+    List<SubscriberMethod> subscriberMethods = findEventMethods(subscriber.getClass());
+    for (SubscriberMethod method : subscriberMethods) {
+      Subscription subscription = new Subscription(subscriber, method);
+      CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(method.eventType);
+      if (subscriptionsByType == null) {
+        subscriptionsByType = new CopyOnWriteArrayList<>();
+        mapSubscriptionByEventType.put(method.eventType, subscriptionsByType);
+      }
 
-        typesBySubscriber.remove(subscriber);
+      subscriptionsByType.add(subscription);
+
+      List<Class<?>> subscribedEvents = typesBySubscriber.get(subscriber);
+      if (subscribedEvents == null) {
+        subscribedEvents = new ArrayList<>();
+        typesBySubscriber.put(subscriber, subscribedEvents);
+      }
+      subscribedEvents.add(method.eventType);
+    }
+  }
+
+  public void unregister(Object subscriber) {
+    List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
+    if (subscribedTypes != null) {
+      for (Class<?> type : subscribedTypes) {
+        CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(type);
+        int subscriptionSize = subscriptionsByType.size();
+        for (int i = 0; i < subscriptionSize; ++i) {
+          Subscription subscription = subscriptionsByType.get(i);
+          if (subscription.subscriber == subscriber) {
+            subscriptionsByType.remove(subscription);
+            --i;
+            --subscriptionSize;
+          }
+        }
+      }
     }
 
-    private List<SubscriberMethod> findEventMethods(Class<?> subscriberClass) {
-        List<SubscriberMethod> subscriberMethods = methodCache.get(subscriberClass);
-        if (subscriberMethods == null) {
-            subscriberMethods = new ArrayList<>();
-            methodCache.put(subscriberClass, subscriberMethods);
-        }
+    typesBySubscriber.remove(subscriber);
+  }
 
-        Method[] methods;
-        try {
-            methods = subscriberClass.getDeclaredMethods();
-        } catch (Throwable th) {
-            methods = subscriberClass.getMethods();
-        }
-
-        for (Method method : methods) {
-            int modifiers = method.getModifiers();
-            if ((modifiers & Modifier.PUBLIC) == 0) {
-                continue;
-            }
-
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            if (parameterTypes.length != 1) {
-                continue;
-            }
-
-            Subscribe subscribeAnnotation = method.getAnnotation(Subscribe.class);
-            if (subscribeAnnotation == null) {
-                continue;
-            }
-
-            Class<?> eventType = parameterTypes[0];
-            subscriberMethods.add(new SubscriberMethod(method, eventType));
-        }
-
-        return subscriberMethods;
+  private List<SubscriberMethod> findEventMethods(Class<?> subscriberClass) {
+    List<SubscriberMethod> subscriberMethods = methodCache.get(subscriberClass);
+    if (subscriberMethods == null) {
+      subscriberMethods = new ArrayList<>();
+      methodCache.put(subscriberClass, subscriberMethods);
     }
 
-    public void post(Object event) {
-        Class<?> eventType = event.getClass();
-        CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(eventType);
-        for (Subscription subscription : subscriptionsByType) {
-            subscription.invoke(event);
-        }
+    Method[] methods;
+    try {
+      methods = subscriberClass.getDeclaredMethods();
+    } catch (Throwable th) {
+      methods = subscriberClass.getMethods();
     }
 
-    public static class SubscriberMethod {
-        private Method method;
-        private Class<?> eventType;
+    for (Method method : methods) {
+      int modifiers = method.getModifiers();
+      if ((modifiers & Modifier.PUBLIC) == 0) {
+        continue;
+      }
 
-        public SubscriberMethod(Method method, Class<?> eventType) {
-            this.method = method;
-            this.eventType = eventType;
-        }
+      Class<?>[] parameterTypes = method.getParameterTypes();
+      if (parameterTypes.length != 1) {
+        continue;
+      }
+
+      Subscribe subscribeAnnotation = method.getAnnotation(Subscribe.class);
+      if (subscribeAnnotation == null) {
+        continue;
+      }
+
+      Class<?> eventType = parameterTypes[0];
+      subscriberMethods.add(new SubscriberMethod(method, eventType));
     }
 
-    public static class Subscription {
-        private Object subscriber;
-        private SubscriberMethod subscriberMethod;
-        private boolean active;
+    return subscriberMethods;
+  }
 
-        public Subscription(Object subscriber, SubscriberMethod subscriberMethod) {
-            this.subscriber = subscriber;
-            this.subscriberMethod = subscriberMethod;
-            this.active = true;
-        }
-
-        public void invoke(Object event) {
-            if (!active) {
-                return;
-            }
-
-            try {
-                subscriberMethod.method.invoke(subscriber, event);
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            }
-        }
+  public void post(Object event) {
+    Class<?> eventType = event.getClass();
+    CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(eventType);
+    for (Subscription subscription : subscriptionsByType) {
+      subscription.invoke(event);
     }
+  }
+
+  public static class SubscriberMethod {
+    private Method method;
+    private Class<?> eventType;
+
+    public SubscriberMethod(Method method, Class<?> eventType) {
+      this.method = method;
+      this.eventType = eventType;
+    }
+  }
+
+  public static class Subscription {
+    private Object subscriber;
+    private SubscriberMethod subscriberMethod;
+    private boolean active;
+
+    public Subscription(Object subscriber, SubscriberMethod subscriberMethod) {
+      this.subscriber = subscriber;
+      this.subscriberMethod = subscriberMethod;
+      this.active = true;
+    }
+
+    public void invoke(Object event) {
+      if (!active) {
+        return;
+      }
+
+      try {
+        subscriberMethod.method.invoke(subscriber, event);
+      } catch (IllegalAccessException e) {
+        e.printStackTrace();
+      } catch (InvocationTargetException e) {
+        e.printStackTrace();
+      }
+    }
+  }
 }

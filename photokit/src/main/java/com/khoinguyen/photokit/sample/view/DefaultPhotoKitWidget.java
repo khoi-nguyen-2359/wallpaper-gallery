@@ -15,143 +15,142 @@ import com.khoinguyen.photokit.PhotoTransitionView;
 import com.khoinguyen.photokit.R;
 import com.khoinguyen.photokit.adapter.ListingViewAdapter;
 import com.khoinguyen.photokit.eventbus.LightEventBus;
+import com.khoinguyen.photokit.eventbus.Subscribe;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoRevealAnimationStart;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photokit.sample.event.OnPhotoShrinkAnimationStart;
-import com.khoinguyen.photokit.eventbus.Subscribe;
 import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
 public class DefaultPhotoKitWidget extends RelativeLayout implements PhotoKitWidget<ListingViewAdapter<PhotoDisplayInfo>> {
-    protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
+  protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
 
-    protected PhotoTransitionView transitDraweeView;
-    protected PhotoBackdropView transitBackdrop;
-    protected PhotoListingView<ListingViewAdapter<PhotoDisplayInfo>> photoGalleryView;
-    protected PhotoListingView<ListingViewAdapter<PhotoDisplayInfo>> photoListingView;
-    protected TransitionState currentTransitionState = TransitionState.LISTING;
+  protected PhotoTransitionView transitDraweeView;
+  protected PhotoBackdropView transitBackdrop;
+  protected PhotoListingView<ListingViewAdapter<PhotoDisplayInfo>> photoGalleryView;
+  protected PhotoListingView<ListingViewAdapter<PhotoDisplayInfo>> photoListingView;
+  protected TransitionState currentTransitionState = TransitionState.LISTING;
 
-    public DefaultPhotoKitWidget(Context context) {
-        super(context);
+  public DefaultPhotoKitWidget(Context context) {
+    super(context);
+  }
+
+  public DefaultPhotoKitWidget(Context context, AttributeSet attrs) {
+    super(context, attrs);
+    readAttrs(attrs);
+  }
+
+  public DefaultPhotoKitWidget(Context context, AttributeSet attrs, int defStyleAttr) {
+    super(context, attrs, defStyleAttr);
+    readAttrs(attrs);
+  }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  public DefaultPhotoKitWidget(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+    readAttrs(attrs);
+  }
+
+  @Override
+  protected void onFinishInflate() {
+    super.onFinishInflate();
+    initViews();
+  }
+
+  @Override
+  protected void onAttachedToWindow() {
+    super.onAttachedToWindow();
+
+    registerEvents();
+  }
+
+  @Override
+  protected void onDetachedFromWindow() {
+    super.onDetachedFromWindow();
+
+    unregisterEvents();
+  }
+
+  @Override
+  public void setAdapters(ListingViewAdapter<PhotoDisplayInfo> listingBinder, ListingViewAdapter<PhotoDisplayInfo> galleryBinder) {
+    photoListingView.setAdapter(listingBinder);
+    photoGalleryView.setAdapter(galleryBinder);
+  }
+
+  private void readAttrs(AttributeSet attrs) {
+    if (attrs == null) {
+      return;
+    }
+  }
+
+  private void initViews() {
+    photoGalleryView = (PhotoListingView) findViewById(R.id.photokit_pager_photo_gallery);
+    transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
+    transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_transition_backdrop);
+    photoListingView = (PhotoListingView) findViewById(R.id.photokit_photo_listing);
+  }
+
+  /**
+   * @return False means no handling happens
+   */
+  @Override
+  public boolean handleBackPressed() {
+    if (currentTransitionState == TransitionState.DETAILS) {
+      ((View) photoGalleryView).setVisibility(View.GONE);
+      transitDraweeView.startShrinkAnimation(new RectF(0, 0, getWidth(), getHeight()));
+      return true;
     }
 
-    public DefaultPhotoKitWidget(Context context, AttributeSet attrs) {
-        super(context, attrs);
-        readAttrs(attrs);
-    }
+    return false;
+  }
 
-    public DefaultPhotoKitWidget(Context context, AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        readAttrs(attrs);
-    }
+  @Subscribe
+  public void handleOnPhotoShrinkAnimationStart(OnPhotoShrinkAnimationStart event) {
+    currentTransitionState = TransitionState.TO_LISTING;
+  }
 
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-    public DefaultPhotoKitWidget(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        readAttrs(attrs);
-    }
+  @Subscribe
+  public void handleOnPhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
+    currentTransitionState = TransitionState.LISTING;
+  }
 
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-        initViews();
-    }
+  @Subscribe
+  public void handleOnPhotoRevealAnimStart(OnPhotoRevealAnimationStart event) {
+    currentTransitionState = TransitionState.TO_DETAILS;
+  }
 
-    @Override
-    protected void onAttachedToWindow() {
-        super.onAttachedToWindow();
+  @Subscribe
+  public void handleOnPhotoRevealAnimEnd(OnPhotoRevealAnimationEnd event) {
+    currentTransitionState = TransitionState.DETAILS;
+  }
 
-        registerEvents();
-    }
+  @Override
+  public TransitionState getTransitionState() {
+    return currentTransitionState;
+  }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+  @Override
+  public void notifyDataSetChanged() {
+    photoListingView.notifyDataSetChanged();
+    photoGalleryView.notifyDataSetChanged();
+  }
 
-        unregisterEvents();
-    }
+  public void registerEvents() {
+    eventEmitter.register(photoGalleryView);
+    eventEmitter.register(photoListingView);
+    eventEmitter.register(transitDraweeView);
+    eventEmitter.register(transitBackdrop);
+    eventEmitter.register(this);
+  }
 
-    @Override
-    public void setAdapters(ListingViewAdapter<PhotoDisplayInfo> listingBinder, ListingViewAdapter<PhotoDisplayInfo> galleryBinder) {
-        photoListingView.setAdapter(listingBinder);
-        photoGalleryView.setAdapter(galleryBinder);
-    }
-
-    private void readAttrs(AttributeSet attrs) {
-        if (attrs == null) {
-            return;
-        }
-    }
-
-    private void initViews() {
-        photoGalleryView = (PhotoListingView) findViewById(R.id.photokit_pager_photo_gallery);
-        transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
-        transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_transition_backdrop);
-        photoListingView = (PhotoListingView) findViewById(R.id.photokit_photo_listing);
-    }
-
-    /**
-     *
-     * @return False means no handling happens
-     */
-    @Override
-    public boolean handleBackPressed() {
-        if (currentTransitionState == TransitionState.DETAILS) {
-            ((View)photoGalleryView).setVisibility(View.GONE);
-            transitDraweeView.startShrinkAnimation(new RectF(0,0,getWidth(),getHeight()));
-            return true;
-        }
-
-        return false;
-    }
-
-    @Subscribe
-    public void handleOnPhotoShrinkAnimationStart(OnPhotoShrinkAnimationStart event) {
-        currentTransitionState = TransitionState.TO_LISTING;
-    }
-
-    @Subscribe
-    public void handleOnPhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
-        currentTransitionState = TransitionState.LISTING;
-    }
-
-    @Subscribe
-    public void handleOnPhotoRevealAnimStart(OnPhotoRevealAnimationStart event) {
-        currentTransitionState = TransitionState.TO_DETAILS;
-    }
-
-    @Subscribe
-    public void handleOnPhotoRevealAnimEnd(OnPhotoRevealAnimationEnd event) {
-        currentTransitionState = TransitionState.DETAILS;
-    }
-
-    @Override
-    public TransitionState getTransitionState() {
-        return currentTransitionState;
-    }
-
-    @Override
-    public void notifyDataSetChanged() {
-        photoListingView.notifyDataSetChanged();
-        photoGalleryView.notifyDataSetChanged();
-    }
-
-    public void registerEvents() {
-        eventEmitter.register(photoGalleryView);
-        eventEmitter.register(photoListingView);
-        eventEmitter.register(transitDraweeView);
-        eventEmitter.register(transitBackdrop);
-        eventEmitter.register(this);
-    }
-
-    public void unregisterEvents() {
-        eventEmitter.unregister(photoGalleryView);
-        eventEmitter.unregister(photoListingView);
-        eventEmitter.unregister(transitBackdrop);
-        eventEmitter.unregister(transitDraweeView);
-        eventEmitter.unregister(this);
-    }
+  public void unregisterEvents() {
+    eventEmitter.unregister(photoGalleryView);
+    eventEmitter.unregister(photoListingView);
+    eventEmitter.unregister(transitBackdrop);
+    eventEmitter.unregister(transitDraweeView);
+    eventEmitter.unregister(this);
+  }
 }

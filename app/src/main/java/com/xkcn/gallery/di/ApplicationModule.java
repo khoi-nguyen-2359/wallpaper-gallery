@@ -2,17 +2,17 @@ package com.xkcn.gallery.di;
 
 import android.content.Context;
 
+import com.xkcn.gallery.BaseApp;
+import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.repo.PhotoDetailsSqliteRepository;
 import com.xkcn.gallery.data.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.repo.PhotoTagSqliteRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepositoryImpl;
+import com.xkcn.gallery.imageloader.PhotoDownloader;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
-import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.DbHelper;
-import com.xkcn.gallery.imageloader.PhotoDownloader;
 
 import javax.inject.Singleton;
 
@@ -24,53 +24,53 @@ import dagger.Provides;
  */
 @Module
 public class ApplicationModule {
-    private final BaseApp baseApp;
-    private final DbHelper dbHelper;
+  private final BaseApp baseApp;
+  private final DbHelper dbHelper;
 
-    public ApplicationModule(BaseApp app) {
-        this.baseApp = app;
-        dbHelper = new DbHelper(app);
-    }
+  public ApplicationModule(BaseApp app) {
+    this.baseApp = app;
+    dbHelper = new DbHelper(app);
+  }
 
-    @Provides
-    @Singleton
-    PreferencesUsecase providePreferencesUsecase(PreferenceRepository preferenceRepository) {
-        return new PreferencesUsecase(preferenceRepository);
-    }
+  @Provides
+  @Singleton
+  PreferencesUsecase providePreferencesUsecase(PreferenceRepository preferenceRepository) {
+    return new PreferencesUsecase(preferenceRepository);
+  }
 
-    @Provides
-    @Singleton
-    PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
-        return new PhotoListingUsecase(photoDetailsRepository);
-    }
+  @Provides
+  @Singleton
+  PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
+    return new PhotoListingUsecase(photoDetailsRepository);
+  }
 
-    @Provides
-    @Singleton
-    Context provideContext() {
-        return this.baseApp;
-    }
+  @Provides
+  @Singleton
+  Context provideContext() {
+    return this.baseApp;
+  }
 
-    @Provides
-    @Singleton
-    PhotoDetailsRepository providePhotoDetailsDataStore() {
-        return new PhotoDetailsSqliteRepository(dbHelper);
-    }
+  @Provides
+  @Singleton
+  PhotoDetailsRepository providePhotoDetailsDataStore() {
+    return new PhotoDetailsSqliteRepository(dbHelper);
+  }
 
-    @Provides
-    @Singleton
-    PreferenceRepository providePreferenceDataStore() {
-        return new PreferenceRepositoryImpl(baseApp);
-    }
+  @Provides
+  @Singleton
+  PreferenceRepository providePreferenceDataStore() {
+    return new PreferenceRepositoryImpl(baseApp);
+  }
 
-    @Provides
-    @Singleton
-    PhotoDownloader providePhotoDownloader() {
-        return new PhotoDownloader(baseApp);
-    }
+  @Provides
+  @Singleton
+  PhotoDownloader providePhotoDownloader() {
+    return new PhotoDownloader(baseApp);
+  }
 
-    @Provides
-    @Singleton
-    PhotoTagRepository providePhotoTagRepository() {
-        return new PhotoTagSqliteRepository(dbHelper);
-    }
+  @Provides
+  @Singleton
+  PhotoTagRepository providePhotoTagRepository() {
+    return new PhotoTagSqliteRepository(dbHelper);
+  }
 }
