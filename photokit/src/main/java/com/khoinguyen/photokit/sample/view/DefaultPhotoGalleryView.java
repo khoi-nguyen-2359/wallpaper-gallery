@@ -43,6 +43,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
   private L log = L.get("DefaultPhotoGalleryView");
   private int touchSlop;
   private float lastInterceptedY;
+  private float lastInterceptedX;
   private boolean isDragging;
   private float lastScrollingY;
   private float lastScrollingX;
@@ -64,6 +65,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
     }
   };
   private GestureDetectorCompat detector;
+
 
   private void updateCurrentSelectedItemInfo(PhotoDisplayInfo photoDisplayInfo) {
     currentSelectedItemInfo.setPhotoId(photoDisplayInfo.getPhotoId());
@@ -135,6 +137,7 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
     switch (action) {
       case MotionEvent.ACTION_DOWN: {
         lastInterceptedY = ev.getRawY();
+        lastInterceptedX = ev.getRawX();
         break;
       }
 
@@ -143,15 +146,8 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
           return true;
         }
 
-        float yDiff = Math.abs(ev.getRawY() - lastInterceptedY);
-        if (yDiff >= touchSlop) {
-          log.d("onInterceptTouchEvent CATCHED");
-          isDragging = true;
-          lastScrollingY = ev.getRawY();
-          lastScrollingX = ev.getRawX();
-
-          eventEmitter.post(new OnPhotoGalleryDragStart());
-
+        doDraggingDetect(ev);
+        if (isDragging) {
           return true;
         }
 
@@ -185,6 +181,11 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
           return true;
         }
 
+        doDraggingDetect(ev);
+        if (isDragging) {
+          return true;
+        }
+
         break;
       }
 
@@ -201,6 +202,19 @@ public class DefaultPhotoGalleryView extends ViewPager implements PhotoListingVi
     }
 
     return super.onTouchEvent(ev);
+  }
+
+  private void doDraggingDetect(MotionEvent ev) {
+    float xDiff = Math.abs(ev.getRawX() - lastInterceptedX);
+    float yDiff = Math.abs(ev.getRawY() - lastInterceptedY);
+    if (yDiff > touchSlop && yDiff * 0.5f > xDiff) {
+      log.d("dragging CATCHED");
+      isDragging = true;
+      lastScrollingY = ev.getRawY();
+      lastScrollingX = ev.getRawX();
+
+      eventEmitter.post(new OnPhotoGalleryDragStart());
+    }
   }
 
   @Override
