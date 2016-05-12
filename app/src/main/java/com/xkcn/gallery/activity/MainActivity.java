@@ -22,17 +22,16 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.khoinguyen.photokit.PhotoKitWidget;
-import com.khoinguyen.photokit.PhotoListingView;
-import com.khoinguyen.photokit.adapter.BaseListingViewAdapter;
-import com.khoinguyen.photokit.adapter.ListingViewHolder;
-import com.khoinguyen.photokit.adapter.RecycledListingViewAdapter;
-import com.khoinguyen.photokit.adapter.ViewCreator;
-import com.khoinguyen.photokit.eventbus.LightEventBus;
-import com.khoinguyen.photokit.sample.event.OnPhotoListingItemClick;
-import com.khoinguyen.photokit.sample.model.PhotoDisplayInfo;
-import com.khoinguyen.photokit.sample.view.DefaultPhotoGalleryView;
-import com.khoinguyen.photokit.sample.view.DefaultPhotoListingView;
+import com.khoinguyen.apptemplate.listing.ItemCreator;
+import com.khoinguyen.apptemplate.listing.ItemViewHolder;
+import com.khoinguyen.apptemplate.listing.adapter.BaseListingViewAdapter;
+import com.khoinguyen.apptemplate.listing.adapter.RecycledListingViewAdapter;
+import com.khoinguyen.apptemplate.eventbus.LightEventBus;
+import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
+import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
+import com.khoinguyen.photoviewerkit.view.PhotoGalleryView;
+import com.khoinguyen.photoviewerkit.view.PhotoListingView;
+import com.khoinguyen.photoviewerkit.view.PhotoViewerKitWidget;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -70,7 +69,7 @@ public abstract class MainActivity extends BaseActivity
   @Bind(R.id.toolbar_container)
   FrameLayout toolbarContainerLayout;
   @Bind(R.id.photokit_widget)
-  PhotoKitWidget<BaseListingViewAdapter<PhotoDisplayInfo>> photoKitWidget;
+  PhotoViewerKitWidget photoKitWidget;
 
   @Bind(R.id.photokit_photo_listing)
   PhotoListingView photoListingView;
@@ -85,7 +84,7 @@ public abstract class MainActivity extends BaseActivity
 
   private List<PhotoDetails> allPhotos;
 
-  protected LightEventBus eventEmitter = LightEventBus.getDefaultInstance();
+  protected LightEventBus photoViewerKitEventBus;
 
   private RecycledListingViewAdapter<PhotoDisplayInfo> photoListingAdapter = new RecycledListingViewAdapter<PhotoDisplayInfo>() {
     @Override
@@ -108,7 +107,7 @@ public abstract class MainActivity extends BaseActivity
 
     @Override
     public Object getViewType(int itemIndex) {
-      return itemIndex == 0 ? ListingCaptionItemCreator.class : DefaultPhotoListingView.PhotoListingViewCreator.class;
+      return itemIndex == 0 ? ListingCaptionItemCreator.class : PhotoListingView.PhotoListingViewCreator.class;
     }
   };
 
@@ -146,13 +145,13 @@ public abstract class MainActivity extends BaseActivity
     super.onStart();
     presenter.checkToCrawlPhoto();
     EventBus.getDefault().register(this);
-    eventEmitter.register(photoKitEventListener);
+    photoViewerKitEventBus.register(photoKitEventListener);
   }
 
   @Override
   protected void onStop() {
     EventBus.getDefault().unregister(this);
-    eventEmitter.unregister(photoKitEventListener);
+    photoViewerKitEventBus.unregister(photoKitEventListener);
     super.onStop();
   }
 
@@ -168,6 +167,7 @@ public abstract class MainActivity extends BaseActivity
 
   private void initViews() {
     photoKitWidget.setAdapters(photoListingAdapter, photoGalleryAdapter);
+    photoViewerKitEventBus = photoKitWidget.getEventBus();
   }
 
   private void initData() {
@@ -180,16 +180,16 @@ public abstract class MainActivity extends BaseActivity
     SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
     kitkatSystemBarConfig = kitkatTintManager.getConfig();
 
-    DefaultPhotoListingView.PhotoListingViewCreator listingPhotoItemCreator = new DefaultPhotoListingView.PhotoListingViewCreator();
-    ViewCreator listingCaptionItemCreator = new ListingCaptionItemCreator();
+    PhotoListingView.PhotoListingViewCreator listingPhotoItemCreator = new PhotoListingView.PhotoListingViewCreator();
+    ItemCreator listingCaptionItemCreator = new ListingCaptionItemCreator();
     photoListingAdapter.registerViewCreator(listingPhotoItemCreator);
     photoListingAdapter.registerViewCreator(listingCaptionItemCreator);
 
-    ViewCreator photoGalleryItemCreator = new DefaultPhotoGalleryView.PhotoGalleryItemViewCreator();
+    ItemCreator photoGalleryItemCreator = new PhotoGalleryView.PhotoGalleryItemViewCreator();
     photoGalleryAdapter.registerViewCreator(photoGalleryItemCreator);
   }
 
-  public static class ListingCaptionItemCreator implements ViewCreator {
+  public static class ListingCaptionItemCreator implements ItemCreator {
     @Override
     public View createView(ViewGroup container) {
       TextView itemView = new TextView(container.getContext());
@@ -198,7 +198,7 @@ public abstract class MainActivity extends BaseActivity
     }
 
     @Override
-    public ListingViewHolder createViewHolder(View view) {
+    public ItemViewHolder createViewHolder(View view) {
       return null;
     }
   }
@@ -312,7 +312,7 @@ public abstract class MainActivity extends BaseActivity
   }
 
   protected Object photoKitEventListener = new Object() {
-    @com.khoinguyen.photokit.eventbus.Subscribe
+    @com.khoinguyen.apptemplate.eventbus.Subscribe
     public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
       appBarLayout.setExpanded(false, false);
     }

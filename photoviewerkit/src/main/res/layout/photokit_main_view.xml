@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+
+    <com.khoinguyen.photoviewerkit.view.PhotoListingView
+        android:id="@+id/photokit_photo_listing"
+        android:visibility="visible"
+        android:clipToPadding="false"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        />
+
+    <com.khoinguyen.photoviewerkit.view.PhotoBackdropView
+        android:alpha="0"
+        android:id="@+id/photokit_transition_backdrop"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+    <com.khoinguyen.photoviewerkit.view.PhotoTransitionView
+        android:visibility="gone"
+        android:id="@+id/photokit_transition_photo"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <com.khoinguyen.photoviewerkit.view.PhotoGalleryView
+        android:visibility="gone"
+        android:id="@+id/photokit_pager_photo_gallery"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+
+</merge>

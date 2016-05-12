@@ -1,0 +1,35 @@
+apply plugin: 'com.android.library'
+
+def configs = rootProject.extensions.getByName("ext")
+
+repositories {
+    jcenter()
+
+    flatDir { dirs '../aars'}
+}
+
+android {
+    compileSdkVersion configs.androidCompileSdk
+    buildToolsVersion configs.androidBuildToolVersion
+
+    defaultConfig {
+        minSdkVersion 9
+        targetSdkVersion configs.androidMaxSdk
+        versionCode 1
+        versionName "1.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile "com.android.support:appcompat-v7:${configs.androidSupportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${configs.androidSupportLibVersion}"
+
+    compile(name:'log', ext:'aar')
+}

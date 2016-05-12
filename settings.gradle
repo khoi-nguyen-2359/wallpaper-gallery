@@ -1,1 +1,1 @@
-include ':app', ':photokit'
+include ':app', ':photoviewerkit', ':apptemplate'
