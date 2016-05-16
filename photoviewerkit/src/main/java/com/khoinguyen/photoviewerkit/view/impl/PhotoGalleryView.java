@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.view;
+package com.khoinguyen.photoviewerkit.view.impl;
 
 import android.content.Context;
 import android.graphics.RectF;
@@ -24,7 +24,7 @@ import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.data.AdapterPhotoFinder;
-import com.khoinguyen.photoviewerkit.data.DataStore;
+import com.khoinguyen.photoviewerkit.data.SharedData;
 import com.khoinguyen.photoviewerkit.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryDragStart;
@@ -33,12 +33,14 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
 import com.khoinguyen.apptemplate.listing.util.ListingPagerViewAdapter;
+import com.khoinguyen.photoviewerkit.view.IPhotoGalleryView;
+import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/11/16.
  */
-public class PhotoGalleryView extends ViewPager {
+public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<SharedData> {
   private static final int DEF_OFFSCREEN_PAGE = 1;
 
   protected L log = L.get("DefaultPhotoGalleryView");
@@ -66,11 +68,11 @@ public class PhotoGalleryView extends ViewPager {
     }
   };
   private GestureDetectorCompat detector;
-  protected DataStore dataStore;
+  protected SharedData sharedData;
 
 
   private void updateCurrentSelectedItemInfo(PhotoDisplayInfo photoDisplayInfo) {
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
     currentSelectedItem.setPhotoId(photoDisplayInfo.getPhotoId());
   }
 
@@ -239,8 +241,14 @@ public class PhotoGalleryView extends ViewPager {
     this.eventBus = eventBus;
   }
 
-  public void setDataStore(DataStore dataStore) {
-    this.dataStore = dataStore;
+  public void setSharedData(SharedData sharedData) {
+    this.sharedData = sharedData;
+  }
+
+  @Override
+  public void attach(IPhotoViewerKitWidget<SharedData> widget) {
+    sharedData = widget.getSharedData();
+    eventBus = widget.getEventBus();
   }
 
   public static class PhotoGalleryItemViewCreator implements ItemCreator {
@@ -295,7 +303,7 @@ public class PhotoGalleryView extends ViewPager {
 
   @Subscribe
   public void handlePhotoRevealAnimationEnd(OnPhotoRevealAnimationEnd event) {
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
     setCurrentItem(getPhotoFinder().indexOf(currentSelectedItem.getPhotoId()), false);
     setTranslationX(0);
     setTranslationY(0);

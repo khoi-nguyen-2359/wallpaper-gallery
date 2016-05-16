@@ -3,7 +3,7 @@ package com.khoinguyen.photoviewerkit.data;
 /**
  * Created by khoinguyen on 5/12/16.
  */
-public class DataStore {
+public class SharedData {
   private ListingItemInfo lastSelectedListingItem = new ListingItemInfo();
   private ListingItemInfo currentSelectedListingItem = new ListingItemInfo();
 

@@ -29,9 +29,9 @@ import com.khoinguyen.apptemplate.listing.adapter.RecycledListingViewAdapter;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
-import com.khoinguyen.photoviewerkit.view.PhotoGalleryView;
-import com.khoinguyen.photoviewerkit.view.PhotoListingView;
-import com.khoinguyen.photoviewerkit.view.PhotoViewerKitWidget;
+import com.khoinguyen.photoviewerkit.view.impl.PhotoGalleryView;
+import com.khoinguyen.photoviewerkit.view.impl.PhotoListingView;
+import com.khoinguyen.photoviewerkit.view.impl.PhotoViewerKitWidget;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -73,6 +73,9 @@ public abstract class MainActivity extends BaseActivity
 
   @Bind(R.id.photokit_photo_listing)
   PhotoListingView photoListingView;
+
+  @Bind(R.id.photokit_pager_photo_gallery)
+  PhotoGalleryView photoGalleryView;
 
   protected MainViewPresenter presenter;
   private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
@@ -160,13 +163,14 @@ public abstract class MainActivity extends BaseActivity
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
     if (drawer.isDrawerOpen(GravityCompat.START)) {
       drawer.closeDrawer(GravityCompat.START);
-    } else if (!photoKitWidget.handleBackPressed()) {
+    } else if (!photoKitWidget.handleBackPress()) {
       super.onBackPressed();
     }
   }
 
   private void initViews() {
-    photoKitWidget.setAdapters(photoListingAdapter, photoGalleryAdapter);
+    photoListingView.setListingAdapter(photoListingAdapter);
+    photoGalleryView.setListingAdapter(photoGalleryAdapter);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
   }
 

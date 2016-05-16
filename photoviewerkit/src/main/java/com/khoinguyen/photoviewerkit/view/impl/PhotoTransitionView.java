@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.view;
+package com.khoinguyen.photoviewerkit.view.impl;
 
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
@@ -13,7 +13,7 @@ import com.khoinguyen.apptemplate.anim.CompoundViewAnimation;
 import com.khoinguyen.photoviewerkit.customview.ClippingRevealDraweeView;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
-import com.khoinguyen.photoviewerkit.data.DataStore;
+import com.khoinguyen.photoviewerkit.data.SharedData;
 import com.khoinguyen.photoviewerkit.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryPageSelect;
@@ -25,16 +25,18 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationUpdate;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationWillStart;
+import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitComponent;
+import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
-public class PhotoTransitionView extends ClippingRevealDraweeView {
+public class PhotoTransitionView extends ClippingRevealDraweeView implements IPhotoViewerKitComponent<SharedData> {
   protected CompoundViewAnimation revealAnim;
   protected CompoundViewAnimation shrinkAnim;
 
   protected LightEventBus eventBus;
-  protected DataStore dataStore;
+  protected SharedData sharedData;
 
   public PhotoTransitionView(Context context, GenericDraweeHierarchy hierarchy) {
     super(context, hierarchy);
@@ -67,7 +69,7 @@ public class PhotoTransitionView extends ClippingRevealDraweeView {
 
   @Subscribe
   public void handlePhotoListingItemClick(final OnPhotoListingItemClick event) {
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
 
     setVisibility(View.VISIBLE);
     setImageUri(event.getPhotoDisplayInfo().getLowResUri());
@@ -95,7 +97,7 @@ public class PhotoTransitionView extends ClippingRevealDraweeView {
   }
 
   public void startShrinkAnimation(RectF fullRect) {
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
     shrinkAnim = createShrinkAnimation(fullRect, currentSelectedItem.getItemRect())
         .addAnimatorListener(new AnimatorListenerAdapter() {
           @Override
@@ -136,7 +138,13 @@ public class PhotoTransitionView extends ClippingRevealDraweeView {
     this.eventBus = eventBus;
   }
 
-  public void setDataStore(DataStore dataStore) {
-    this.dataStore = dataStore;
+  public void setSharedData(SharedData sharedData) {
+    this.sharedData = sharedData;
+  }
+
+  @Override
+  public void attach(IPhotoViewerKitWidget<SharedData> widget) {
+    sharedData = widget.getSharedData();
+    eventBus = widget.getEventBus();
   }
 }

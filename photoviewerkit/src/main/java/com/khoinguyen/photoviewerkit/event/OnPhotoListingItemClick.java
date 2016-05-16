@@ -3,7 +3,6 @@ package com.khoinguyen.photoviewerkit.event;
 import android.graphics.RectF;
 
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
-import com.khoinguyen.photoviewerkit.view.PhotoListingView;
 
 /**
  * Created by khoinguyen on 4/26/16.

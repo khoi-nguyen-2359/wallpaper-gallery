@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.view;
+package com.khoinguyen.photoviewerkit.view.impl;
 
 import android.annotation.TargetApi;
 import android.content.Context;

@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.view;
+package com.khoinguyen.photoviewerkit.view.impl;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -23,7 +23,7 @@ import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.data.AdapterPhotoFinder;
-import com.khoinguyen.photoviewerkit.data.DataStore;
+import com.khoinguyen.photoviewerkit.data.SharedData;
 import com.khoinguyen.photoviewerkit.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryPageSelect;
@@ -32,19 +32,21 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
 import com.khoinguyen.apptemplate.listing.util.ListingRecyclerViewAdapter;
+import com.khoinguyen.photoviewerkit.view.IPhotoListingView;
+import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 3/29/16.
  */
-public class PhotoListingView extends RecyclerView {
+public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData> {
   protected StaggeredGridLayoutManager rcvLayoutMan;
   protected RecycledListingViewAdapter<PhotoDisplayInfo> listingAdapter;
   protected AdapterPhotoFinder photoFinder;
 
   protected LightEventBus eventBus;
-  protected DataStore dataStore;
+  protected SharedData sharedData;
   protected RecyclerViewAdapter adapterPhotos;
 
   private L log = L.get("DefaultPhotoListingView");
@@ -97,8 +99,8 @@ public class PhotoListingView extends RecyclerView {
   }
 
   private void changeSelectedItemHighlight() {
-    ListingItemInfo lastSelectedItem = dataStore.getLastSelectedItem();
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo lastSelectedItem = sharedData.getLastSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
     if (lastSelectedItem.getPhotoId() != null && lastSelectedItem.getPhotoId().equals(currentSelectedItem.getPhotoId())) {
       return;
     }
@@ -124,7 +126,7 @@ public class PhotoListingView extends RecyclerView {
 
   @Subscribe
   public void handlePhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
     unhighlightClickedItemView(photoFinder.indexOf(currentSelectedItem.getPhotoId()));
   }
 
@@ -132,8 +134,14 @@ public class PhotoListingView extends RecyclerView {
     this.eventBus = eventBus;
   }
 
-  public void setDataStore(DataStore dataStore) {
-    this.dataStore = dataStore;
+  public void setSharedData(SharedData sharedData) {
+    this.sharedData = sharedData;
+  }
+
+  @Override
+  public void attach(IPhotoViewerKitWidget<SharedData> widget) {
+    sharedData = widget.getSharedData();
+    eventBus = widget.getEventBus();
   }
 
   /**
@@ -172,8 +180,8 @@ public class PhotoListingView extends RecyclerView {
       return;
     }
 
-    ListingItemInfo lastSelectedItem = dataStore.getLastSelectedItem();
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo lastSelectedItem = sharedData.getLastSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
 
     lastSelectedItem.setPhotoId("");
     lastSelectedItem.updateItemRect(new RectF());
@@ -182,7 +190,7 @@ public class PhotoListingView extends RecyclerView {
   }
 
   private void updateSelectedItemRect() {
-    ListingItemInfo currentSelectedItem = dataStore.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
     int itemIndex = getPhotoFinder().indexOf(currentSelectedItem.getPhotoId());
     View v = rcvLayoutMan.findViewByPosition(itemIndex);
     RectF itemRect = createItemViewLocation(v);

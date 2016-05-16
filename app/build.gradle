@@ -34,6 +34,11 @@ android {
         versionName "1.0"
     }
 
+    dexOptions {
+        maxProcessCount 2
+        javaMaxHeapSize "2g"
+    }
+
     buildTypes {
         release {
             minifyEnabled false
