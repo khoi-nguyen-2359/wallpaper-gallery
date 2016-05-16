@@ -4,19 +4,35 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.khoinguyen.apptemplate.listing.adapter.BaseListingViewAdapter;
+import com.khoinguyen.apptemplate.listing.IViewHolder;
+import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 
 /**
  * Created by khoinguyen on 5/10/16.
  */
-public class ListingPagerViewAdapter extends PagerAdapter {
-  private BaseListingViewAdapter listingViewAdapter;
+public class PagerListingAdapter extends PagerAdapter {
+  private ListingAdapter listingViewAdapter;
+
+  @Override
+  public void notifyDataSetChanged() {
+    super.notifyDataSetChanged();
+
+    if (listingViewAdapter != null) {
+      listingViewAdapter.notifyDataSetChanged();
+    }
+  }
 
   @Override
   public Object instantiateItem(ViewGroup container, int position) {
-    View itemView = listingViewAdapter.getView(container, listingViewAdapter.getViewType(position));
-    listingViewAdapter.bindData(itemView, position);
+    int viewType = listingViewAdapter.getViewType(position);
+    View itemView = listingViewAdapter.getView(container, viewType);
+    IViewHolder viewHolder = listingViewAdapter.getViewHolder(itemView, viewType);
+
     container.addView(itemView);
+
+    Object data = listingViewAdapter.getData(position);
+    viewHolder.bind(data);
+
     return itemView;
   }
 
@@ -37,7 +53,7 @@ public class ListingPagerViewAdapter extends PagerAdapter {
     return view == object;
   }
 
-  public void setListingViewAdapter(BaseListingViewAdapter listingViewAdapter) {
+  public void setListingViewAdapter(ListingAdapter listingViewAdapter) {
     this.listingViewAdapter = listingViewAdapter;
   }
 }

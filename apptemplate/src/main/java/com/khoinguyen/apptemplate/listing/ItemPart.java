@@ -5,12 +5,7 @@ package com.khoinguyen.apptemplate.listing;
  */
 public class ItemPart {
   private Object data;
-  private Object viewType;
-
-  public ItemPart(Object data, Object viewType) {
-    this.data = data;
-    this.viewType = viewType;
-  }
+  private int viewType;
 
   public ItemPart(Object data, int viewType) {
     this.data = data;
@@ -21,7 +16,7 @@ public class ItemPart {
     return data;
   }
 
-  public Object getViewType() {
+  public int getViewType() {
     return viewType;
   }
 }

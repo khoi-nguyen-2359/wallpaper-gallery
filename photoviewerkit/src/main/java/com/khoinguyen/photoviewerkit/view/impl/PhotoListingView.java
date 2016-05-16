@@ -16,9 +16,10 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
-import com.khoinguyen.apptemplate.listing.ItemCreator;
-import com.khoinguyen.apptemplate.listing.ItemViewHolder;
-import com.khoinguyen.apptemplate.listing.adapter.RecycledListingViewAdapter;
+import com.khoinguyen.apptemplate.listing.BaseItemCreator;
+import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
+import com.khoinguyen.apptemplate.listing.util.RecyclerListingAdapter;
+import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
@@ -31,7 +32,6 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
-import com.khoinguyen.apptemplate.listing.util.ListingRecyclerViewAdapter;
 import com.khoinguyen.photoviewerkit.view.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
@@ -42,7 +42,7 @@ import com.khoinguyen.util.log.L;
  */
 public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData> {
   protected StaggeredGridLayoutManager rcvLayoutMan;
-  protected RecycledListingViewAdapter<PhotoDisplayInfo> listingAdapter;
+  protected ListingAdapter<RecyclerListingViewHolder> listingAdapter;
   protected AdapterPhotoFinder photoFinder;
 
   protected LightEventBus eventBus;
@@ -77,10 +77,13 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     setAdapter(adapterPhotos);
   }
 
-  public void setListingAdapter(RecycledListingViewAdapter<PhotoDisplayInfo> adapter) {
+  public void setListingAdapter(ListingAdapter<RecyclerListingViewHolder> adapter) {
     this.listingAdapter = adapter;
     adapterPhotos.setListingAdapter(listingAdapter);
     adapterPhotos.notifyDataSetChanged();
+    if (photoFinder == null || photoFinder.getAdapter() != listingAdapter) {
+      photoFinder = new AdapterPhotoFinder(listingAdapter);
+    }
   }
 
   public void notifyDataSetChanged() {
@@ -105,8 +108,8 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
       return;
     }
 
-    unhighlightClickedItemView(getPhotoFinder().indexOf(lastSelectedItem.getPhotoId()));
-    highlightClickedItemView(getPhotoFinder().indexOf(currentSelectedItem.getPhotoId()));
+    unhighlightClickedItemView(photoFinder.indexOf(lastSelectedItem.getPhotoId()));
+    highlightClickedItemView(photoFinder.indexOf(currentSelectedItem.getPhotoId()));
   }
 
   @Subscribe
@@ -147,13 +150,13 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   /**
    * Created by khoinguyen on 12/22/14.
    */
-  public class RecyclerViewAdapter extends ListingRecyclerViewAdapter {
+  public class RecyclerViewAdapter extends RecyclerListingAdapter {
     @Override
-    public void onBindViewHolder(ViewHolder viewHolder, int position) {
+    public void onBindViewHolder(RecyclerListingViewHolder viewHolder, int position) {
       super.onBindViewHolder(viewHolder, position);
       log.d("DefaultPhotoListingView.childCount=%d", PhotoListingView.this.getChildCount());
 
-      final PhotoDisplayInfo photoData = listingAdapter.getData(position);
+      final PhotoDisplayInfo photoData = photoFinder.getPhoto(position);
       if (photoData != null) {
         viewHolder.itemView.setOnClickListener(new OnClickListener() {
           @Override
@@ -165,14 +168,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
         });
       }
     }
-  }
-
-  private AdapterPhotoFinder getPhotoFinder() {
-    if (photoFinder == null || photoFinder.getAdapter() != listingAdapter) {
-      photoFinder = new AdapterPhotoFinder(listingAdapter);
-    }
-
-    return photoFinder;
   }
 
   private void resetItemSelectionInfo(PhotoDisplayInfo selectedPhotoItem) {
@@ -191,7 +186,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
   private void updateSelectedItemRect() {
     ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
-    int itemIndex = getPhotoFinder().indexOf(currentSelectedItem.getPhotoId());
+    int itemIndex = photoFinder.indexOf(currentSelectedItem.getPhotoId());
     View v = rcvLayoutMan.findViewByPosition(itemIndex);
     RectF itemRect = createItemViewLocation(v);
     currentSelectedItem.updateItemRect(itemRect);
@@ -221,8 +216,12 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     eventBus.post(new OnPhotoListingItemClick(photoDisplayInfo, fullRect));
   }
 
-  public static class PhotoListingViewCreator implements ItemCreator {
+  public static class PhotoListingViewCreator extends BaseItemCreator {
     private LayoutInflater layoutInflater;
+
+    public PhotoListingViewCreator(int viewType) {
+      super(viewType);
+    }
 
     @Override
     public View createView(ViewGroup container) {
@@ -234,12 +233,12 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     }
 
     @Override
-    public ItemViewHolder createViewHolder(View view) {
+    public RecyclerListingViewHolder createViewHolder(View view) {
       return new PhotoListingItemViewHolder(view);
     }
   }
 
-  public static class PhotoListingItemViewHolder extends ItemViewHolder<PhotoDisplayInfo> {
+  public static class PhotoListingItemViewHolder extends RecyclerListingViewHolder<PhotoDisplayInfo> {
     protected final SimpleDraweeView ivPhoto;
 
     public PhotoListingItemViewHolder(View itemView) {

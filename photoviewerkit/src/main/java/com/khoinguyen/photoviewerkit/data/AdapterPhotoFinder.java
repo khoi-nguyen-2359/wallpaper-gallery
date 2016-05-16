@@ -2,17 +2,25 @@ package com.khoinguyen.photoviewerkit.data;
 
 import android.text.TextUtils;
 
-import com.khoinguyen.apptemplate.listing.adapter.ListingViewAdapter;
-import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
+import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 
 /**
  * Created by khoinguyen on 5/9/16.
  */
 public class AdapterPhotoFinder {
-  private ListingViewAdapter<PhotoDisplayInfo> adapter;
+  private ListingAdapter adapter;
 
-  public AdapterPhotoFinder(ListingViewAdapter<PhotoDisplayInfo> adapter) {
+  public AdapterPhotoFinder(ListingAdapter adapter) {
     this.adapter = adapter;
+  }
+
+  public PhotoDisplayInfo getPhoto(int itemIndex) {
+    Object data = adapter.getData(itemIndex);
+    if (data == null || !(data instanceof PhotoDisplayInfo)) {
+      return null;
+    }
+
+    return (PhotoDisplayInfo) data;
   }
 
   /**
@@ -28,12 +36,12 @@ public class AdapterPhotoFinder {
 
     final int itemCount = adapter.getCount();
     for (int i = 0; i < itemCount; ++i) {
-      PhotoDisplayInfo data = adapter.getData(i);
-      if (data == null) {
+      PhotoDisplayInfo displayInfo = getPhoto(i);
+      if (displayInfo == null) {
         continue;
       }
 
-      if (photoId.equals(data.getPhotoId())) {
+      if (photoId.equals(displayInfo.getPhotoId())) {
         return i;
       }
     }
@@ -41,7 +49,7 @@ public class AdapterPhotoFinder {
     return -1;
   }
 
-  public ListingViewAdapter<PhotoDisplayInfo> getAdapter() {
+  public ListingAdapter getAdapter() {
     return adapter;
   }
 }

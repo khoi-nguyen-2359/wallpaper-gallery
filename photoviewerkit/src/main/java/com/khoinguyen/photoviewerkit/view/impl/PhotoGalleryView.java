@@ -17,9 +17,9 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
-import com.khoinguyen.apptemplate.listing.ItemCreator;
-import com.khoinguyen.apptemplate.listing.ItemViewHolder;
-import com.khoinguyen.apptemplate.listing.adapter.BaseListingViewAdapter;
+import com.khoinguyen.apptemplate.listing.BaseItemCreator;
+import com.khoinguyen.apptemplate.listing.BaseViewHolder;
+import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
@@ -32,7 +32,7 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryPageSelect;
 import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
-import com.khoinguyen.apptemplate.listing.util.ListingPagerViewAdapter;
+import com.khoinguyen.apptemplate.listing.util.PagerListingAdapter;
 import com.khoinguyen.photoviewerkit.view.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 import com.khoinguyen.util.log.L;
@@ -50,20 +50,22 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   protected boolean isDragging;
   protected float lastScrollingY;
   protected float lastScrollingX;
-  protected BaseListingViewAdapter<PhotoDisplayInfo> photoAdapter;
+  protected ListingAdapter photoAdapter;
   protected AdapterPhotoFinder adapterPhotoFinder;
 
   protected LightEventBus eventBus;
 
-  protected ListingPagerViewAdapter adapterPhotoGallery;
+  protected PagerListingAdapter adapterPhotoGallery;
 
   private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
     @Override
     public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
       if (positionOffset == 0) {
-        PhotoDisplayInfo photoDisplayInfo = photoAdapter.getData(position);
-        updateCurrentSelectedItemInfo(photoDisplayInfo);
-        eventBus.post(new OnPhotoGalleryPageSelect(position, photoDisplayInfo));
+        PhotoDisplayInfo photoDisplayInfo = adapterPhotoFinder.getPhoto(position);
+        if (photoDisplayInfo != null) {
+          updateCurrentSelectedItemInfo(photoDisplayInfo);
+          eventBus.post(new OnPhotoGalleryPageSelect(position, photoDisplayInfo));
+        }
       }
     }
   };
@@ -93,7 +95,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     isDragging = false;
 
     addOnPageChangeListener(internalOnPageChangeListener);
-    adapterPhotoGallery = new ListingPagerViewAdapter();
+    adapterPhotoGallery = new PagerListingAdapter();
     setAdapter(adapterPhotoGallery);
 
     detector = new GestureDetectorCompat(getContext(), new GestureDetector.OnGestureListener() {
@@ -220,21 +222,16 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     }
   }
 
-  public void setListingAdapter(BaseListingViewAdapter<PhotoDisplayInfo> photoAdapter) {
+  public void setListingAdapter(ListingAdapter photoAdapter) {
     this.photoAdapter = photoAdapter;
     adapterPhotoGallery.setListingViewAdapter(photoAdapter);
+    if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
+      adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
+    }
   }
 
   public void notifyDataSetChanged() {
     adapterPhotoGallery.notifyDataSetChanged();
-  }
-
-  public AdapterPhotoFinder getPhotoFinder() {
-    if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
-      adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
-    }
-
-    return adapterPhotoFinder;
   }
 
   public void setEventBus(LightEventBus eventBus) {
@@ -251,8 +248,12 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     eventBus = widget.getEventBus();
   }
 
-  public static class PhotoGalleryItemViewCreator implements ItemCreator {
+  public static class PhotoGalleryItemViewCreator extends BaseItemCreator {
     private LayoutInflater layoutInflater;
+
+    public PhotoGalleryItemViewCreator(int viewType) {
+      super(viewType);
+    }
 
     @Override
     public View createView(ViewGroup container) {
@@ -268,12 +269,12 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     }
 
     @Override
-    public ItemViewHolder createViewHolder(View view) {
+    public BaseViewHolder createViewHolder(View view) {
       return new PhotoGalleryItemViewHolder((ZoomableDraweeView) view);
     }
   }
 
-  public static class PhotoGalleryItemViewHolder extends ItemViewHolder<PhotoDisplayInfo> {
+  public static class PhotoGalleryItemViewHolder extends BaseViewHolder<PhotoDisplayInfo> {
     private ZoomableDraweeView itemView;
 
     private PhotoGalleryItemViewHolder(ZoomableDraweeView itemView) {
@@ -304,7 +305,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   @Subscribe
   public void handlePhotoRevealAnimationEnd(OnPhotoRevealAnimationEnd event) {
     ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
-    setCurrentItem(getPhotoFinder().indexOf(currentSelectedItem.getPhotoId()), false);
+    setCurrentItem(adapterPhotoFinder.indexOf(currentSelectedItem.getPhotoId()), false);
     setTranslationX(0);
     setTranslationY(0);
     setVisibility(View.VISIBLE);

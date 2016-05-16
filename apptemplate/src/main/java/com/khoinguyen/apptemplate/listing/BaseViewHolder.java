@@ -5,10 +5,10 @@ import android.view.View;
 /**
  * Created by khoinguyen on 4/29/16.
  */
-public abstract class ItemViewHolder<DATA> {
+public abstract class BaseViewHolder<DATA> implements IViewHolder<DATA> {
   protected View itemView;
 
-  public ItemViewHolder(View itemView) {
+  public BaseViewHolder(View itemView) {
     this.itemView = itemView;
   }
 
@@ -17,11 +17,5 @@ public abstract class ItemViewHolder<DATA> {
 
   public View getItemView() {
     return this.itemView;
-  }
-
-  public void prepare() {
-  }
-
-  public void unbind() {
   }
 }
