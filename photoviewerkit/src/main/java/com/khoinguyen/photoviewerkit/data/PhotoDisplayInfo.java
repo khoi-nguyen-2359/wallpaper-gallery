@@ -11,6 +11,16 @@ public class PhotoDisplayInfo {
   private String lowResUrl;
   private float ratio;
 
+  public static PhotoDisplayInfo create(String photoId, String highResUrl, String lowResUrl, float ratio) {
+    PhotoDisplayInfo photo = new PhotoDisplayInfo();
+    photo.setHighResUrl(highResUrl);
+    photo.setLowResUrl(lowResUrl);
+    photo.setPhotoId(photoId);
+    photo.setRatio(ratio);
+
+    return photo;
+  }
+
   public String getHighResUrl() {
     return highResUrl;
   }

@@ -23,10 +23,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.listing.BaseItemCreator;
-import com.khoinguyen.apptemplate.listing.ItemPart;
+import com.khoinguyen.apptemplate.listing.ListingItemType;
+import com.khoinguyen.apptemplate.listing.BaseViewHolder;
+import com.khoinguyen.apptemplate.listing.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
-import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
@@ -44,7 +44,6 @@ import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.util.AndroidUtils;
-import com.xkcn.gallery.view.AppViewType;
 import com.xkcn.gallery.view.MainView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -90,40 +89,38 @@ public abstract class MainActivity extends BaseActivity
   private List<PhotoDetails> allPhotos;
 
   protected IEventBus photoViewerKitEventBus;
+  private PhotoListingAdapter photoListingAdapter;
+  private PhotoGalleryAdapter photoGalleryAdapter;
 
-  private PartitionedListingAdapter<RecyclerListingViewHolder> photoListingAdapter = new PartitionedListingAdapter<RecyclerListingViewHolder>() {
+  private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
+    public static final int TYPE_PHOTO = 2;
+    public static final int TYPE_CAPTION = 1;
+
     @Override
-    protected List<ItemPart> createDataSet() {
-      List<ItemPart> parts = new ArrayList<>();
-      parts.add(new ItemPart("Caption", AppViewType.MainView_PhotoListing_CaptionItem.ordinal()));
+    protected List<ListingItem> createDataSet() {
+      List<ListingItem> listingItems = new ArrayList<>();
+      listingItems.add(new ListingItem("Caption", getListingItemType(TYPE_CAPTION)));
       for (PhotoDetails photoDetails : allPhotos) {
-        PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
-        photoDisplayInfo.setPhotoId(photoDetails.getIdentifier()+"");
-        photoDisplayInfo.setLowResUrl(photoDetails.getLowResUrl());
-        photoDisplayInfo.setHighResUrl(photoDetails.getHighResUrl());
-
-        ItemPart photoPart = new ItemPart(photoDisplayInfo, AppViewType.MainView_PhotoListing_PhotoItem.ordinal());
-        parts.add(photoPart);
+        PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
+        listingItems.add(new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO)));
       }
 
-      return parts;
+      return listingItems;
     }
   };
 
-  private PartitionedListingAdapter photoGalleryAdapter = new PartitionedListingAdapter() {
-    @Override
-    protected List<ItemPart> createDataSet() {
-      List<ItemPart> parts = new ArrayList<>();
-      for (PhotoDetails photoDetails : allPhotos) {
-        PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
-        photoDisplayInfo.setPhotoId(String.valueOf(photoDetails.getIdentifier()));
-        photoDisplayInfo.setHighResUrl(photoDetails.getHighResUrl());
-        photoDisplayInfo.setLowResUrl(photoDetails.getLowResUrl());
+  private class PhotoGalleryAdapter extends PartitionedListingAdapter<BaseViewHolder> {
+    public static final int TYPE_PHOTO = 1;
 
-        ItemPart photoPart = new ItemPart(photoDisplayInfo, AppViewType.MainView_PhotoGallery_PhotoItem.ordinal());
-        parts.add(photoPart);
+    @Override
+    protected List<ListingItem> createDataSet() {
+      List<ListingItem> listingItems = new ArrayList<>();
+      for (PhotoDetails photoDetails : allPhotos) {
+        PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
+        ListingItem photoListingItem = new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO));
+        listingItems.add(photoListingItem);
       }
-      return parts;
+      return listingItems;
     }
   };
 
@@ -177,16 +174,15 @@ public abstract class MainActivity extends BaseActivity
     SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
     kitkatSystemBarConfig = kitkatTintManager.getConfig();
 
-    PhotoListingView.PhotoListingViewCreator listingPhotoItemCreator = new PhotoListingView.PhotoListingViewCreator(AppViewType.MainView_PhotoListing_PhotoItem.ordinal());
-    BaseItemCreator listingCaptionItemCreator = new ListingCaptionItemCreator(AppViewType.MainView_PhotoListing_CaptionItem.ordinal());
-    photoListingAdapter.registerViewCreator(listingPhotoItemCreator);
-    photoListingAdapter.registerViewCreator(listingCaptionItemCreator);
+    photoListingAdapter = new PhotoListingAdapter();
+    photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoListingViewCreator(PhotoListingAdapter.TYPE_PHOTO));
+    photoListingAdapter.registerListingItemType(new ListingCaptionItemCreator(PhotoListingAdapter.TYPE_CAPTION));
 
-    BaseItemCreator photoGalleryItemCreator = new PhotoGalleryView.PhotoGalleryItemViewCreator(AppViewType.MainView_PhotoGallery_PhotoItem.ordinal());
-    photoGalleryAdapter.registerViewCreator(photoGalleryItemCreator);
+    photoGalleryAdapter = new PhotoGalleryAdapter();
+    photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoGalleryItemViewCreator(PhotoGalleryAdapter.TYPE_PHOTO));
   }
 
-  public static class ListingCaptionItemCreator extends BaseItemCreator<RecyclerListingViewHolder> {
+  public static class ListingCaptionItemCreator extends ListingItemType<RecyclerListingViewHolder> {
     public ListingCaptionItemCreator(int viewType) {
       super(viewType);
     }

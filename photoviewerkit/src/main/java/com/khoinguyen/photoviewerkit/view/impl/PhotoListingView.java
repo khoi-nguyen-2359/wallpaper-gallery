@@ -17,22 +17,22 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.listing.BaseItemCreator;
+import com.khoinguyen.apptemplate.eventbus.LightEventBus;
+import com.khoinguyen.apptemplate.eventbus.Subscribe;
+import com.khoinguyen.apptemplate.listing.ListingItemType;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.R;
-import com.khoinguyen.apptemplate.eventbus.LightEventBus;
-import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.data.AdapterPhotoFinder;
-import com.khoinguyen.photoviewerkit.data.SharedData;
 import com.khoinguyen.photoviewerkit.data.ListingItemInfo;
+import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
+import com.khoinguyen.photoviewerkit.data.SharedData;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryPageSelect;
 import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationWillStart;
-import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.view.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
@@ -217,7 +217,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     eventBus.post(new OnPhotoListingItemClick(photoDisplayInfo, fullRect));
   }
 
-  public static class PhotoListingViewCreator extends BaseItemCreator {
+  public static class PhotoListingViewCreator extends ListingItemType<RecyclerListingViewHolder> {
     private LayoutInflater layoutInflater;
 
     public PhotoListingViewCreator(int viewType) {

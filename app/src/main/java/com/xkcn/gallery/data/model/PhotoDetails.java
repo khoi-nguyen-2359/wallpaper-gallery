@@ -66,6 +66,10 @@ public class PhotoDetails implements Parcelable {
     return identifier;
   }
 
+  public String getIdentifierAsString() {
+    return String.valueOf(identifier);
+  }
+
   public void setIdentifier(long identifier) {
     this.identifier = identifier;
   }

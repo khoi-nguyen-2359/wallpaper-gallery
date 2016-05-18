@@ -5,8 +5,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.khoinguyen.apptemplate.listing.IViewHolder;
-import com.khoinguyen.apptemplate.listing.BaseItemCreator;
-import com.khoinguyen.apptemplate.listing.ItemPart;
+import com.khoinguyen.apptemplate.listing.ListingItemType;
+import com.khoinguyen.apptemplate.listing.ListingItem;
 import com.khoinguyen.util.log.L;
 
 import java.util.ArrayList;
@@ -18,19 +18,20 @@ import java.util.List;
  * This adapter provides item views/viewholders based on item view type.
  */
 public abstract class PartitionedListingAdapter<VH extends IViewHolder> implements ListingAdapter<VH> {
-  protected SparseArrayCompat<BaseItemCreator<VH>> mapViewCreatorByViewType = new SparseArrayCompat<>();
+  protected SparseArrayCompat<ListingItemType<VH>> itemTypeRegistry = new SparseArrayCompat<>();
   protected DataObservable dataObservable = new DataObservable();
 
   private L log = L.get("PartitionedListingAdapter");
 
-  protected final List<ItemPart> dataSet = new ArrayList<>();
+  protected final List<ListingItem> dataSet = new ArrayList<>();
 
-  protected abstract List<ItemPart> createDataSet();
+  protected abstract List<ListingItem> createDataSet();
 
   @Override
   public void updateDataSet() {
+    List<ListingItem> newDataSet = createDataSet();
     dataSet.clear();
-    dataSet.addAll(createDataSet());
+    dataSet.addAll(newDataSet);
   }
 
   @Override
@@ -49,8 +50,12 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> implemen
     dataObservable.unregisterObserver(observer);
   }
 
-  public void registerViewCreator(BaseItemCreator<VH> viewCreator) {
-    mapViewCreatorByViewType.put(viewCreator.getViewType(), viewCreator);
+  public void registerListingItemType(ListingItemType<VH> listingItemType) {
+    itemTypeRegistry.put(listingItemType.getViewType(), listingItemType);
+  }
+
+  public ListingItemType<VH> getListingItemType(int viewType) {
+    return itemTypeRegistry.get(viewType);
   }
 
   @Override
@@ -60,8 +65,8 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> implemen
 
   @Override
   public int getViewType(int itemIndex) {
-    ItemPart part = dataSet.get(itemIndex);
-    return part.getViewType();
+    ListingItem listingItem = dataSet.get(itemIndex);
+    return listingItem.getListingItemType().getViewType();
   }
 
   @Override
@@ -71,13 +76,13 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> implemen
 
   @Override
   public View getView(ViewGroup containerView, int viewType) {
-    BaseItemCreator viewCreator = mapViewCreatorByViewType.get(viewType);
+    ListingItemType viewCreator = itemTypeRegistry.get(viewType);
     return viewCreator.createView(containerView);
   }
 
   @Override
   public VH getViewHolder(View itemView, int viewType) {
-    BaseItemCreator<VH> viewCreator = mapViewCreatorByViewType.get(viewType);
+    ListingItemType<VH> viewCreator = itemTypeRegistry.get(viewType);
     return viewCreator.createViewHolder(itemView);
   }
 }

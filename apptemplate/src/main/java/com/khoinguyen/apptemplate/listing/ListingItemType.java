@@ -6,10 +6,10 @@ import android.view.ViewGroup;
 /**
  * Created by khoinguyen on 5/7/16.
  */
-public abstract class BaseItemCreator<VH extends IViewHolder> {
+public abstract class ListingItemType<VH extends IViewHolder> {
   protected int viewType;
 
-  public BaseItemCreator(int viewType) {
+  public ListingItemType(int viewType) {
     this.viewType = viewType;
   }
 
