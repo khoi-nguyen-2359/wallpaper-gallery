@@ -7,11 +7,6 @@ import com.khoinguyen.apptemplate.eventbus.LightEventBus;
  */
 public interface IPhotoViewerKitWidget<D> {
   /**
-   * Notify there's changes in photo listing dataset to do any UI updates.
-   */
-  void notifyDataSetChanged();
-
-  /**
    * Open gallery view at a specific photo item.
    * @param photoId id of the photo to be opened
    */

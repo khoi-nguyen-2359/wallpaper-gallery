@@ -9,7 +9,13 @@ import com.khoinguyen.apptemplate.listing.IViewHolder;
  * Created by khoinguyen on 4/29/16.
  */
 public interface ListingAdapter<VH extends IViewHolder> {
+  void updateDataSet();
+
   void notifyDataSetChanged();
+
+  void registerDataObserver(DataObserver observer);
+
+  void unregisterDataObserver(DataObserver observer);
 
   int getCount();
 

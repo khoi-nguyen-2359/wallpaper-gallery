@@ -124,12 +124,6 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     return currentTransitState;
   }
 
-  @Override
-  public void notifyDataSetChanged() {
-    photoListingView.notifyDataSetChanged();
-    photoGalleryView.notifyDataSetChanged();
-  }
-
   public void registerEvents() {
     eventBus.register(photoGalleryView);
     eventBus.register(photoListingView);

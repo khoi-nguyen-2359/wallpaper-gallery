@@ -1,6 +1,5 @@
 package com.khoinguyen.apptemplate.listing.adapter;
 
-import android.database.Observable;
 import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,22 +25,26 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> implemen
 
   protected final List<ItemPart> dataSet = new ArrayList<>();
 
-  protected abstract List<ItemPart> updateDataSet();
+  protected abstract List<ItemPart> createDataSet();
 
-  public void doUpdateDataSet() {
+  @Override
+  public void updateDataSet() {
     dataSet.clear();
-    dataSet.addAll(updateDataSet());
+    dataSet.addAll(createDataSet());
   }
 
+  @Override
   public final void notifyDataSetChanged() {
-    doUpdateDataSet();
+    updateDataSet();
     dataObservable.notifyChanged();
   }
 
+  @Override
   public void registerDataObserver(DataObserver observer) {
     dataObservable.registerObserver(observer);
   }
 
+  @Override
   public void unregisterDataObserver(DataObserver observer) {
     dataObservable.unregisterObserver(observer);
   }
@@ -76,22 +79,5 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> implemen
   public VH getViewHolder(View itemView, int viewType) {
     BaseItemCreator<VH> viewCreator = mapViewCreatorByViewType.get(viewType);
     return viewCreator.createViewHolder(itemView);
-  }
-
-  public abstract static class DataObserver {
-    public void onChanged() {
-    }
-  }
-
-  public class DataObservable extends Observable<DataObserver> {
-    public boolean hasObservers() {
-      return !mObservers.isEmpty();
-    }
-
-    public void notifyChanged() {
-      for (int i = mObservers.size() - 1; i >= 0; i--) {
-        mObservers.get(i).onChanged();
-      }
-    }
   }
 }

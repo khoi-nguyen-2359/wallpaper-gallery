@@ -26,7 +26,6 @@ import com.khoinguyen.apptemplate.listing.BaseItemCreator;
 import com.khoinguyen.apptemplate.listing.ItemPart;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
-import com.khoinguyen.apptemplate.listing.util.EmptyRecyclerListingViewHolder;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
@@ -93,7 +92,7 @@ public abstract class MainActivity extends BaseActivity
 
   private PartitionedListingAdapter<RecyclerListingViewHolder> photoListingAdapter = new PartitionedListingAdapter<RecyclerListingViewHolder>() {
     @Override
-    protected List<ItemPart> updateDataSet() {
+    protected List<ItemPart> createDataSet() {
       List<ItemPart> parts = new ArrayList<>();
       parts.add(new ItemPart("Caption", AppViewType.MainView_PhotoListing_CaptionItem.ordinal()));
       for (PhotoDetails photoDetails : allPhotos) {
@@ -112,7 +111,7 @@ public abstract class MainActivity extends BaseActivity
 
   private PartitionedListingAdapter photoGalleryAdapter = new PartitionedListingAdapter() {
     @Override
-    protected List<ItemPart> updateDataSet() {
+    protected List<ItemPart> createDataSet() {
       List<ItemPart> parts = new ArrayList<>();
       for (PhotoDetails photoDetails : allPhotos) {
         PhotoDisplayInfo photoDisplayInfo = new PhotoDisplayInfo();
@@ -282,9 +281,8 @@ public abstract class MainActivity extends BaseActivity
     }
 
     allPhotos.addAll(photos);
-    photoListingAdapter.doUpdateDataSet();
-    photoGalleryAdapter.doUpdateDataSet();
-    photoKitWidget.notifyDataSetChanged();
+    photoListingAdapter.notifyDataSetChanged();
+    photoGalleryAdapter.notifyDataSetChanged();
   }
 
   /***

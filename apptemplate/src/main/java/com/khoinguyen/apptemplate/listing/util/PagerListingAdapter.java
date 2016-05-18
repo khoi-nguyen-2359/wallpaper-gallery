@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.khoinguyen.apptemplate.listing.IViewHolder;
+import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 
 /**
@@ -12,14 +13,21 @@ import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
  */
 public class PagerListingAdapter extends PagerAdapter {
   private ListingAdapter listingViewAdapter;
+  private DataObserver dataObserver = new DataObserver() {
+    @Override
+    public void onChanged() {
+      super.onChanged();
+      notifyDataSetChanged();
+    }
+  };
 
   @Override
   public void notifyDataSetChanged() {
-    super.notifyDataSetChanged();
-
     if (listingViewAdapter != null) {
-      listingViewAdapter.notifyDataSetChanged();
+      listingViewAdapter.updateDataSet();
     }
+
+    super.notifyDataSetChanged();
   }
 
   @Override
@@ -54,6 +62,14 @@ public class PagerListingAdapter extends PagerAdapter {
   }
 
   public void setListingViewAdapter(ListingAdapter listingViewAdapter) {
+    if (this.listingViewAdapter != null) {
+      this.listingViewAdapter.unregisterDataObserver(dataObserver);
+    }
+
+    if (listingViewAdapter != null) {
+      listingViewAdapter.registerDataObserver(dataObserver);
+    }
+
     this.listingViewAdapter = listingViewAdapter;
   }
 }

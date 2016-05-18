@@ -8,8 +8,13 @@ import com.khoinguyen.apptemplate.listing.IViewHolder;
 /**
  * Created by khoinguyen on 5/17/16.
  */
-public abstract class RecyclerListingViewHolder<DATA> extends RecyclerView.ViewHolder implements IViewHolder<DATA> {
+public class RecyclerListingViewHolder<DATA> extends RecyclerView.ViewHolder implements IViewHolder<DATA> {
   public RecyclerListingViewHolder(View itemView) {
     super(itemView);
+  }
+
+  @Override
+  public void bind(DATA data) {
+    // do nothing to use this as a dummy view holder
   }
 }
