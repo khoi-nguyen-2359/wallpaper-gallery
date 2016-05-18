@@ -1,6 +1,6 @@
 package com.khoinguyen.photoviewerkit.view;
 
-import com.khoinguyen.apptemplate.eventbus.LightEventBus;
+import com.khoinguyen.apptemplate.eventbus.IEventBus;
 
 /**
  * Created by khoinguyen on 5/13/16.
@@ -23,7 +23,7 @@ public interface IPhotoViewerKitWidget<D> {
    * Only one event bus is used for the whole widget and its components.
    * @return
    */
-  LightEventBus getEventBus();
+  IEventBus getEventBus();
 
   D getSharedData();
 }

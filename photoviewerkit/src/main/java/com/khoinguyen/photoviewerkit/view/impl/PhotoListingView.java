@@ -16,6 +16,7 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
+import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.BaseItemCreator;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingAdapter;
@@ -45,7 +46,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   protected ListingAdapter<RecyclerListingViewHolder> listingAdapter;
   protected AdapterPhotoFinder photoFinder;
 
-  protected LightEventBus eventBus;
+  protected IEventBus eventBus;
   protected SharedData sharedData;
   protected RecyclerViewAdapter adapterPhotos;
 

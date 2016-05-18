@@ -8,6 +8,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
 
+import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
@@ -140,7 +141,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     eventBus.unregister(this);
   }
 
-  public LightEventBus getEventBus() {
+  public IEventBus getEventBus() {
     return eventBus == null ? eventBus = new LightEventBus() : eventBus;
   }
 

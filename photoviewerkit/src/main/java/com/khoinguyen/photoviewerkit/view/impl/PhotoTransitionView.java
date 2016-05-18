@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.khoinguyen.apptemplate.anim.CompoundViewAnimation;
+import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.photoviewerkit.customview.ClippingRevealDraweeView;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
@@ -35,7 +36,7 @@ public class PhotoTransitionView extends ClippingRevealDraweeView implements IPh
   protected CompoundViewAnimation revealAnim;
   protected CompoundViewAnimation shrinkAnim;
 
-  protected LightEventBus eventBus;
+  protected IEventBus eventBus;
   protected SharedData sharedData;
 
   public PhotoTransitionView(Context context, GenericDraweeHierarchy hierarchy) {

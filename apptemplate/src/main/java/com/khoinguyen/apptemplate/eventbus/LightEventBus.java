@@ -14,11 +14,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * <p/>
  * Light version of EventBus, doesnt have advanced features: Threading, Sticky, Event's super class
  */
-public class LightEventBus {
+public class LightEventBus implements IEventBus {
   private static Map<Class<?>, List<SubscriberMethod>> methodCache = new HashMap<>();
   private final Map<Class<?>, CopyOnWriteArrayList<Subscription>> mapSubscriptionByEventType = new HashMap<>();
   private final Map<Object, List<Class<?>>> typesBySubscriber = new HashMap<>();
 
+  @Override
   public void register(Object subscriber) {
     if (subscriber == null) {
       return;
@@ -44,6 +45,7 @@ public class LightEventBus {
     }
   }
 
+  @Override
   public void unregister(Object subscriber) {
     List<Class<?>> subscribedTypes = typesBySubscriber.get(subscriber);
     if (subscribedTypes != null) {
@@ -101,6 +103,7 @@ public class LightEventBus {
     return subscriberMethods;
   }
 
+  @Override
   public void post(Object event) {
     Class<?> eventType = event.getClass();
     CopyOnWriteArrayList<Subscription> subscriptionsByType = mapSubscriptionByEventType.get(eventType);

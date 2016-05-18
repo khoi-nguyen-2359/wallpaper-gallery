@@ -17,6 +17,7 @@ import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
+import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.BaseItemCreator;
 import com.khoinguyen.apptemplate.listing.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
@@ -53,7 +54,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   protected ListingAdapter photoAdapter;
   protected AdapterPhotoFinder adapterPhotoFinder;
 
-  protected LightEventBus eventBus;
+  protected IEventBus eventBus;
 
   protected PagerListingAdapter adapterPhotoGallery;
 

@@ -22,6 +22,7 @@ import android.widget.FrameLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.BaseItemCreator;
 import com.khoinguyen.apptemplate.listing.ItemPart;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
@@ -88,7 +89,7 @@ public abstract class MainActivity extends BaseActivity
 
   private List<PhotoDetails> allPhotos;
 
-  protected LightEventBus photoViewerKitEventBus;
+  protected IEventBus photoViewerKitEventBus;
 
   private PartitionedListingAdapter<RecyclerListingViewHolder> photoListingAdapter = new PartitionedListingAdapter<RecyclerListingViewHolder>() {
     @Override
