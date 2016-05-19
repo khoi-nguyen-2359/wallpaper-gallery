@@ -4,9 +4,9 @@ import android.support.v4.util.SparseArrayCompat;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.khoinguyen.apptemplate.listing.IViewHolder;
-import com.khoinguyen.apptemplate.listing.ListingItemType;
-import com.khoinguyen.apptemplate.listing.ListingItem;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
+import com.khoinguyen.apptemplate.listing.item.ListingItemType;
+import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.util.log.L;
 
 import java.util.ArrayList;

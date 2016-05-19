@@ -3,7 +3,7 @@ package com.khoinguyen.apptemplate.listing.util;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 
-import com.khoinguyen.apptemplate.listing.IViewHolder;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 
 /**
  * Created by khoinguyen on 5/17/16.

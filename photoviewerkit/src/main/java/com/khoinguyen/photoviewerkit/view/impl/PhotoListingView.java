@@ -19,7 +19,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
-import com.khoinguyen.apptemplate.listing.ListingItemType;
+import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
@@ -217,10 +217,10 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     eventBus.post(new OnPhotoListingItemClick(photoDisplayInfo, fullRect));
   }
 
-  public static class PhotoListingViewCreator extends ListingItemType<RecyclerListingViewHolder> {
+  public static class PhotoItemType extends ListingItemType<RecyclerListingViewHolder> {
     private LayoutInflater layoutInflater;
 
-    public PhotoListingViewCreator(int viewType) {
+    public PhotoItemType(int viewType) {
       super(viewType);
     }
 

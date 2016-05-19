@@ -23,9 +23,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.listing.ListingItemType;
-import com.khoinguyen.apptemplate.listing.BaseViewHolder;
-import com.khoinguyen.apptemplate.listing.ListingItem;
+import com.khoinguyen.apptemplate.listing.item.ListingItemType;
+import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
+import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
@@ -175,15 +175,15 @@ public abstract class MainActivity extends BaseActivity
     kitkatSystemBarConfig = kitkatTintManager.getConfig();
 
     photoListingAdapter = new PhotoListingAdapter();
-    photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoListingViewCreator(PhotoListingAdapter.TYPE_PHOTO));
-    photoListingAdapter.registerListingItemType(new ListingCaptionItemCreator(PhotoListingAdapter.TYPE_CAPTION));
+    photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
+    photoListingAdapter.registerListingItemType(new CaptionItemType(PhotoListingAdapter.TYPE_CAPTION));
 
     photoGalleryAdapter = new PhotoGalleryAdapter();
-    photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoGalleryItemViewCreator(PhotoGalleryAdapter.TYPE_PHOTO));
+    photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
   }
 
-  public static class ListingCaptionItemCreator extends ListingItemType<RecyclerListingViewHolder> {
-    public ListingCaptionItemCreator(int viewType) {
+  public static class CaptionItemType extends ListingItemType<RecyclerListingViewHolder> {
+    public CaptionItemType(int viewType) {
       super(viewType);
     }
 
@@ -236,7 +236,7 @@ public abstract class MainActivity extends BaseActivity
       @Override
       public WindowInsetsCompat onApplyWindowInsets(View v, final WindowInsetsCompat insets) {
         toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
-        ((View) photoListingView).setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
+        photoListingView.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
 
         return insets;
       }
@@ -244,7 +244,7 @@ public abstract class MainActivity extends BaseActivity
 
     if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
       toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
-      ((View) photoListingView).setPadding(0, 0, 0, kitkatSystemBarConfig.getPixelInsetBottom());
+      photoListingView.setPadding(0, 0, 0, kitkatSystemBarConfig.getPixelInsetBottom());
     }
   }
 

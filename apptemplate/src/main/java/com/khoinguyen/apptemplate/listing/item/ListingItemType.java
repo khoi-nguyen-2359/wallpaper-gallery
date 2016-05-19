@@ -1,4 +1,4 @@
-package com.khoinguyen.apptemplate.listing;
+package com.khoinguyen.apptemplate.listing.item;
 
 import android.view.View;
 import android.view.ViewGroup;

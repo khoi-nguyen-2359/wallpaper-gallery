@@ -2,7 +2,7 @@ package com.khoinguyen.apptemplate.listing.adapter;
 
 import android.view.View;
 
-import com.khoinguyen.apptemplate.listing.IViewHolder;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.util.log.L;
 
 import java.util.HashMap;

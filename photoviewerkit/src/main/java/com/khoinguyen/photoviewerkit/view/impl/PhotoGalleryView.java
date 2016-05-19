@@ -18,8 +18,8 @@ import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.listing.ListingItemType;
-import com.khoinguyen.apptemplate.listing.BaseViewHolder;
+import com.khoinguyen.apptemplate.listing.item.ListingItemType;
+import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
@@ -249,10 +249,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     eventBus = widget.getEventBus();
   }
 
-  public static class PhotoGalleryItemViewCreator extends ListingItemType<BaseViewHolder> {
+  public static class PhotoItemType extends ListingItemType<BaseViewHolder> {
     private LayoutInflater layoutInflater;
 
-    public PhotoGalleryItemViewCreator(int viewType) {
+    public PhotoItemType(int viewType) {
       super(viewType);
     }
 

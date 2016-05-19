@@ -4,7 +4,7 @@ import android.support.v4.view.PagerAdapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.khoinguyen.apptemplate.listing.IViewHolder;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
 

@@ -3,7 +3,7 @@ package com.khoinguyen.apptemplate.listing.adapter;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.khoinguyen.apptemplate.listing.IViewHolder;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 
 /**
  * Created by khoinguyen on 4/29/16.

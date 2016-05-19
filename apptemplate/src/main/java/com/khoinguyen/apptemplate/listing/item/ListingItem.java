@@ -1,4 +1,4 @@
-package com.khoinguyen.apptemplate.listing;
+package com.khoinguyen.apptemplate.listing.item;
 
 /**
  * Created by khoinguyen on 5/7/16.
