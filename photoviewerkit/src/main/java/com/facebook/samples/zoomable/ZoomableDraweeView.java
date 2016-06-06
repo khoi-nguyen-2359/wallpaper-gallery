@@ -111,7 +111,7 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy> {
   }
 
   private void init() {
-    mZoomableController = AnimatedZoomableController.newInstance();
+    mZoomableController = createZoomableController();
     mZoomableController.setListener(mZoomableListener);
     mTapGestureDetector = new GestureDetector(getContext(), mTapListenerWrapper);
   }
@@ -249,34 +249,52 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy> {
   @Override
   public boolean onTouchEvent(MotionEvent event) {
     int a = event.getActionMasked();
-    FLog.v(TAG, "onTouchEvent: %d, view %x, received", a, this.hashCode());
+    FLog.v(getLogTag(), "onTouchEvent: %d, view %x, received", a, this.hashCode());
     if (mTapGestureDetector.onTouchEvent(event)) {
-      FLog.v(TAG, "onTouchEvent: %d, view %x, handled by tap gesture detector", a, this.hashCode());
+      FLog.v(
+          getLogTag(),
+          "onTouchEvent: %d, view %x, handled by tap gesture detector",
+          a,
+          this.hashCode());
       return true;
     }
     if (mZoomableController.onTouchEvent(event)) {
-      if (!mZoomableController.isIdentity()) {
+      if (!mZoomableController.wasTransformCorrected()) {
         getParent().requestDisallowInterceptTouchEvent(true);
       }
-      FLog.v(TAG, "onTouchEvent: %d, view %x, handled by zoomable controller", a, this.hashCode());
+      FLog.v(
+          getLogTag(),
+          "onTouchEvent: %d, view %x, handled by zoomable controller",
+          a,
+          this.hashCode());
       return true;
     }
     if (super.onTouchEvent(event)) {
-      FLog.v(TAG, "onTouchEvent: %d, view %x, handled by the super", a, this.hashCode());
+      FLog.v(getLogTag(), "onTouchEvent: %d, view %x, handled by the super", a, this.hashCode());
       return true;
     }
+    // None of our components reported that they handled the touch event. Upon returning false
+    // from this method, our parent won't send us any more events for this gesture. Unfortunately,
+    // some componentes may have started a delayed action, such as a long-press timer, and since we
+    // won't receive an ACTION_UP that would cancel that timer, a false event may be triggered.
+    // To prevent that we explicitly send one last cancel event when returning false.
+    MotionEvent cancelEvent = MotionEvent.obtain(event);
+    cancelEvent.setAction(MotionEvent.ACTION_CANCEL);
+    mTapGestureDetector.onTouchEvent(cancelEvent);
+    mZoomableController.onTouchEvent(cancelEvent);
+    cancelEvent.recycle();
     return false;
   }
 
   @Override
   protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-    FLog.v(TAG, "onLayout: view %x", this.hashCode());
+    FLog.v(getLogTag(), "onLayout: view %x", this.hashCode());
     super.onLayout(changed, left, top, right, bottom);
     updateZoomableControllerBounds();
   }
 
   private void onFinalImageSet() {
-    FLog.v(TAG, "onFinalImageSet: view %x", this.hashCode());
+    FLog.v(getLogTag(), "onFinalImageSet: view %x", this.hashCode());
     if (!mZoomableController.isEnabled()) {
       updateZoomableControllerBounds();
       mZoomableController.setEnabled(true);
@@ -284,12 +302,12 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy> {
   }
 
   private void onRelease() {
-    FLog.v(TAG, "onRelease: view %x", this.hashCode());
+    FLog.v(getLogTag(), "onRelease: view %x", this.hashCode());
     mZoomableController.setEnabled(false);
   }
 
   protected void onTransformChanged(Matrix transform) {
-    FLog.v(TAG, "onTransformChanged: view %x, transform: %s", this.hashCode(), transform);
+    FLog.v(getLogTag(), "onTransformChanged: view %x, transform: %s", this.hashCode(), transform);
     maybeSetHugeImageController();
     invalidate();
   }
@@ -300,10 +318,18 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy> {
     mZoomableController.setImageBounds(mImageBounds);
     mZoomableController.setViewBounds(mViewBounds);
     FLog.v(
-        TAG,
+        getLogTag(),
         "updateZoomableControllerBounds: view %x, view bounds: %s, image bounds: %s",
         this.hashCode(),
         mViewBounds,
         mImageBounds);
+  }
+
+  protected Class<?> getLogTag() {
+    return TAG;
+  }
+
+  protected ZoomableController createZoomableController() {
+    return AnimatedZoomableController.newInstance();
   }
 }
