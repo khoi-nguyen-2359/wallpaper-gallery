@@ -2,12 +2,9 @@ package com.khoinguyen.photoviewerkit.view.impl;
 
 import android.content.Context;
 import android.graphics.Matrix;
-import android.graphics.PointF;
 import android.graphics.RectF;
-import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
-import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -18,7 +15,7 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
-import com.facebook.samples.zoomable.AbstractAnimatedZoomableController;
+import com.facebook.samples.zoomable.AnimatedZoomableController;
 import com.facebook.samples.zoomable.DefaultZoomableController;
 import com.facebook.samples.zoomable.ZoomableController;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
@@ -39,6 +36,7 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
 import com.khoinguyen.apptemplate.listing.util.PagerListingAdapter;
+import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.view.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.view.IPhotoViewerKitWidget;
 import com.khoinguyen.util.log.L;
@@ -61,7 +59,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   protected IEventBus eventBus;
 
-  protected PagerListingAdapter adapterPhotoGallery;
+  protected PhotoGalleryPagerAdapter adapterPhotoGallery;
 
   private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
     @Override
@@ -100,7 +98,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     isDragging = false;
 
     addOnPageChangeListener(internalOnPageChangeListener);
-    adapterPhotoGallery = new PagerListingAdapter();
+    adapterPhotoGallery = new PhotoGalleryPagerAdapter();
     setAdapter(adapterPhotoGallery);
   }
 
@@ -284,7 +282,40 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     setVisibility(View.VISIBLE);
   }
 
+  @Subscribe
+  public void handlePhotoShrinkAnimWillStart(OnPhotoShrinkAnimationWillStart event) {
+    zoomPrimaryItemToOriginal();
+  }
+
+  private void zoomPrimaryItemToOriginal() {
+    ZoomableDraweeView primaryItemView = (ZoomableDraweeView) findViewWithTag(adapterPhotoGallery.primaryItemAdapterPosition);
+    if (primaryItemView == null) {
+      return;
+    }
+
+    ZoomableController zoomableController = primaryItemView.getZoomableController();
+    if (zoomableController instanceof DefaultZoomableController) {
+      DefaultZoomableController animatedZoomableController = (DefaultZoomableController) zoomableController;
+      animatedZoomableController.setTransform(new Matrix());
+    }
+  }
+
   /**
    * END - EVENT HANDLERS
    */
+
+  static class PhotoGalleryPagerAdapter extends PagerListingAdapter {
+    int primaryItemAdapterPosition;
+
+    @Override
+    public void setPrimaryItem(ViewGroup container, int position, Object object) {
+      super.setPrimaryItem(container, position, object);
+
+      if (object instanceof View) {
+        View itemView = (View) object;
+        itemView.setTag(position);
+        primaryItemAdapterPosition = position;
+      }
+    }
+  }
 }
