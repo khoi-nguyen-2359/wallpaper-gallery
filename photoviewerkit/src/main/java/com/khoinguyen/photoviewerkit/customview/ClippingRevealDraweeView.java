@@ -20,7 +20,7 @@ import com.khoinguyen.photoviewerkit.anim.ZoomToAnimation;
  * Created by khoinguyen on 4/11/16.
  */
 public class ClippingRevealDraweeView extends SimpleDraweeView {
-  private static final long DUR_ANIMATION = 300;
+  private static final long DUR_ANIMATION = 200;
   private ScalingUtils.InterpolatingScaleType actualScaleType;
 
   public ClippingRevealDraweeView(Context context, GenericDraweeHierarchy hierarchy) {
