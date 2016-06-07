@@ -1,6 +1,8 @@
 package com.khoinguyen.photoviewerkit.view.impl;
 
 import android.content.Context;
+import android.graphics.Matrix;
+import android.graphics.PointF;
 import android.graphics.RectF;
 import android.support.v4.view.GestureDetectorCompat;
 import android.support.v4.view.ViewPager;
@@ -16,6 +18,9 @@ import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.drawee.drawable.ScalingUtils;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.imagepipeline.request.ImageRequest;
+import com.facebook.samples.zoomable.AbstractAnimatedZoomableController;
+import com.facebook.samples.zoomable.DefaultZoomableController;
+import com.facebook.samples.zoomable.ZoomableController;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
@@ -70,7 +75,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
       }
     }
   };
-  private GestureDetectorCompat detector;
   protected SharedData sharedData;
 
 
@@ -98,37 +102,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     addOnPageChangeListener(internalOnPageChangeListener);
     adapterPhotoGallery = new PagerListingAdapter();
     setAdapter(adapterPhotoGallery);
-
-    detector = new GestureDetectorCompat(getContext(), new GestureDetector.OnGestureListener() {
-      @Override
-      public boolean onDown(MotionEvent e) {
-        return false;
-      }
-
-      @Override
-      public void onShowPress(MotionEvent e) {
-      }
-
-      @Override
-      public boolean onSingleTapUp(MotionEvent e) {
-        return false;
-      }
-
-      @Override
-      public boolean onScroll(MotionEvent e1, MotionEvent e2, float distanceX, float distanceY) {
-        return false;
-      }
-
-      @Override
-      public void onLongPress(MotionEvent e) {
-      }
-
-      @Override
-      public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
-        log.d("onFling");
-        return false;
-      }
-    });
   }
 
   @Override
@@ -172,8 +145,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
-    detector.onTouchEvent(ev);
-
     int action = ev.getActionMasked();
     switch (action) {
       case MotionEvent.ACTION_MOVE: {
@@ -276,11 +247,12 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   }
 
   public static class PhotoGalleryItemViewHolder extends BaseViewHolder<PhotoDisplayInfo> {
-    protected ZoomableDraweeView itemView;
+    protected ZoomableDraweeView draweeView;
 
     private PhotoGalleryItemViewHolder(ZoomableDraweeView itemView) {
       super(itemView);
-      this.itemView = itemView;
+      this.draweeView = itemView;
+      draweeView.setIsLongpressEnabled(false);
     }
 
     @Override
@@ -288,10 +260,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
       DraweeController controller = Fresco.newDraweeControllerBuilder()
           .setLowResImageRequest(ImageRequest.fromUri(data.getLowResUri()))
           .setImageRequest(ImageRequest.fromUri(data.getHighResUri()))
-          .setOldController(itemView.getController())
+          .setOldController(draweeView.getController())
           .setCallerContext(this)
           .build();
-      itemView.setController(controller);
+      draweeView.setController(controller);
     }
   }
 

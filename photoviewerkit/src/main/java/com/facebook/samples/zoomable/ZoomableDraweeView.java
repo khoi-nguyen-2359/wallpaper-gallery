@@ -34,6 +34,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeView;
+import com.khoinguyen.photoviewerkit.zoomable.DoubleTapZoomableController;
 
 /**
  * DraweeView that has zoomable capabilities.
@@ -330,6 +331,6 @@ public class ZoomableDraweeView extends DraweeView<GenericDraweeHierarchy> {
   }
 
   protected ZoomableController createZoomableController() {
-    return AnimatedZoomableController.newInstance();
+    return DoubleTapZoomableController.newInstance(getContext());
   }
 }
