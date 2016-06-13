@@ -375,7 +375,6 @@ public class DefaultZoomableController
     if (transformCorrected) {
       mGestureDetector.restartGesture();
     }
-    mWasTransformCorrected = transformCorrected;
   }
 
   @Override

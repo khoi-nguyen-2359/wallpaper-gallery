@@ -10,6 +10,7 @@ import android.view.View;
 
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.event.OnPhotoGalleryDragStart;
+import com.khoinguyen.photoviewerkit.event.OnPhotoRecenterAnimationUpdate;
 import com.khoinguyen.photoviewerkit.event.OnPhotoRevealAnimationUpdate;
 import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationUpdate;
 
@@ -17,6 +18,7 @@ import com.khoinguyen.photoviewerkit.event.OnPhotoShrinkAnimationUpdate;
  * Created by khoinguyen on 4/25/16.
  */
 public class PhotoBackdropView extends View {
+  public static final float TRANSITION_OPAQUE_VALUE = 0.75f;
   public PhotoBackdropView(Context context) {
     super(context);
   }
@@ -45,12 +47,17 @@ public class PhotoBackdropView extends View {
   }
 
   @Subscribe
+  public void handlePhotoRecenterAnimationUpdate(OnPhotoRecenterAnimationUpdate event) {
+    setAlpha(TRANSITION_OPAQUE_VALUE + event.getAnimatedFraction() * (1 - TRANSITION_OPAQUE_VALUE));
+  }
+
+  @Subscribe
   public void handlePhotoShrinkAnimationUpdate(OnPhotoShrinkAnimationUpdate event) {
-    setAlpha(0.75f * (1 - event.getAnimationProgress()));
+    setAlpha(TRANSITION_OPAQUE_VALUE * (1 - event.getAnimationProgress()));
   }
 
   @Subscribe
   public void handlePhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
-    setAlpha(0.75f);
+    setAlpha(TRANSITION_OPAQUE_VALUE);
   }
 }
