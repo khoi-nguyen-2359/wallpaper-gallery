@@ -41,7 +41,7 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
             shrinkResources true
 
             buildConfigField "boolean", "LOGGABLE", "false"
@@ -51,7 +51,7 @@ android {
 
         debug {
             minifyEnabled false
-            shrinkResources true
+            shrinkResources false
 
             buildConfigField "boolean", "LOGGABLE", "true"
 
