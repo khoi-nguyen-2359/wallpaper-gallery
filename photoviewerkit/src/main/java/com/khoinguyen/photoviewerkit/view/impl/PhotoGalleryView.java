@@ -50,7 +50,7 @@ import com.khoinguyen.util.log.L;
  */
 public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<SharedData> {
   private static final int DEF_OFFSCREEN_PAGE = 1;
-  private static final int END_DRAG_MIN_DISTANCE_DPS = 50;
+  private static final int END_DRAG_MIN_DISTANCE_DPS = 75;
   private static final long DURATION_DRAG_CANCEL = 200;
 
   protected L log = L.get("DefaultPhotoGalleryView");
