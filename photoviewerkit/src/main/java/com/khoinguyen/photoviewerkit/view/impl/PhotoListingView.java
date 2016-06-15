@@ -87,10 +87,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     }
   }
 
-  public void notifyDataSetChanged() {
-    adapterPhotos.notifyDataSetChanged();
-  }
-
   private static RectF createItemViewLocation(View itemView) {
     int[] location = new int[2];
     itemView.getLocationInWindow(location);

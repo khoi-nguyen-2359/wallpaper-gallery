@@ -254,10 +254,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     }
   }
 
-  public void notifyDataSetChanged() {
-    adapterPhotoGallery.notifyDataSetChanged();
-  }
-
   public void setEventBus(LightEventBus eventBus) {
     this.eventBus = eventBus;
   }
