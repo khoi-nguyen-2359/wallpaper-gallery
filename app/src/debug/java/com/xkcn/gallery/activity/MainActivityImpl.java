@@ -61,7 +61,7 @@ public class MainActivityImpl extends MainActivity {
   private class DebugEventListener {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(RefreshPhotoListingPager event) {
-      photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+      photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
     }
   }
 

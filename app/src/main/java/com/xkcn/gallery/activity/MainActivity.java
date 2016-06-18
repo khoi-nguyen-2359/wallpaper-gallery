@@ -28,16 +28,18 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
-import com.khoinguyen.photoviewerkit.event.OnPhotoListingItemClick;
-import com.khoinguyen.photoviewerkit.data.PhotoDisplayInfo;
-import com.khoinguyen.photoviewerkit.view.impl.PhotoGalleryView;
-import com.khoinguyen.photoviewerkit.view.impl.PhotoListingView;
-import com.khoinguyen.photoviewerkit.view.impl.PhotoViewerKitWidget;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
+import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
+import com.khoinguyen.photoviewerkit.impl.view.IPhotoViewerKitPageableWidget;
+import com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView;
+import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
+import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.model.PhotoDetailsPage;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.presenter.MainViewPresenter;
@@ -86,11 +88,17 @@ public abstract class MainActivity extends BaseActivity
 
   protected PhotoListingViewPresenter photoListingPresenter;
 
-  private List<PhotoDetails> allPhotos;
-
   protected IEventBus photoViewerKitEventBus;
   private PhotoListingAdapter photoListingAdapter;
   private PhotoGalleryAdapter photoGalleryAdapter;
+
+  private IPhotoViewerKitPageableWidget.PagingListener listingPagingListener = new IPhotoViewerKitPageableWidget.PagingListener() {
+    @Override
+    public void onPagingNext(IPhotoViewerKitPageableWidget widget) {
+      photoListingPresenter.loadNextPhotoPage();
+      L.get().d("onPagingNext len=%d", photoListingPresenter.getAllPhotos().size());
+    }
+  };
 
   private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
     public static final int TYPE_PHOTO = 2;
@@ -100,7 +108,7 @@ public abstract class MainActivity extends BaseActivity
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
       listingItems.add(new ListingItem("Caption", getListingItemType(TYPE_CAPTION)));
-      for (PhotoDetails photoDetails : allPhotos) {
+      for (PhotoDetails photoDetails : photoListingPresenter.getAllPhotos()) {
         PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
         listingItems.add(new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO)));
       }
@@ -115,7 +123,7 @@ public abstract class MainActivity extends BaseActivity
     @Override
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
-      for (PhotoDetails photoDetails : allPhotos) {
+      for (PhotoDetails photoDetails : photoListingPresenter.getAllPhotos()) {
         PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
         ListingItem photoListingItem = new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO));
         listingItems.add(photoListingItem);
@@ -130,7 +138,7 @@ public abstract class MainActivity extends BaseActivity
     initData();
     initTemplateViews();
     initViews();
-    photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+    photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
   }
 
   @Override
@@ -162,11 +170,11 @@ public abstract class MainActivity extends BaseActivity
     photoListingView.setListingAdapter(photoListingAdapter);
     photoGalleryView.setListingAdapter(photoGalleryAdapter);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
+
+    photoKitWidget.setPagingListener(listingPagingListener);
   }
 
   private void initData() {
-    allPhotos = new ArrayList<>();
-
     presenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
     photoListingPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
     photoListingPresenter.setView(this);
@@ -255,9 +263,9 @@ public abstract class MainActivity extends BaseActivity
     int id = item.getItemId();
 
     if (id == R.id.nav_hotest) {
-      photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_HOTEST);
+      photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_HOTEST);
     } else if (id == R.id.nav_latest) {
-      photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+      photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
     }
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -271,15 +279,10 @@ public abstract class MainActivity extends BaseActivity
   }
 
   @Override
-  public void appendPhotoData(int page, List<PhotoDetails> photos) {
-    log.d("page=%d, photos=%d", page, photos != null ? photos.size() : 0);
-    if (page == 1) {
-      allPhotos.clear();
-    }
-
-    allPhotos.addAll(photos);
+  public void appendPhotoData(PhotoDetailsPage photos) {
     photoListingAdapter.notifyDataSetChanged();
     photoGalleryAdapter.notifyDataSetChanged();
+    photoKitWidget.setPagingLoaded();
   }
 
   /***
@@ -288,7 +291,7 @@ public abstract class MainActivity extends BaseActivity
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
-    photoListingPresenter.loadPhotoListPage(1, PhotoListingViewPresenter.TYPE_LATEST);
+    photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
   }
 
   @Subscribe(threadMode = ThreadMode.MAIN)

@@ -23,7 +23,7 @@ import android.view.MotionEvent;
 public interface ZoomableController {
 
   /**
-   * Listener interface.
+   * Listener interfaces.
    */
   interface Listener {
 

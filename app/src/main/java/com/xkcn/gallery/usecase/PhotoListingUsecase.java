@@ -1,5 +1,6 @@
 package com.xkcn.gallery.usecase;
 
+import com.xkcn.gallery.data.model.PhotoDetailsPage;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 
@@ -29,23 +30,29 @@ public class PhotoListingUsecase {
     });
   }
 
-  public Observable<List<PhotoDetails>> createHotestPhotoDetailsObservable(final int page, final int perPage) {
-    return Observable.create(new Observable.OnSubscribe<List<PhotoDetails>>() {
+  public Observable<PhotoDetailsPage> createHotestPhotoDetailsObservable(final int page, final int perPage) {
+    return Observable.create(new Observable.OnSubscribe<PhotoDetailsPage>() {
       @Override
-      public void call(Subscriber<? super List<PhotoDetails>> subscriber) {
-        List<PhotoDetails> hotestPhotos = photoDetailsRepository.getHotestPhotos(page, perPage);
-        subscriber.onNext(hotestPhotos);
+      public void call(Subscriber<? super PhotoDetailsPage> subscriber) {
+        List<PhotoDetails> photos = photoDetailsRepository.getHotestPhotos(page, perPage);
+        PhotoDetailsPage photoPage = new PhotoDetailsPage();
+        photoPage.setPage(page);
+        photoPage.setPhotos(photos);
+        subscriber.onNext(photoPage);
         subscriber.onCompleted();
       }
     });
   }
 
-  public Observable<List<PhotoDetails>> createLatestPhotoDetailsObservable(final int page, final int perPage) {
-    return Observable.create(new Observable.OnSubscribe<List<PhotoDetails>>() {
+  public Observable<PhotoDetailsPage> createLatestPhotoDetailsObservable(final int page, final int perPage) {
+    return Observable.create(new Observable.OnSubscribe<PhotoDetailsPage>() {
       @Override
-      public void call(Subscriber<? super List<PhotoDetails>> subscriber) {
-        List<PhotoDetails> hotestPhotos = photoDetailsRepository.getLatestPhotos(page, perPage);
-        subscriber.onNext(hotestPhotos);
+      public void call(Subscriber<? super PhotoDetailsPage> subscriber) {
+        List<PhotoDetails> photos = photoDetailsRepository.getLatestPhotos(page, perPage);
+        PhotoDetailsPage photoPage = new PhotoDetailsPage();
+        photoPage.setPage(page);
+        photoPage.setPhotos(photos);
+        subscriber.onNext(photoPage);
         subscriber.onCompleted();
       }
     });

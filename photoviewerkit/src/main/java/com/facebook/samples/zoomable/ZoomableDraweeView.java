@@ -34,7 +34,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.generic.GenericDraweeHierarchyInflater;
 import com.facebook.drawee.interfaces.DraweeController;
 import com.facebook.drawee.view.DraweeView;
-import com.khoinguyen.photoviewerkit.zoomable.DoubleTapZoomableController;
+import com.khoinguyen.photoviewerkit.impl.zoomable.DoubleTapZoomableController;
 
 /**
  * DraweeView that has zoomable capabilities.

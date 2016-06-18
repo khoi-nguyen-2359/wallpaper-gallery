@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     >
 
-    <com.khoinguyen.photoviewerkit.view.impl.PhotoListingView
+    <com.khoinguyen.photoviewerkit.impl.view.PhotoListingView
         android:id="@+id/photokit_photo_listing"
         android:visibility="visible"
         android:clipToPadding="false"
@@ -13,19 +13,19 @@
         android:layout_height="match_parent"
         />
 
-    <com.khoinguyen.photoviewerkit.view.impl.PhotoBackdropView
+    <com.khoinguyen.photoviewerkit.impl.view.PhotoBackdropView
         android:alpha="0"
         android:id="@+id/photokit_transition_backdrop"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
-    <com.khoinguyen.photoviewerkit.view.impl.PhotoTransitionView
+    <com.khoinguyen.photoviewerkit.impl.view.PhotoTransitionView
         android:visibility="gone"
         android:id="@+id/photokit_transition_photo"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <com.khoinguyen.photoviewerkit.view.impl.PhotoGalleryView
+    <com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView
         android:visibility="gone"
         android:id="@+id/photokit_pager_photo_gallery"
         android:layout_width="match_parent"

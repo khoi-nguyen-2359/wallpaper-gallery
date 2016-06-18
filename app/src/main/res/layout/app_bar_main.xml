@@ -33,7 +33,7 @@
         </FrameLayout>
     </android.support.design.widget.AppBarLayout>
 
-    <com.khoinguyen.photoviewerkit.view.impl.PhotoViewerKitWidget
+    <com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         android:id="@+id/photokit_widget"
         android:layout_width="match_parent"
@@ -41,6 +41,6 @@
 
         <include layout="@layout/photokit_main_view" />
 
-    </com.khoinguyen.photoviewerkit.view.impl.PhotoViewerKitWidget>
+    </com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget>
 
 </android.support.design.widget.CoordinatorLayout>

@@ -1,6 +1,7 @@
 package com.xkcn.gallery.view;
 
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.model.PhotoDetailsPage;
 
 import java.io.File;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 public interface MainView extends ScreenView {
   void startActionUpdate();
 
-  void appendPhotoData(int page, List<PhotoDetails> photos);
+  void appendPhotoData(PhotoDetailsPage photos);
 
   void showWallpaperChooser(File photoFile);
 }

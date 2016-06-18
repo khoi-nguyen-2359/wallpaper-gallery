@@ -1,10 +1,12 @@
 package com.xkcn.gallery.presenter;
 
 import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.model.PhotoDetailsPage;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.view.MainView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import rx.Observable;
@@ -25,7 +27,10 @@ public class PhotoListingViewPresenter {
   private PhotoListingUsecase photoListingUsecase;
   private PreferencesUsecase preferencesUsecase;
 
-  private List<PhotoDetails> cachedPhotos;
+  private Observable<Integer> photoPerPageObservable;
+
+  private List<PhotoDetails> allPhotos = new ArrayList<>();
+  private int currentListingType;
 
   public PhotoListingViewPresenter(PhotoListingUsecase photoListingUsecase, PreferencesUsecase preferencesUsecase) {
     this.photoListingUsecase = photoListingUsecase;
@@ -36,18 +41,32 @@ public class PhotoListingViewPresenter {
     this.view = view;
   }
 
-  public void loadPhotoListPage(final int photoPage, final int listingType) {
-    preferencesUsecase.getListingPagerPerPage().flatMap(new Func1<Integer, Observable<List<PhotoDetails>>>() {
+  public void clearPhotos() {
+    allPhotos.clear();
+  }
+
+  private Observable<Integer> getPhotoPerPageObservable() {
+    return (photoPerPageObservable == null ? photoPerPageObservable = preferencesUsecase.getListingPagerPerPage() : photoPerPageObservable).cache();
+  }
+
+  /**
+   *
+   * @param aPageItem provide position of an arbitrary item in the page to load. This will help to infer the page to load.
+   * @param listingType type of current listing
+   */
+  public void loadPhotoPage(final int aPageItem, final int listingType) {
+    getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<PhotoDetailsPage>>() {
       @Override
-      public Observable<List<PhotoDetails>> call(Integer perPage) {
-        Observable<List<PhotoDetails>> photoQueryObservable = null;
+      public Observable<PhotoDetailsPage> call(Integer perPage) {
+        int page = aPageItem / perPage + 1;
+        Observable<PhotoDetailsPage> photoQueryObservable = null;
         switch (listingType) {
           case TYPE_HOTEST: {
-            photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(photoPage, perPage);
+            photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(page, perPage);
             break;
           }
           case TYPE_LATEST: {
-            photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(photoPage, perPage);
+            photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(page, perPage);
             break;
           }
           default:
@@ -59,7 +78,7 @@ public class PhotoListingViewPresenter {
     })
         .subscribeOn(Schedulers.newThread())
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<List<PhotoDetails>>() {
+        .subscribe(new Observer<PhotoDetailsPage>() {
           @Override
           public void onCompleted() {
 
@@ -67,21 +86,26 @@ public class PhotoListingViewPresenter {
 
           @Override
           public void onError(Throwable e) {
+
           }
 
           @Override
-          public void onNext(List<PhotoDetails> photos) {
-            cachedPhotos = photos;
-            view.appendPhotoData(photoPage, photos);
+          public void onNext(PhotoDetailsPage photoDetailsPage) {
+            currentListingType = listingType;
+            if (photoDetailsPage.getPage() == 1) {
+              allPhotos.clear();
+            }
+            allPhotos.addAll(photoDetailsPage.getPhotos());
+            view.appendPhotoData(photoDetailsPage);
           }
         });
   }
 
-  public PhotoDetails getCachedPhotoDetails(int position) {
-    if (cachedPhotos == null || position >= cachedPhotos.size()) {
-      return null;
-    }
+  public List<PhotoDetails> getAllPhotos() {
+    return allPhotos;
+  }
 
-    return cachedPhotos.get(position);
+  public void loadNextPhotoPage() {
+    loadPhotoPage(allPhotos.size(), currentListingType);
   }
 }
