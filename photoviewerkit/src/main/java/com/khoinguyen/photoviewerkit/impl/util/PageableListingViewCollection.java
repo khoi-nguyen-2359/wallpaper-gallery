@@ -9,13 +9,13 @@ import java.util.HashSet;
  */
 
 public class PageableListingViewCollection extends HashSet<IPageableListingView> {
-  public void notifyPagingLoaded() {
+  public void enablePaging() {
     for (IPageableListingView item : this) {
       if (item == null) {
         continue;
       }
 
-      item.setPagingLoaded();
+      item.enablePaging();
     }
   }
 }

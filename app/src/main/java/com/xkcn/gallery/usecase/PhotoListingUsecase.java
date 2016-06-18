@@ -1,6 +1,6 @@
 package com.xkcn.gallery.usecase;
 
-import com.xkcn.gallery.data.model.PhotoDetailsPage;
+import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 
@@ -30,28 +30,28 @@ public class PhotoListingUsecase {
     });
   }
 
-  public Observable<PhotoDetailsPage> createHotestPhotoDetailsObservable(final int page, final int perPage) {
-    return Observable.create(new Observable.OnSubscribe<PhotoDetailsPage>() {
+  public Observable<DataPage<PhotoDetails>> createHotestPhotoDetailsObservable(final int startIndex, final int perPage) {
+    return Observable.create(new Observable.OnSubscribe<DataPage<PhotoDetails>>() {
       @Override
-      public void call(Subscriber<? super PhotoDetailsPage> subscriber) {
-        List<PhotoDetails> photos = photoDetailsRepository.getHotestPhotos(page, perPage);
-        PhotoDetailsPage photoPage = new PhotoDetailsPage();
-        photoPage.setPage(page);
-        photoPage.setPhotos(photos);
+      public void call(Subscriber<? super DataPage<PhotoDetails>> subscriber) {
+        List<PhotoDetails> photos = photoDetailsRepository.getHotestPhotos(startIndex, perPage);
+        DataPage<PhotoDetails> photoPage = new DataPage<>();
+        photoPage.setData(photos);
+        photoPage.setStartIndex(startIndex);
         subscriber.onNext(photoPage);
         subscriber.onCompleted();
       }
     });
   }
 
-  public Observable<PhotoDetailsPage> createLatestPhotoDetailsObservable(final int page, final int perPage) {
-    return Observable.create(new Observable.OnSubscribe<PhotoDetailsPage>() {
+  public Observable<DataPage<PhotoDetails>> createLatestPhotoDetailsObservable(final int startIndex, final int perPage) {
+    return Observable.create(new Observable.OnSubscribe<DataPage<PhotoDetails>>() {
       @Override
-      public void call(Subscriber<? super PhotoDetailsPage> subscriber) {
-        List<PhotoDetails> photos = photoDetailsRepository.getLatestPhotos(page, perPage);
-        PhotoDetailsPage photoPage = new PhotoDetailsPage();
-        photoPage.setPage(page);
-        photoPage.setPhotos(photos);
+      public void call(Subscriber<? super DataPage<PhotoDetails>> subscriber) {
+        List<PhotoDetails> photos = photoDetailsRepository.getLatestPhotos(startIndex, perPage);
+        DataPage<PhotoDetails> photoPage = new DataPage<>();
+        photoPage.setData(photos);
+        photoPage.setStartIndex(startIndex);
         subscriber.onNext(photoPage);
         subscriber.onCompleted();
       }

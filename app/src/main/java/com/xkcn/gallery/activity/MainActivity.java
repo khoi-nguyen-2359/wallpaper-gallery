@@ -39,7 +39,6 @@ import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.model.PhotoDetailsPage;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.presenter.MainViewPresenter;
@@ -279,10 +278,14 @@ public abstract class MainActivity extends BaseActivity
   }
 
   @Override
-  public void appendPhotoData(PhotoDetailsPage photos) {
+  public void onPagingLoaded() {
     photoListingAdapter.notifyDataSetChanged();
     photoGalleryAdapter.notifyDataSetChanged();
-    photoKitWidget.setPagingLoaded();
+  }
+
+  @Override
+  public void enablePaging() {
+    photoKitWidget.enablePaging();
   }
 
   /***

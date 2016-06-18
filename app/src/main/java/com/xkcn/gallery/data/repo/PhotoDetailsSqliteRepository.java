@@ -91,12 +91,12 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
   }
 
   @Override
-  public List<PhotoDetails> getLatestPhotos(int page, int perPage) {
+  public List<PhotoDetails> getLatestPhotos(int startIndex, int perPage) {
     List<PhotoDetails> photoList = new ArrayList<>();
 
     SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-    Cursor c = db.query(TABLE_NAME, null, COL_STATUS + "=" + ModelConstants.PHOTO_STATUS_CRAWLED, null, null, null, COL_IDENTIFIER + " desc", ((page - 1) * perPage) + "," + perPage);
+    Cursor c = db.query(TABLE_NAME, null, COL_STATUS + "=" + ModelConstants.PHOTO_STATUS_CRAWLED, null, null, null, COL_IDENTIFIER + " desc", startIndex + "," + perPage);
     if (c != null) {
       PhotoDetails photo = null;
       while (c.moveToNext()) {
@@ -111,12 +111,12 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
   }
 
   @Override
-  public List<PhotoDetails> getHotestPhotos(int page, int perPage) {
+  public List<PhotoDetails> getHotestPhotos(int startIndex, int perPage) {
     List<PhotoDetails> photoList = new ArrayList<>();
 
     SQLiteDatabase db = dbHelper.getReadableDatabase();
 
-    Cursor c = db.query(TABLE_NAME, null, COL_STATUS + "=" + ModelConstants.PHOTO_STATUS_CRAWLED, null, null, null, COL_NOTES + " desc", ((page - 1) * perPage) + "," + perPage);
+    Cursor c = db.query(TABLE_NAME, null, COL_STATUS + "=" + ModelConstants.PHOTO_STATUS_CRAWLED, null, null, null, COL_NOTES + " desc", startIndex + "," + perPage);
     if (c != null) {
       PhotoDetails photo = null;
       while (c.moveToNext()) {

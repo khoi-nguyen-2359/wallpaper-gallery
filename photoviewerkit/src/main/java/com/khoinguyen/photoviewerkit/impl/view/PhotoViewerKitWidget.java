@@ -160,8 +160,8 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   }
 
   @Override
-  public void setPagingLoaded() {
-    pageableListingViews.notifyPagingLoaded();
+  public void enablePaging() {
+    pageableListingViews.enablePaging();
   }
 
   @Override

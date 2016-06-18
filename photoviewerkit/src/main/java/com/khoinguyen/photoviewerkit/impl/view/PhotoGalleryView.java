@@ -299,7 +299,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoPageableGallery
   }
 
   @Override
-  public void setPagingLoaded() {
+  public void enablePaging() {
     pagingNextHasFired = false;
   }
 

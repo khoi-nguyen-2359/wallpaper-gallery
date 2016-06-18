@@ -160,8 +160,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoPageableList
   }
 
   @Override
-  public void setPagingLoaded() {
-    adapterPhotos.notifyDataSetChanged();
+  public void enablePaging() {
     rcvPagingListener.setEnable(true);
   }
 
