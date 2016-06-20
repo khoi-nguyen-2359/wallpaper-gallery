@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
@@ -17,7 +18,7 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationStart;
-import com.khoinguyen.photoviewerkit.impl.util.PageableListingViewCollection;
+import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
 
 /**
  * Created by khoinguyen on 4/25/16.

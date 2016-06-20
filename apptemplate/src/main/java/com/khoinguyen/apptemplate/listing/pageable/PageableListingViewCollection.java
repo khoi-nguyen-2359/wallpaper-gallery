@@ -1,6 +1,4 @@
-package com.khoinguyen.photoviewerkit.impl.util;
-
-import com.khoinguyen.photoviewerkit.impl.view.IPageableListingView;
+package com.khoinguyen.apptemplate.listing.pageable;
 
 import java.util.HashSet;
 

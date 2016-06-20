@@ -27,7 +27,7 @@ import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
-import com.khoinguyen.apptemplate.listing.util.RecyclerListingViewHolder;
+import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.view.IPhotoViewerKitPageableWidget;

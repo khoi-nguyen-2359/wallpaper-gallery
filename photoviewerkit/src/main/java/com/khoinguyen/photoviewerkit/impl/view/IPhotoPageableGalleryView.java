@@ -1,5 +1,6 @@
 package com.khoinguyen.photoviewerkit.impl.view;
 
+import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 
 /**

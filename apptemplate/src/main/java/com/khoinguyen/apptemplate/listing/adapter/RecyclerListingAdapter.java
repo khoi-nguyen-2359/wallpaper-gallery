@@ -1,10 +1,11 @@
-package com.khoinguyen.apptemplate.listing.util;
+package com.khoinguyen.apptemplate.listing.adapter;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.ViewGroup;
 
 import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
 import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
+import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.util.log.L;
 
 /**

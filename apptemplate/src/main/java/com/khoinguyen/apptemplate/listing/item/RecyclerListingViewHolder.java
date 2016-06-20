@@ -1,4 +1,4 @@
-package com.khoinguyen.apptemplate.listing.util;
+package com.khoinguyen.apptemplate.listing.item;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.View;

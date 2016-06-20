@@ -1,4 +1,4 @@
-package com.khoinguyen.apptemplate.listing.util;
+package com.khoinguyen.apptemplate.listing.adapter;
 
 import android.support.v4.view.PagerAdapter;
 import android.view.View;

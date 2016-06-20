@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.impl.view;
+package com.khoinguyen.apptemplate.listing.pageable;
 
 /**
  * Created by khoinguyen on 6/16/16.
