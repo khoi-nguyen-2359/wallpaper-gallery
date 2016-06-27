@@ -24,7 +24,6 @@ import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
-import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
@@ -35,7 +34,6 @@ import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRecenterAnimationUpdate;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
@@ -108,8 +106,8 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
       return;
     }
 
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
-    currentSelectedItem.setPhotoId(photoDisplayInfo.getPhotoId());
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
+    currentSelectedItem.setPhoto(photoDisplayInfo);
 
     eventBus.post(new OnPhotoGalleryPhotoSelect(position, photoDisplayInfo));
   }
@@ -353,12 +351,8 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
    */
 
   @Subscribe
-  public void handlePhotoListingItemClick(OnPhotoListingItemClick event) {
-  }
-
-  @Subscribe
   public void handlePhotoRevealAnimationEnd(OnPhotoRevealAnimationEnd event) {
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
     setCurrentItem(adapterPhotoFinder.indexOf(currentSelectedItem.getPhotoId()), false);
     setTranslationX(0);
     setTranslationY(0);

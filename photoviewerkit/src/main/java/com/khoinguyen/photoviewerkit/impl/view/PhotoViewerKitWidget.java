@@ -2,6 +2,7 @@ package com.khoinguyen.photoviewerkit.impl.view;
 
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -9,10 +10,12 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
+import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationStart;
@@ -21,7 +24,9 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoTransitionView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
+import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/25/16.
@@ -30,12 +35,12 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   protected LightEventBus eventBus;
 
   protected IPhotoGalleryView<SharedData> photoGalleryView;
-  protected IPhotoListingView<SharedData> photoListingView;
+  protected IPhotoListingView<SharedData, ? extends IViewHolder> photoListingView;
   protected View photoActionButton;
 
   protected PageableListingViewCollection pageableListingViews = new PageableListingViewCollection();
 
-  protected PhotoTransitionView transitDraweeView;
+  protected IPhotoTransitionView<SharedData> transitDraweeView;
   protected PhotoBackdropView transitBackdrop;
 
   protected TransitState currentTransitState = TransitState.LISTING;
@@ -97,7 +102,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   }
 
   private void initViews() {
-    photoListingView = (IPhotoListingView<SharedData>) findViewById(R.id.photokit_photo_listing);
+    photoListingView = (IPhotoListingView<SharedData, ? extends IViewHolder>) findViewById(R.id.photokit_photo_listing);
     photoGalleryView = (IPhotoGalleryView<SharedData>) findViewById(R.id.photokit_photo_gallery);
 
     transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
@@ -196,6 +201,16 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     if (pagingListener != null) {
       pagingListener.onPagingNext(this);
     }
+  }
+
+  @Override
+  public void openGallery(ListingItemInfo currentActiveItem) {
+    transitDraweeView.show();
+    transitDraweeView.dislayPhoto(currentActiveItem.getPhoto());
+    Rect fullRect = new Rect();
+    getDrawingRect(fullRect);
+    L.get().d("openGallery fullrect=%s", fullRect);
+    transitDraweeView.startRevealAnimation(currentActiveItem.getItemRect(), new RectF(fullRect));
   }
 
   // // TODO: 6/17/16 move this into SharedData

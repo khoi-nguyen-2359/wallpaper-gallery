@@ -24,13 +24,13 @@ import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.adapter.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.R;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
 import com.khoinguyen.photoviewerkit.impl.util.AdapterPhotoFinder;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
@@ -42,7 +42,7 @@ import com.khoinguyen.util.log.L;
 /**
  * Created by khoinguyen on 3/29/16.
  */
-public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData> {
+public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData, RecyclerListingViewHolder> {
   private static final int PAGING_OFFSET = 10;
   protected StaggeredGridLayoutManager rcvLayoutMan;
   protected IListingAdapter<RecyclerListingViewHolder> listingAdapter;
@@ -83,7 +83,8 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     addOnScrollListener(rcvPagingListener);
   }
 
-  public void setListingAdapter(IListingAdapter<RecyclerListingViewHolder> adapter) {
+  @Override
+  public void setPhotoAdapter(IListingAdapter<RecyclerListingViewHolder> adapter) {
     this.listingAdapter = adapter;
     adapterPhotos.setListingAdapter(listingAdapter);
     updatePhotoFinder();
@@ -110,14 +111,16 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   }
 
   private void changeSelectedItemHighlight() {
-    ListingItemInfo lastSelectedItem = sharedData.getLastSelectedItem();
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
-    if (lastSelectedItem.getPhotoId() != null && lastSelectedItem.getPhotoId().equals(currentSelectedItem.getPhotoId())) {
+    ListingItemInfo lastSelectedItem = sharedData.getLastActiveItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
+    String lastActivePhotoId = lastSelectedItem.getPhotoId();
+    String currentActivePhotoId = currentSelectedItem.getPhotoId();
+    if (lastActivePhotoId != null && lastActivePhotoId.equals(currentActivePhotoId)) {
       return;
     }
 
-    unhighlightClickedItemView(photoFinder.indexOf(lastSelectedItem.getPhotoId()));
-    highlightClickedItemView(photoFinder.indexOf(currentSelectedItem.getPhotoId()));
+    unhighlightClickedItemView(photoFinder.indexOf(lastActivePhotoId));
+    highlightClickedItemView(photoFinder.indexOf(currentActivePhotoId));
   }
 
   @Subscribe
@@ -131,13 +134,13 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   }
 
   private void onChangeSelectedItemHighlight() {
-    updateSelectedItemRect();
+    updateActiveItemRect();
     changeSelectedItemHighlight();
   }
 
   @Subscribe
   public void handlePhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
     unhighlightClickedItemView(photoFinder.indexOf(currentSelectedItem.getPhotoId()));
   }
 
@@ -175,31 +178,33 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
         viewHolder.itemView.setOnClickListener(new OnClickListener() {
           @Override
           public void onClick(View v) {
-            resetItemSelectionInfo(photoData);
-            updateSelectedItemRect();
-            postPhotoListingItemClickEvent(photoData);
+            resetActiveItemInfo(photoData);
+            updateActiveItemRect();
+            photoKitWidget.openGallery(sharedData.getCurrentActiveItem());
+
+            eventBus.post(new OnPhotoListingItemActivate());
           }
         });
       }
     }
   }
 
-  private void resetItemSelectionInfo(PhotoDisplayInfo selectedPhotoItem) {
-    if (selectedPhotoItem == null) {
+  private void resetActiveItemInfo(PhotoDisplayInfo activeItem) {
+    if (activeItem == null) {
       return;
     }
 
-    ListingItemInfo lastSelectedItem = sharedData.getLastSelectedItem();
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
+    ListingItemInfo lastActiveItem = sharedData.getLastActiveItem();
+    ListingItemInfo currentActiveItem = sharedData.getCurrentActiveItem();
 
-    lastSelectedItem.setPhotoId("");
-    lastSelectedItem.updateItemRect(new RectF());
+    lastActiveItem.setPhoto(null);
+    lastActiveItem.updateItemRect(new RectF());
 
-    currentSelectedItem.setPhotoId(selectedPhotoItem.getPhotoId());
+    currentActiveItem.setPhoto(activeItem);
   }
 
-  private void updateSelectedItemRect() {
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentSelectedItem();
+  private void updateActiveItemRect() {
+    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
     int itemIndex = photoFinder.indexOf(currentSelectedItem.getPhotoId());
     View v = rcvLayoutMan.findViewByPosition(itemIndex);
     RectF itemRect = createItemViewLocation(v);
@@ -222,12 +227,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
     View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
     itemView.setVisibility(View.VISIBLE);
-  }
-
-  private void postPhotoListingItemClickEvent(PhotoDisplayInfo photoDisplayInfo) {
-    RectF fullRect = new RectF(getX(), getY(), getWidth(), getHeight());   // stretch details itemView maximum at photokit size
-
-    eventBus.post(new OnPhotoListingItemClick(photoDisplayInfo, fullRect));
   }
 
   public static class PhotoItemType extends ListingItemType<RecyclerListingViewHolder> {

@@ -4,22 +4,22 @@ package com.khoinguyen.photoviewerkit.impl.data;
  * Created by khoinguyen on 5/12/16.
  */
 public class SharedData {
-  private ListingItemInfo lastSelectedListingItem = new ListingItemInfo();
-  private ListingItemInfo currentSelectedListingItem = new ListingItemInfo();
+  private ListingItemInfo lastActiveItem = new ListingItemInfo();
+  private ListingItemInfo currentActiveItem = new ListingItemInfo();
 
-  public ListingItemInfo getLastSelectedItem() {
-    return lastSelectedListingItem;
+  public ListingItemInfo getLastActiveItem() {
+    return lastActiveItem;
   }
 
-  public void setLastSelectedListingItem(ListingItemInfo lastSelectedListingItem) {
-    this.lastSelectedListingItem = lastSelectedListingItem;
+  public void setLastActiveItem(ListingItemInfo lastActiveItem) {
+    this.lastActiveItem = lastActiveItem;
   }
 
-  public ListingItemInfo getCurrentSelectedItem() {
-    return currentSelectedListingItem;
+  public ListingItemInfo getCurrentActiveItem() {
+    return currentActiveItem;
   }
 
-  public void setCurrentSelectedListingItem(ListingItemInfo currentSelectedListingItem) {
-    this.currentSelectedListingItem = currentSelectedListingItem;
+  public void setCurrentActiveItem(ListingItemInfo currentActiveItem) {
+    this.currentActiveItem = currentActiveItem;
   }
 }

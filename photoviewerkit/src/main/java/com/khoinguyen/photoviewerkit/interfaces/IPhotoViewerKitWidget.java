@@ -2,6 +2,7 @@ package com.khoinguyen.photoviewerkit.interfaces;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
+import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 
 /**
  * Created by khoinguyen on 5/13/16.
@@ -23,6 +24,8 @@ public interface IPhotoViewerKitWidget<D> extends IPageableListingView {
   D getSharedData();
 
   void onPagingNext(IPageableListingView component);
+
+  void openGallery(ListingItemInfo currentActiveItem);
 
   interface PagingListener {
     void onPagingNext(IPhotoViewerKitWidget widget);

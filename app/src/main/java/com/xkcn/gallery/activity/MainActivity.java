@@ -25,7 +25,7 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
@@ -69,10 +69,8 @@ public abstract class MainActivity extends BaseActivity
   FrameLayout toolbarContainerLayout;
   @Bind(R.id.photokit_widget)
   PhotoViewerKitWidget photoKitWidget;
-
   @Bind(R.id.photokit_photo_listing)
   PhotoListingView photoListingView;
-
   @Bind(R.id.photokit_photo_gallery)
   PhotoGalleryView photoGalleryView;
 
@@ -162,7 +160,7 @@ public abstract class MainActivity extends BaseActivity
   }
 
   private void initViews() {
-    photoListingView.setListingAdapter(photoListingAdapter);
+    photoListingView.setPhotoAdapter(photoListingAdapter);
     photoGalleryView.setListingAdapter(photoGalleryAdapter);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
 
@@ -296,7 +294,7 @@ public abstract class MainActivity extends BaseActivity
 
   protected Object photoKitEventListener = new Object() {
     @com.khoinguyen.apptemplate.eventbus.Subscribe
-    public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
+    public void handleOnPhotoListingItemClick(OnPhotoListingItemActivate event) {
       appBarLayout.setExpanded(false, false);
     }
   };

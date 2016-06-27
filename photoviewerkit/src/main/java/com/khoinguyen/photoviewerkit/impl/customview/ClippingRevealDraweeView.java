@@ -71,7 +71,7 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
     setController(controller);
   }
 
-  public CompoundViewAnimation createExpanseAnimation(RectF startRect, RectF endRect) {
+  public CompoundViewAnimation createRevealAnimation(RectF startRect, RectF endRect) {
     return new ZoomToAnimation()
         .rects(startRect, endRect)
         .duration(DUR_ANIMATION)
