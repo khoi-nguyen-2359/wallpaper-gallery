@@ -6,7 +6,7 @@
     >
 
     <com.khoinguyen.photoviewerkit.impl.view.PhotoListingView
-        android:id="@+id/photokit_photo_listing"
+        android:id="@id/photokit_photo_listing"
         android:visibility="visible"
         android:clipToPadding="false"
         android:layout_width="match_parent"
@@ -27,8 +27,12 @@
 
     <com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView
         android:visibility="gone"
-        android:id="@+id/photokit_pager_photo_gallery"
+        android:id="@id/photokit_photo_gallery"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 
+    <com.khoinguyen.photoviewerkit.impl.view.PhotoOverlayView
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
 </merge>

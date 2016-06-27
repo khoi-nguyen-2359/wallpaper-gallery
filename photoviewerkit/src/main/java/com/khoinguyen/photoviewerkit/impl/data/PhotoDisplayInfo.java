@@ -10,6 +10,7 @@ public class PhotoDisplayInfo {
   private String highResUrl;
   private String lowResUrl;
   private float ratio;
+  private String description;
 
   public static PhotoDisplayInfo create(String photoId, String highResUrl, String lowResUrl, float ratio) {
     PhotoDisplayInfo photo = new PhotoDisplayInfo();
@@ -59,5 +60,13 @@ public class PhotoDisplayInfo {
 
   public void setPhotoId(String photoId) {
     this.photoId = photoId;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public void setDescription(String description) {
+    this.description = description;
   }
 }

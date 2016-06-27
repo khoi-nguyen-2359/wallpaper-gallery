@@ -2,7 +2,7 @@ package com.khoinguyen.photoviewerkit.impl.util;
 
 import android.text.TextUtils;
 
-import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
+import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 
 /**
@@ -10,9 +10,9 @@ import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
  */
 public class AdapterPhotoFinder {
   private static final int NO_POSITION = -1;
-  private ListingAdapter adapter;
+  private IListingAdapter adapter;
 
-  public AdapterPhotoFinder(ListingAdapter adapter) {
+  public AdapterPhotoFinder(IListingAdapter adapter) {
     this.adapter = adapter;
   }
 
@@ -51,7 +51,7 @@ public class AdapterPhotoFinder {
     return NO_POSITION;
   }
 
-  public ListingAdapter getAdapter() {
+  public IListingAdapter getAdapter() {
     return adapter;
   }
 

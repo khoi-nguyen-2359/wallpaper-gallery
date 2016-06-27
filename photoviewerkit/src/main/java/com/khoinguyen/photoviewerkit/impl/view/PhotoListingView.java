@@ -19,7 +19,7 @@ import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
-import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
+import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.adapter.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
@@ -33,6 +33,7 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationWillStart;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.impl.util.RecyclerViewPagingListener;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
@@ -41,10 +42,10 @@ import com.khoinguyen.util.log.L;
 /**
  * Created by khoinguyen on 3/29/16.
  */
-public class PhotoListingView extends RecyclerView implements IPhotoPageableListingView<SharedData> {
+public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData> {
   private static final int PAGING_OFFSET = 10;
   protected StaggeredGridLayoutManager rcvLayoutMan;
-  protected ListingAdapter<RecyclerListingViewHolder> listingAdapter;
+  protected IListingAdapter<RecyclerListingViewHolder> listingAdapter;
   protected AdapterPhotoFinder photoFinder;
 
   protected IEventBus eventBus;
@@ -52,7 +53,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoPageableList
   protected RecyclerViewAdapter adapterPhotos;
 
   private L log = L.get("DefaultPhotoListingView");
-  protected IPhotoViewerKitPageableWidget<SharedData> photoKitWidget;
+  protected IPhotoViewerKitWidget<SharedData> photoKitWidget;
 
   public PhotoListingView(Context context) {
     super(context);
@@ -82,7 +83,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoPageableList
     addOnScrollListener(rcvPagingListener);
   }
 
-  public void setListingAdapter(ListingAdapter<RecyclerListingViewHolder> adapter) {
+  public void setListingAdapter(IListingAdapter<RecyclerListingViewHolder> adapter) {
     this.listingAdapter = adapter;
     adapterPhotos.setListingAdapter(listingAdapter);
     updatePhotoFinder();
@@ -150,13 +151,9 @@ public class PhotoListingView extends RecyclerView implements IPhotoPageableList
 
   @Override
   public void attach(IPhotoViewerKitWidget<SharedData> widget) throws UnsupportedOperationException {
-    if (!(widget instanceof IPhotoViewerKitPageableWidget)) {
-      throw new UnsupportedOperationException("widget must implement IPhotoViewerKitPageableWidget");
-    }
-
     sharedData = widget.getSharedData();
     eventBus = widget.getEventBus();
-    photoKitWidget = (IPhotoViewerKitPageableWidget<SharedData>) widget;
+    photoKitWidget = widget;
   }
 
   @Override

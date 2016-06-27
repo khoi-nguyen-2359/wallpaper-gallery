@@ -17,23 +17,20 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
-import com.khoinguyen.photoviewerkit.impl.view.IPhotoViewerKitPageableWidget;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
@@ -76,7 +73,7 @@ public abstract class MainActivity extends BaseActivity
   @Bind(R.id.photokit_photo_listing)
   PhotoListingView photoListingView;
 
-  @Bind(R.id.photokit_pager_photo_gallery)
+  @Bind(R.id.photokit_photo_gallery)
   PhotoGalleryView photoGalleryView;
 
   protected MainViewPresenter presenter;
@@ -91,24 +88,22 @@ public abstract class MainActivity extends BaseActivity
   private PhotoListingAdapter photoListingAdapter;
   private PhotoGalleryAdapter photoGalleryAdapter;
 
-  private IPhotoViewerKitPageableWidget.PagingListener listingPagingListener = new IPhotoViewerKitPageableWidget.PagingListener() {
+  private IPhotoViewerKitWidget.PagingListener listingPagingListener = new IPhotoViewerKitWidget.PagingListener() {
     @Override
-    public void onPagingNext(IPhotoViewerKitPageableWidget widget) {
+    public void onPagingNext(IPhotoViewerKitWidget widget) {
       photoListingPresenter.loadNextPhotoPage();
-      L.get().d("onPagingNext len=%d", photoListingPresenter.getAllPhotos().size());
     }
   };
 
   private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
     public static final int TYPE_PHOTO = 2;
-    public static final int TYPE_CAPTION = 1;
 
     @Override
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
-      listingItems.add(new ListingItem("Caption", getListingItemType(TYPE_CAPTION)));
       for (PhotoDetails photoDetails : photoListingPresenter.getAllPhotos()) {
         PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
+        photoDisplayInfo.setDescription(photoDetails.getPermalinkMeta());
         listingItems.add(new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO)));
       }
 
@@ -124,6 +119,7 @@ public abstract class MainActivity extends BaseActivity
       List<ListingItem> listingItems = new ArrayList<>();
       for (PhotoDetails photoDetails : photoListingPresenter.getAllPhotos()) {
         PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
+        photoDisplayInfo.setDescription(photoDetails.getPermalinkMeta());
         ListingItem photoListingItem = new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO));
         listingItems.add(photoListingItem);
       }
@@ -183,41 +179,9 @@ public abstract class MainActivity extends BaseActivity
 
     photoListingAdapter = new PhotoListingAdapter();
     photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
-    photoListingAdapter.registerListingItemType(new CaptionItemType(PhotoListingAdapter.TYPE_CAPTION));
 
     photoGalleryAdapter = new PhotoGalleryAdapter();
     photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
-  }
-
-  public static class CaptionItemType extends ListingItemType<RecyclerListingViewHolder> {
-    public CaptionItemType(int viewType) {
-      super(viewType);
-    }
-
-    @Override
-    public View createView(ViewGroup container) {
-      return new TextView(container.getContext());
-    }
-
-    @Override
-    public RecyclerListingViewHolder createViewHolder(View view) {
-      return new PhotoListingCaptionViewHolder(view);
-    }
-  }
-
-  private static class PhotoListingCaptionViewHolder extends RecyclerListingViewHolder<String> {
-    TextView tvCaption;
-
-    public PhotoListingCaptionViewHolder(View view) {
-      super(view);
-
-      tvCaption = (TextView) view;
-    }
-
-    @Override
-    public void bind(String s) {
-      tvCaption.setText(s);
-    }
   }
 
   protected void initTemplateViews() {
@@ -279,7 +243,9 @@ public abstract class MainActivity extends BaseActivity
 
   @Override
   public void onPagingLoaded() {
+    photoListingAdapter.updateDataSet();
     photoListingAdapter.notifyDataSetChanged();
+    photoGalleryAdapter.updateDataSet();
     photoGalleryAdapter.notifyDataSetChanged();
   }
 

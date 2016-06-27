@@ -9,7 +9,7 @@
 
         <TextView
             android:id="@+id/bt_set_wallpaper"
-            style="@style/AppTheme.PhotoActionText"
+            style="@style/PhotoActionText"
             android:text="Set Wallpaper"
             android:layout_width="150dp"
             android:layout_height="wrap_content" />
@@ -20,7 +20,7 @@
 
         <TextView
             android:id="@+id/bt_share"
-            style="@style/AppTheme.PhotoActionText"
+            style="@style/PhotoActionText"
             android:text="Share"
             android:layout_width="150dp"
             android:layout_height="wrap_content" />

@@ -23,7 +23,7 @@ import com.facebook.samples.zoomable.ZoomableDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
-import com.khoinguyen.apptemplate.listing.adapter.ListingAdapter;
+import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
@@ -41,13 +41,14 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.apptemplate.listing.adapter.PagerListingAdapter;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationWillStart;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/11/16.
  */
-public class PhotoGalleryView extends ViewPager implements IPhotoPageableGalleryView<SharedData>, IPageableListingView {
+public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<SharedData> {
   private static final int PAGING_OFFSET = 3;
   private static final int DEF_OFFSCREEN_PAGE = 1;
   private static final int END_DRAG_MIN_DISTANCE_DPS = 75;
@@ -61,14 +62,14 @@ public class PhotoGalleryView extends ViewPager implements IPhotoPageableGallery
   protected boolean isDragging;
   protected float lastDraggingY;
   protected float lastDraggingX;
-  protected ListingAdapter photoAdapter;
+  protected IListingAdapter photoAdapter;
   protected AdapterPhotoFinder adapterPhotoFinder;
 
   protected IEventBus eventBus;
 
   protected PhotoGalleryPagerAdapter adapterPhotoGallery;
 
-  protected IPhotoViewerKitPageableWidget<SharedData> photoKitWidget;
+  protected IPhotoViewerKitWidget<SharedData> photoKitWidget;
 
   protected SharedData sharedData;
 
@@ -272,7 +273,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoPageableGallery
     return false;
   }
 
-  public void setListingAdapter(ListingAdapter photoAdapter) {
+  public void setListingAdapter(IListingAdapter photoAdapter) {
     this.photoAdapter = photoAdapter;
     adapterPhotoGallery.setListingViewAdapter(photoAdapter);
     if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
@@ -290,13 +291,9 @@ public class PhotoGalleryView extends ViewPager implements IPhotoPageableGallery
 
   @Override
   public void attach(IPhotoViewerKitWidget<SharedData> widget) throws UnsupportedOperationException {
-    if (!(widget instanceof IPhotoViewerKitPageableWidget)) {
-      throw new UnsupportedOperationException("widget must implement IPhotoViewerKitPageableWidget");
-    }
-
     sharedData = widget.getSharedData();
     eventBus = widget.getEventBus();
-    photoKitWidget = (IPhotoViewerKitPageableWidget<SharedData>) widget;
+    photoKitWidget = widget;
   }
 
   @Override

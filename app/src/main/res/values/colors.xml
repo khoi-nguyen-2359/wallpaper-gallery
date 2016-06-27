@@ -1,7 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="photo_action_bg_stroke">#fff</color>
-    <color name="bg_photo_action_text_normal">#0000</color>
-    <color name="bg_photo_action_text_pressed">#3fff</color>
     <color name="xkcn_avatar_pink">#FF2193</color>
 </resources>

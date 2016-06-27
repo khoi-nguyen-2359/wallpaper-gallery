@@ -1,17 +1,12 @@
 package com.khoinguyen.photoviewerkit.interfaces;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 
 /**
  * Created by khoinguyen on 5/13/16.
  */
-public interface IPhotoViewerKitWidget<D> {
-  /**
-   * Open gallery view at a specific photo item.
-   * @param photoId id of the photo to be opened
-   */
-  void openGalleryView(String photoId);
-
+public interface IPhotoViewerKitWidget<D> extends IPageableListingView {
   /**
    * Handle back button action.
    * @return False indicates nothing handled, otherwise True.
@@ -26,4 +21,10 @@ public interface IPhotoViewerKitWidget<D> {
   IEventBus getEventBus();
 
   D getSharedData();
+
+  void onPagingNext(IPageableListingView component);
+
+  interface PagingListener {
+    void onPagingNext(IPhotoViewerKitWidget widget);
+  }
 }

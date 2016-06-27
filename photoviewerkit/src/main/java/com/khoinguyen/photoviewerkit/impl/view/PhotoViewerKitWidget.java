@@ -19,15 +19,19 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
-public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewerKitPageableWidget<SharedData> {
+public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewerKitWidget<SharedData> {
   protected LightEventBus eventBus;
 
-  protected IPhotoPageableGalleryView<SharedData> photoGalleryView;
-  protected IPhotoPageableListingView<SharedData> photoListingView;
+  protected IPhotoGalleryView<SharedData> photoGalleryView;
+  protected IPhotoListingView<SharedData> photoListingView;
+  protected View photoActionButton;
 
   protected PageableListingViewCollection pageableListingViews = new PageableListingViewCollection();
 
@@ -37,7 +41,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   protected TransitState currentTransitState = TransitState.LISTING;
   protected SharedData sharedData;
 
-  private PagingListener pagingListener;
+  private IPhotoViewerKitWidget.PagingListener pagingListener;
 
   public PhotoViewerKitWidget(Context context) {
     super(context);
@@ -93,8 +97,8 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   }
 
   private void initViews() {
-    photoListingView = (IPhotoPageableListingView<SharedData>) findViewById(R.id.photokit_photo_listing);
-    photoGalleryView = (IPhotoPageableGalleryView<SharedData>) findViewById(R.id.photokit_pager_photo_gallery);
+    photoListingView = (IPhotoListingView<SharedData>) findViewById(R.id.photokit_photo_listing);
+    photoGalleryView = (IPhotoGalleryView<SharedData>) findViewById(R.id.photokit_photo_gallery);
 
     transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
     transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_transition_backdrop);
@@ -111,6 +115,13 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     pageableListingViews.add(photoListingView);
     pageableListingViews.add(photoGalleryView);
   }
+
+  private OnClickListener onActionButtonClicked = new OnClickListener() {
+    @Override
+    public void onClick(View v) {
+
+    }
+  };
 
   @Subscribe
   public void handleOnPhotoShrinkAnimationStart(OnPhotoShrinkAnimationStart event) {
@@ -163,11 +174,6 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   @Override
   public void enablePaging() {
     pageableListingViews.enablePaging();
-  }
-
-  @Override
-  public void openGalleryView(String photoId) {
-
   }
 
   @Override

@@ -17,9 +17,8 @@ import java.util.List;
  * <p/>
  * This adapter provides item views/viewholders based on item view type.
  */
-public abstract class PartitionedListingAdapter<VH extends IViewHolder> implements ListingAdapter<VH> {
+public abstract class PartitionedListingAdapter<VH extends IViewHolder> extends ListingAdapter<VH> {
   protected SparseArrayCompat<ListingItemType<VH>> itemTypeRegistry = new SparseArrayCompat<>();
-  protected DataObservable dataObservable = new DataObservable();
 
   private L log = L.get("PartitionedListingAdapter");
 
@@ -27,27 +26,10 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> implemen
 
   protected abstract List<ListingItem> createDataSet();
 
-  @Override
   public void updateDataSet() {
     List<ListingItem> newDataSet = createDataSet();
     dataSet.clear();
     dataSet.addAll(newDataSet);
-  }
-
-  @Override
-  public final void notifyDataSetChanged() {
-    updateDataSet();
-    dataObservable.notifyChanged();
-  }
-
-  @Override
-  public void registerDataObserver(DataObserver observer) {
-    dataObservable.registerObserver(observer);
-  }
-
-  @Override
-  public void unregisterDataObserver(DataObserver observer) {
-    dataObservable.unregisterObserver(observer);
   }
 
   public void registerListingItemType(ListingItemType<VH> listingItemType) {
