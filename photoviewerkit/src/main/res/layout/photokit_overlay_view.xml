@@ -20,11 +20,11 @@
             app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"/>
 
         <TextView
+            android:textColorLink="#fff"
             android:textColor="#fff"
             tools:text="TextView\nasdasdasd\nLine3\nLine4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:maxLines="3"
             android:id="@+id/tv_photo_description"
             app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
             app:layout_constraintRight_toRightOf="@+id/constraintLayout"

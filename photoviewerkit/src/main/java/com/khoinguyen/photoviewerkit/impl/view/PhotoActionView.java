@@ -3,16 +3,16 @@ package com.khoinguyen.photoviewerkit.impl.view;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.res.TypedArray;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.view.LayoutInflater;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.LinearLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
-import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
@@ -26,8 +26,6 @@ import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComponent<SharedData> {
   public static final int TYPE_ICON = 0;
   public static final int TYPE_ICON_TEXT = 1;
-
-  private static final int ITEM_TAG_ACTION_ID = 0;
 
   private int type;
 
@@ -68,6 +66,10 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     a.recycle();
 
     setOrientation(HORIZONTAL);
+    setGravity(Gravity.CENTER_HORIZONTAL);
+    setShowDividers(SHOW_DIVIDER_MIDDLE);
+    Drawable divider = getResources().getDrawable(R.drawable.photoaction_item_divider);
+    setDividerDrawable(divider);
   }
 
   public void setPhoto(PhotoDisplayInfo photo) {
@@ -124,7 +126,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     IViewHolder viewHolder = listingAdapter.getViewHolder(itemView, viewType);
     Object data = listingAdapter.getData(i);
     viewHolder.bind(data);
-    itemView.setTag(ITEM_TAG_ACTION_ID, listingAdapter.getItemId(i));
+    itemView.setTag(R.id.photoaction_id_tag, listingAdapter.getItemId(i));
     // TODO: 6/29/16 what if the itemView has been setOnClickListener already?
     itemView.setOnClickListener(onItemClicked);
   }
@@ -132,7 +134,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
   private OnClickListener onItemClicked = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      triggerOnItemSelect(v.getTag(ITEM_TAG_ACTION_ID));
+      triggerOnItemSelect(v.getTag(R.id.photoaction_id_tag));
     }
   };
 

@@ -4,6 +4,8 @@ import android.content.Context;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
+import android.text.Html;
+import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -55,6 +57,7 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
     inflate(getContext(), R.layout.photokit_overlay_view, this);
     mainLayout = (ConstraintLayout) findViewById(R.id.constraintLayout);
     tvPhotoDescription = (TextView) findViewById(R.id.tv_photo_description);
+    tvPhotoDescription.setMovementMethod(LinkMovementMethod.getInstance());
     viewPhotoAction = (PhotoActionView) findViewById(R.id.view_photo_action);
   }
 
@@ -77,7 +80,8 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
 
   @Override
   public void bindPhoto(PhotoDisplayInfo photoDisplayInfo) {
-    tvPhotoDescription.setText(photoDisplayInfo.getDescription());
+    tvPhotoDescription.setText(Html.fromHtml(photoDisplayInfo.getDescription()));
+    viewPhotoAction.setPhoto(photoDisplayInfo);
   }
 
   @Override

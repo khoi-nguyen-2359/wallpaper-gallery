@@ -5,4 +5,5 @@
     <item name="photokit_photo_overlay" type="id"/>
     <item name="photokit_photo_backdrop" type="id"/>
     <item name="photokit_photo_transition" type="id"/>
+    <item name="photoaction_id_tag" type="id"/>
 </resources>

@@ -177,6 +177,8 @@ public abstract class MainActivity extends BaseActivity
     photoListingView.setPhotoAdapter(photoListingAdapter);
     photoGalleryView.setPhotoAdapter(photoGalleryAdapter);
     photoOverlayView.setPhotoActionAdapter(photoActionAdapter);
+    photoActionAdapter.updateDataSet();
+    photoActionAdapter.notifyDataSetChanged();
     photoOverlayView.setPhotoActionEventListener(photoActionListener);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
 
