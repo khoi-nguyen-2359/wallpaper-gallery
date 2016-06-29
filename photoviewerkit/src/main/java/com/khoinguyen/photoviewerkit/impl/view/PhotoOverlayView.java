@@ -1,16 +1,19 @@
 package com.khoinguyen.photoviewerkit.impl.view;
 
 import android.content.Context;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.photoviewerkit.impl.listingadapter.PhotoActionListingAdapter;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoOverlayView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
@@ -18,7 +21,7 @@ import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
  * Created by khoinguyen on 6/22/16.
  */
 
-public class PhotoOverlayView extends ViewGroup implements IPhotoOverlayView<SharedData> {
+public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<SharedData> {
   private TextView tvPhotoDescription;
   private ConstraintLayout mainLayout;
   private PhotoActionView viewPhotoAction;
@@ -42,11 +45,10 @@ public class PhotoOverlayView extends ViewGroup implements IPhotoOverlayView<Sha
     init();
   }
 
-  @Override
-  protected void onLayout(boolean changed, int l, int t, int r, int b) {
-    if (changed) {
-      mainLayout.layout(l, t, r, b);
-    }
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public PhotoOverlayView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    super(context, attrs, defStyleAttr, defStyleRes);
+    init();
   }
 
   private void init() {
@@ -64,12 +66,27 @@ public class PhotoOverlayView extends ViewGroup implements IPhotoOverlayView<Sha
   }
 
   @Override
-  public void setPhotoActionAdapter(PhotoActionListingAdapter actionAdapter) {
+  public void setPhotoActionAdapter(IListingAdapter actionAdapter) {
     viewPhotoAction.setActionAdapter(actionAdapter);
+  }
+
+  @Override
+  public void setPhotoActionEventListener(PhotoActionView.PhotoActionEventListener eventListener) {
+    viewPhotoAction.setEventListener(eventListener);
   }
 
   @Override
   public void bindPhoto(PhotoDisplayInfo photoDisplayInfo) {
     tvPhotoDescription.setText(photoDisplayInfo.getDescription());
+  }
+
+  @Override
+  public void show() {
+    setVisibility(VISIBLE);
+  }
+
+  @Override
+  public void hide() {
+    setVisibility(GONE);
   }
 }

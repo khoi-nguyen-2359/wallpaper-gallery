@@ -27,14 +27,17 @@ import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
+import com.khoinguyen.photoviewerkit.impl.view.PhotoActionView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
+import com.khoinguyen.photoviewerkit.impl.view.PhotoOverlayView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.adapter.PhotoActionAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.event.SetWallpaperClicked;
@@ -73,6 +76,8 @@ public abstract class MainActivity extends BaseActivity
   PhotoListingView photoListingView;
   @Bind(R.id.photokit_photo_gallery)
   PhotoGalleryView photoGalleryView;
+  @Bind(R.id.photokit_photo_overlay)
+  PhotoOverlayView photoOverlayView;
 
   protected MainViewPresenter presenter;
   private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
@@ -92,6 +97,15 @@ public abstract class MainActivity extends BaseActivity
       photoListingPresenter.loadNextPhotoPage();
     }
   };
+
+  private PhotoActionView.PhotoActionEventListener photoActionListener = new PhotoActionView.PhotoActionEventListener() {
+    @Override
+    public void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo) {
+      L.get().d("onPhotoActionSelect %d %s", actionId, photo.getPhotoId());
+    }
+  };
+
+  private PhotoActionAdapter photoActionAdapter;
 
   private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
     public static final int TYPE_PHOTO = 2;
@@ -162,6 +176,8 @@ public abstract class MainActivity extends BaseActivity
   private void initViews() {
     photoListingView.setPhotoAdapter(photoListingAdapter);
     photoGalleryView.setPhotoAdapter(photoGalleryAdapter);
+    photoOverlayView.setPhotoActionAdapter(photoActionAdapter);
+    photoOverlayView.setPhotoActionEventListener(photoActionListener);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
 
     photoKitWidget.setPagingListener(listingPagingListener);
@@ -180,6 +196,10 @@ public abstract class MainActivity extends BaseActivity
 
     photoGalleryAdapter = new PhotoGalleryAdapter();
     photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
+
+    photoActionAdapter = new PhotoActionAdapter();
+    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.ShareItemType(PhotoActionAdapter.TYPE_SHARE));
+    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.SetWallpaperItemType(PhotoActionAdapter.TYPE_SET_WALLPAPER));
   }
 
   protected void initTemplateViews() {

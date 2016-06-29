@@ -11,12 +11,12 @@ import android.widget.LinearLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
+import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.photoviewerkit.impl.listingadapter.PhotoActionListingAdapter;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitComponent;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
@@ -34,7 +34,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
   private PhotoDisplayInfo photo;
   private IEventBus eventBus;
   private SharedData sharedData;
-  private PhotoActionListingAdapter listingAdapter;
+  private IListingAdapter listingAdapter;
   private PhotoActionEventListener eventListener;
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -70,7 +70,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     setOrientation(HORIZONTAL);
   }
 
-  public void bind(PhotoDisplayInfo photo) {
+  public void setPhoto(PhotoDisplayInfo photo) {
     this.photo = photo;
   }
 
@@ -89,7 +89,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     sharedData = widget.getSharedData();
   }
 
-  public void setActionAdapter(PhotoActionListingAdapter listingAdapter) {
+  public void setActionAdapter(IListingAdapter listingAdapter) {
     if (this.listingAdapter != null) {
       this.listingAdapter.unregisterDataObserver(itemDataObserver);
     }
@@ -124,7 +124,8 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     IViewHolder viewHolder = listingAdapter.getViewHolder(itemView, viewType);
     Object data = listingAdapter.getData(i);
     viewHolder.bind(data);
-    itemView.setTag(ITEM_TAG_ACTION_ID, listingAdapter.getActionId(i));
+    itemView.setTag(ITEM_TAG_ACTION_ID, listingAdapter.getItemId(i));
+    // TODO: 6/29/16 what if the itemView has been setOnClickListener already?
     itemView.setOnClickListener(onItemClicked);
   }
 
@@ -140,7 +141,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
       return;
     }
 
-    eventListener.onPhotoActionSelect((Integer) actionId);
+    eventListener.onPhotoActionSelect((Integer) actionId, photo);
   }
 
   private View addAdapterItemView(int viewType) {
@@ -177,6 +178,6 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
 //  }
 
   public interface PhotoActionEventListener {
-    void onPhotoActionSelect(int actionId);
+    void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo);
   }
 }

@@ -15,6 +15,7 @@ import android.view.View;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.R;
@@ -22,9 +23,11 @@ import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoBackdropView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoOverlayView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoTransitionView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
@@ -45,6 +48,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   protected IPhotoListingView<SharedData, ? extends IViewHolder> photoListingView;
   protected IPhotoTransitionView<SharedData> transitDraweeView;
   protected IPhotoBackdropView<SharedData> transitBackdrop;
+  protected IPhotoOverlayView<SharedData> overlayView;
 
   protected LightEventBus eventBus;
   protected SharedData sharedData;
@@ -110,9 +114,10 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   private void initViews() {
     photoListingView = (IPhotoListingView<SharedData, ? extends IViewHolder>) findViewById(R.id.photokit_photo_listing);
     photoGalleryView = (IPhotoGalleryView<SharedData>) findViewById(R.id.photokit_photo_gallery);
+    overlayView = (IPhotoOverlayView<SharedData>) findViewById(R.id.photokit_photo_overlay);
 
-    transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_transition_photo);
-    transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_transition_backdrop);
+    transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_photo_transition);
+    transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_photo_backdrop);
 
     photoListingView.attach(this);
     photoGalleryView.attach(this);
@@ -184,6 +189,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   private AnimatorListenerAdapter shrinkAnimationListener = new AnimatorListenerAdapter() {
     @Override
     public void onAnimationStart(Animator animation) {
+      overlayView.hide();
       transitDraweeView.show();
       sharedData.setCurrentTransitionState(TRANS_TO_LISTING);
     }
@@ -265,10 +271,16 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
       photoGalleryView.translate(0, 0);
       photoGalleryView.show();
       transitDraweeView.hide();
+      overlayView.show();
     }
 
     public void setPhotoId(String photoId) {
       this.photoId = photoId;
     }
-  };
+  }
+
+  @Subscribe
+  public void onPhotoGalleryPageSelect(OnPhotoGalleryPhotoSelect event) {
+    overlayView.bindPhoto(event.getPhotoDisplayInfo());
+  }
 }

@@ -21,5 +21,7 @@ public interface IListingAdapter<VH extends IViewHolder> {
 
   int getViewType(int itemIndex);
 
+  int getItemId(int itemIndex);
+
   VH getViewHolder(View itemView, int viewType);
 }
