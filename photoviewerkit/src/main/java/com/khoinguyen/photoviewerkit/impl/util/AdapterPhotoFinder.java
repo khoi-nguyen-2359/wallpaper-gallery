@@ -9,7 +9,7 @@ import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
  * Created by khoinguyen on 5/9/16.
  */
 public class AdapterPhotoFinder {
-  private static final int NO_POSITION = -1;
+  public static final int NO_POSITION = -1;
   private IListingAdapter adapter;
 
   public AdapterPhotoFinder(IListingAdapter adapter) {

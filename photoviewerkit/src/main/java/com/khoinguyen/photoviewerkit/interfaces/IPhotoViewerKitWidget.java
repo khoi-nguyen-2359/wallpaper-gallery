@@ -25,7 +25,9 @@ public interface IPhotoViewerKitWidget<D> extends IPageableListingView {
 
   void onPagingNext(IPageableListingView component);
 
-  void openGallery(ListingItemInfo currentActiveItem);
+  void revealGallery(int itemIndex);
+
+  void returnToListing();
 
   interface PagingListener {
     void onPagingNext(IPhotoViewerKitWidget widget);

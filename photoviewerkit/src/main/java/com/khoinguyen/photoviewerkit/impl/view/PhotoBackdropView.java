@@ -11,13 +11,13 @@ import android.view.View;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRecenterAnimationUpdate;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationUpdate;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationUpdate;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoBackdropView;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
-public class PhotoBackdropView extends View {
+public class PhotoBackdropView extends View implements IPhotoBackdropView {
   public static final float TRANSITION_OPAQUE_VALUE = 0.75f;
   public PhotoBackdropView(Context context) {
     super(context);
@@ -42,22 +42,27 @@ public class PhotoBackdropView extends View {
   }
 
   @Subscribe
-  public void handlePhotoRevealAnimationUpdate(OnPhotoRevealAnimationUpdate event) {
-    setAlpha(event.getAnimationProgress());
-  }
-
-  @Subscribe
   public void handlePhotoRecenterAnimationUpdate(OnPhotoRecenterAnimationUpdate event) {
     setAlpha(TRANSITION_OPAQUE_VALUE + event.getAnimatedFraction() * (1 - TRANSITION_OPAQUE_VALUE));
   }
 
   @Subscribe
-  public void handlePhotoShrinkAnimationUpdate(OnPhotoShrinkAnimationUpdate event) {
-    setAlpha(TRANSITION_OPAQUE_VALUE * (1 - event.getAnimationProgress()));
+  public void onPhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
+    setAlpha(TRANSITION_OPAQUE_VALUE);
   }
 
-  @Subscribe
-  public void handlePhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
-    setAlpha(TRANSITION_OPAQUE_VALUE);
+  @Override
+  public void attach(IPhotoViewerKitWidget widget) {
+
+  }
+
+  @Override
+  public void updateAlphaOnShrinkAnimationUpdate(float animationProgress) {
+    setAlpha(TRANSITION_OPAQUE_VALUE * (1 - animationProgress));
+  }
+
+  @Override
+  public void updateAlphaOnRevealAnimationUpdate(float animationProgress) {
+    setAlpha(animationProgress);
   }
 }

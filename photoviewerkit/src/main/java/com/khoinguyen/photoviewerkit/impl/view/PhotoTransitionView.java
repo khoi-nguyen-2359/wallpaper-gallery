@@ -1,6 +1,5 @@
 package com.khoinguyen.photoviewerkit.impl.view;
 
-import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ValueAnimator;
 import android.content.Context;
@@ -16,16 +15,7 @@ import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationStart;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationUpdate;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationStart;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationUpdate;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoTransitionView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
@@ -69,65 +59,25 @@ public class PhotoTransitionView extends ClippingRevealDraweeView implements IPh
   }
 
   @Override
-  public void startRevealAnimation(RectF itemRect, RectF fullRect) {
+  public void startRevealAnimation(RectF itemRect, RectF fullRect, AnimatorListenerAdapter animatorListener, ValueAnimator.AnimatorUpdateListener updateListener) {
     revealAnim = createRevealAnimation(itemRect, fullRect)
-        .addAnimatorListener(new AnimatorListenerAdapter() {
-          @Override
-          public void onAnimationStart(Animator animation) {
-            eventBus.post(new OnPhotoRevealAnimationStart());
-          }
-
-          @Override
-          public void onAnimationEnd(Animator animation) {
-            eventBus.post(new OnPhotoRevealAnimationEnd());
-            setVisibility(View.GONE);
-          }
-        })
-        .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-          @Override
-          public void onAnimationUpdate(ValueAnimator animation) {
-            eventBus.post(new OnPhotoRevealAnimationUpdate(animation.getAnimatedFraction()));
-          }
-        });
+        .addAnimatorListener(animatorListener)
+        .addUpdateListener(updateListener);
     revealAnim.run();
   }
 
-  public void startShrinkAnimation(RectF fullRect) {
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
-    shrinkAnim = createShrinkAnimation(fullRect, currentSelectedItem.getItemRect())
-        .addAnimatorListener(new AnimatorListenerAdapter() {
-          @Override
-          public void onAnimationStart(Animator animation) {
-            setVisibility(View.VISIBLE);
-            eventBus.post(new OnPhotoShrinkAnimationStart());
-          }
-
-          @Override
-          public void onAnimationEnd(Animator animation) {
-            setVisibility(View.GONE);
-            eventBus.post(new OnPhotoShrinkAnimationEnd());
-          }
-        })
-        .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-          @Override
-          public void onAnimationUpdate(ValueAnimator animation) {
-            eventBus.post(new OnPhotoShrinkAnimationUpdate(animation.getAnimatedFraction()));
-          }
-        });
-
-    eventBus.post(new OnPhotoShrinkAnimationWillStart());
+  @Override
+  public void startShrinkAnimation(RectF itemRect, RectF fullRect, AnimatorListenerAdapter animatorListener, ValueAnimator.AnimatorUpdateListener updateListener) {
+    shrinkAnim = createShrinkAnimation(fullRect, itemRect)
+        .addAnimatorListener(animatorListener)
+        .addUpdateListener(updateListener);
     shrinkAnim.run();
-  }
-
-  @Subscribe
-  public void handlePhotoGalleryDraggingEnd(final OnPhotoGalleryDragEnd event) {
-    startShrinkAnimation(event.getFullRect());
   }
 
   @Subscribe
   public void handlePhotoGalleryPageSelected(OnPhotoGalleryPhotoSelect event) {
     //todo: might affect loading speed of gallery itemView
-    setImageUri(event.getPhotoDisplayInfo().getLowResUri());
+    displayPhoto(event.getPhotoDisplayInfo());
   }
 
   public void setEventBus(LightEventBus eventBus) {
@@ -150,7 +100,12 @@ public class PhotoTransitionView extends ClippingRevealDraweeView implements IPh
   }
 
   @Override
-  public void dislayPhoto(PhotoDisplayInfo photo) {
+  public void displayPhoto(PhotoDisplayInfo photo) {
     setImageUri(photo.getLowResUri());
+  }
+
+  @Override
+  public void hide() {
+    setVisibility(GONE);
   }
 }

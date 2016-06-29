@@ -31,8 +31,6 @@ import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.impl.util.RecyclerViewPagingListener;
@@ -100,9 +98,14 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   }
 
   private static RectF createItemViewLocation(View itemView) {
-    int[] location = new int[2];
-    itemView.getLocationInWindow(location);
-    return new RectF(location[0], location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+    // // TODO: 6/28/16 what if itemView is null, which is in case that the requested photo item hasn't been laid out as view. Should return a rect to be ignored.
+    if (itemView != null) {
+      int[] location = new int[2];
+      itemView.getLocationInWindow(location);
+      return new RectF(location[0], location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+    }
+
+    return new RectF();
   }
 
   @Subscribe
@@ -110,38 +113,26 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     scrollToPosition(event.getItemIndex());
   }
 
-  private void changeSelectedItemHighlight() {
-    ListingItemInfo lastSelectedItem = sharedData.getLastActiveItem();
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
-    String lastActivePhotoId = lastSelectedItem.getPhotoId();
-    String currentActivePhotoId = currentSelectedItem.getPhotoId();
-    if (lastActivePhotoId != null && lastActivePhotoId.equals(currentActivePhotoId)) {
+  private void changeActiveItemHighlight() {
+    if (!sharedData.hasActiveItemChanged()) {
       return;
     }
 
+    String lastActivePhotoId = sharedData.getLastActiveItem().getPhotoId();
+    String currentActivePhotoId = sharedData.getCurrentActiveItem().getPhotoId();
     unhighlightClickedItemView(photoFinder.indexOf(lastActivePhotoId));
     highlightClickedItemView(photoFinder.indexOf(currentActivePhotoId));
   }
 
   @Subscribe
   public void onPhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
-    onChangeSelectedItemHighlight();
+    toggleActiveItems();
   }
 
-  @Subscribe
-  public void onPhotoShrinkAnimWillStart(OnPhotoShrinkAnimationWillStart event) {
-    onChangeSelectedItemHighlight();
-  }
-
-  private void onChangeSelectedItemHighlight() {
+  @Override
+  public void toggleActiveItems() {
     updateActiveItemRect();
-    changeSelectedItemHighlight();
-  }
-
-  @Subscribe
-  public void handlePhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
-    unhighlightClickedItemView(photoFinder.indexOf(currentSelectedItem.getPhotoId()));
+    changeActiveItemHighlight();
   }
 
   public void setEventBus(LightEventBus eventBus) {
@@ -169,38 +160,31 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
    */
   public class RecyclerViewAdapter extends RecyclerListingAdapter {
     @Override
-    public void onBindViewHolder(RecyclerListingViewHolder viewHolder, int position) {
+    public void onBindViewHolder(final RecyclerListingViewHolder viewHolder, int position) {
       super.onBindViewHolder(viewHolder, position);
-      log.d("DefaultPhotoListingView.childCount=%d", PhotoListingView.this.getChildCount());
 
-      final PhotoDisplayInfo photoData = photoFinder.getPhoto(position);
-      if (photoData != null) {
+      //// TODO: 6/27/16 what if the itemView has already set onClickListener before?
         viewHolder.itemView.setOnClickListener(new OnClickListener() {
           @Override
           public void onClick(View v) {
-            resetActiveItemInfo(photoData);
-            updateActiveItemRect();
-            photoKitWidget.openGallery(sharedData.getCurrentActiveItem());
+            int position = rcvLayoutMan.getPosition(v);
+            photoKitWidget.revealGallery(position);
 
             eventBus.post(new OnPhotoListingItemActivate());
           }
         });
       }
-    }
   }
 
-  private void resetActiveItemInfo(PhotoDisplayInfo activeItem) {
-    if (activeItem == null) {
+  @Override
+  public void activatePhotoItem(int position) {
+    PhotoDisplayInfo photoData = photoFinder.getPhoto(position);
+    if (photoData == null) {
       return;
     }
 
-    ListingItemInfo lastActiveItem = sharedData.getLastActiveItem();
-    ListingItemInfo currentActiveItem = sharedData.getCurrentActiveItem();
-
-    lastActiveItem.setPhoto(null);
-    lastActiveItem.updateItemRect(new RectF());
-
-    currentActiveItem.setPhoto(activeItem);
+    sharedData.resetActiveItemInfo(photoData);
+    updateActiveItemRect();
   }
 
   private void updateActiveItemRect() {

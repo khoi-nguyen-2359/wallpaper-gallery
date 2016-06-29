@@ -26,19 +26,15 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
-import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.impl.anim.ZoomToAnimation;
 import com.khoinguyen.photoviewerkit.impl.util.AdapterPhotoFinder;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragEnd;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRecenterAnimationUpdate;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.apptemplate.listing.adapter.PagerListingAdapter;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationWillStart;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.util.log.L;
@@ -213,8 +209,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private void onDragEnd(float endX, float endY) {
     double dragDistance = Math.hypot(endX - lastInterceptX, endY - lastInterceptY);
     if (dragDistance > endDragMinDistance) {
-      setVisibility(View.GONE);
-      eventBus.post(new OnPhotoGalleryDragEnd(new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight())));
+      photoKitWidget.returnToListing();
     } else {
       new ZoomToAnimation()
           .rects(new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight()), new RectF(0,0,getWidth(),getHeight()))
@@ -238,10 +233,15 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private void dragTo(float draggingX, float draggingY) {
     float xTranslate = draggingX - lastDraggingX;
     float yTranslate = draggingY - lastDraggingY;
-    setTranslationX(getTranslationX() + xTranslate);
-    setTranslationY(getTranslationY() + yTranslate);
+    translate(getTranslationX() + xTranslate, getTranslationY() + yTranslate);
     lastDraggingX = draggingX;
     lastDraggingY = draggingY;
+  }
+
+  @Override
+  public void translate(float x, float y) {
+    setTranslationX(x);
+    setTranslationY(y);
   }
 
   /**
@@ -350,21 +350,33 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
    * EVENT HANDLERS
    */
 
-  @Subscribe
-  public void handlePhotoRevealAnimationEnd(OnPhotoRevealAnimationEnd event) {
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
-    setCurrentItem(adapterPhotoFinder.indexOf(currentSelectedItem.getPhotoId()), false);
-    setTranslationX(0);
-    setTranslationY(0);
-    setVisibility(View.VISIBLE);
+  @Override
+  public void setCurrentPhoto(String photoId) {
+    int itemIndex = adapterPhotoFinder.indexOf(photoId);
+    if (itemIndex == AdapterPhotoFinder.NO_POSITION) {
+      return;
+    }
+
+    setCurrentItem(itemIndex, false);
   }
 
-  @Subscribe
-  public void handlePhotoShrinkAnimWillStart(OnPhotoShrinkAnimationWillStart event) {
-    zoomPrimaryItemToOriginal();
+  @Override
+  public void setCurrentPhoto(int itemIndex) {
+    PhotoDisplayInfo photo = adapterPhotoFinder.getPhoto(itemIndex);
+    if (photo == null) {
+      return;
+    }
+
+    setCurrentItem(itemIndex, false);
   }
 
-  private void zoomPrimaryItemToOriginal() {
+  @Override
+  public void show() {
+    setVisibility(VISIBLE);
+  }
+
+  @Override
+  public void zoomPrimaryItem(Matrix transformMatrix) {
     ZoomableDraweeView primaryItemView = (ZoomableDraweeView) findViewWithTag(adapterPhotoGallery.primaryItemAdapterPosition);
     if (primaryItemView == null) {
       return;
@@ -373,8 +385,13 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     ZoomableController zoomableController = primaryItemView.getZoomableController();
     if (zoomableController instanceof DefaultZoomableController) {
       DefaultZoomableController animatedZoomableController = (DefaultZoomableController) zoomableController;
-      animatedZoomableController.setTransform(new Matrix());
+      animatedZoomableController.setTransform(transformMatrix);
     }
+  }
+
+  @Override
+  public void hide() {
+    setVisibility(GONE);
   }
 
   /**

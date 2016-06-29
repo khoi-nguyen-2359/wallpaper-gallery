@@ -1,10 +1,15 @@
 package com.khoinguyen.photoviewerkit.impl.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ValueAnimator;
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
+import android.support.annotation.IntDef;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -14,39 +19,40 @@ import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.apptemplate.eventbus.LightEventBus;
-import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationEnd;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRevealAnimationStart;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationEnd;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoShrinkAnimationStart;
 import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
+import com.khoinguyen.photoviewerkit.interfaces.IPhotoBackdropView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoTransitionView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
-import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
 public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewerKitWidget<SharedData> {
-  protected LightEventBus eventBus;
+
+  @IntDef({TRANS_LISTING, TRANS_TO_GALLERY, TRANS_GALLERY, TRANS_TO_LISTING})
+  public @interface TransitionState {}
+
+  public static final int TRANS_LISTING = 0;
+  public static final int TRANS_TO_GALLERY = 1;
+  public static final int TRANS_GALLERY = 2;
+  public static final int TRANS_TO_LISTING = 3;
 
   protected IPhotoGalleryView<SharedData> photoGalleryView;
   protected IPhotoListingView<SharedData, ? extends IViewHolder> photoListingView;
-  protected View photoActionButton;
-
-  protected PageableListingViewCollection pageableListingViews = new PageableListingViewCollection();
-
   protected IPhotoTransitionView<SharedData> transitDraweeView;
-  protected PhotoBackdropView transitBackdrop;
+  protected IPhotoBackdropView<SharedData> transitBackdrop;
 
-  protected TransitState currentTransitState = TransitState.LISTING;
+  protected LightEventBus eventBus;
   protected SharedData sharedData;
 
+  protected PageableListingViewCollection pageableListingViews = new PageableListingViewCollection();
   private IPhotoViewerKitWidget.PagingListener pagingListener;
+
+  private RevealAnimationListener revealAnimationListener = new RevealAnimationListener();
 
   public PhotoViewerKitWidget(Context context) {
     super(context);
@@ -128,30 +134,6 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     }
   };
 
-  @Subscribe
-  public void handleOnPhotoShrinkAnimationStart(OnPhotoShrinkAnimationStart event) {
-    currentTransitState = TransitState.TO_LISTING;
-  }
-
-  @Subscribe
-  public void handleOnPhotoShrinkAnimationEnd(OnPhotoShrinkAnimationEnd event) {
-    currentTransitState = TransitState.LISTING;
-  }
-
-  @Subscribe
-  public void handleOnPhotoRevealAnimStart(OnPhotoRevealAnimationStart event) {
-    currentTransitState = TransitState.TO_GALLERY;
-  }
-
-  @Subscribe
-  public void handleOnPhotoRevealAnimEnd(OnPhotoRevealAnimationEnd event) {
-    currentTransitState = TransitState.GALLERY;
-  }
-
-  public TransitState getTransitionState() {
-    return currentTransitState;
-  }
-
   public void registerEvents() {
     eventBus.register(photoGalleryView);
     eventBus.register(photoListingView);
@@ -183,14 +165,38 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
 
   @Override
   public boolean handleBackPress() {
-    if (currentTransitState == TransitState.GALLERY) {
-      ((View) photoGalleryView).setVisibility(View.GONE);
-      transitDraweeView.startShrinkAnimation(new RectF(0, 0, getWidth(), getHeight()));
+    if (sharedData.getCurrentTransitionState() == TRANS_GALLERY) {
+      photoListingView.toggleActiveItems();
+      returnToListing();
       return true;
     }
 
     return false;
   }
+
+  private ValueAnimator.AnimatorUpdateListener shrinkAnimationUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+    @Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+      transitBackdrop.updateAlphaOnShrinkAnimationUpdate(animation.getAnimatedFraction());
+    }
+  };
+
+  private AnimatorListenerAdapter shrinkAnimationListener = new AnimatorListenerAdapter() {
+    @Override
+    public void onAnimationStart(Animator animation) {
+      transitDraweeView.show();
+      sharedData.setCurrentTransitionState(TRANS_TO_LISTING);
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+      transitDraweeView.hide();
+      sharedData.setCurrentTransitionState(TRANS_LISTING);
+      sharedData.getLastActiveItem().setPhoto(sharedData.getCurrentActiveItem().getPhoto());
+      sharedData.getCurrentActiveItem().setPhoto(null);
+      photoListingView.toggleActiveItems();
+    }
+  };
 
   public void setPagingListener(PagingListener pagingListener) {
     this.pagingListener = pagingListener;
@@ -203,21 +209,66 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     }
   }
 
-  @Override
-  public void openGallery(ListingItemInfo currentActiveItem) {
+  private void revealGallery(final ListingItemInfo itemInfo) {
+    if (itemInfo == null || !itemInfo.isPhotoValid()) {
+      return;
+    }
+
     transitDraweeView.show();
-    transitDraweeView.dislayPhoto(currentActiveItem.getPhoto());
-    Rect fullRect = new Rect();
-    getDrawingRect(fullRect);
-    L.get().d("openGallery fullrect=%s", fullRect);
-    transitDraweeView.startRevealAnimation(currentActiveItem.getItemRect(), new RectF(fullRect));
+    transitDraweeView.displayPhoto(itemInfo.getPhoto());
+
+    revealAnimationListener.setPhotoId(itemInfo.getPhotoId());
+    transitDraweeView.startRevealAnimation(itemInfo.getItemRect(), getWidgetFullRect(), revealAnimationListener, revealAnimUpdateListener);
   }
 
-  // // TODO: 6/17/16 move this into SharedData
-  enum TransitState {
-    LISTING,
-    TO_GALLERY,
-    GALLERY,
-    TO_LISTING
+  @Override
+  public void revealGallery(int itemIndex) {
+    photoListingView.activatePhotoItem(itemIndex);
+    ListingItemInfo currentActiveItem = sharedData.getCurrentActiveItem();
+    revealGallery(currentActiveItem);
   }
+
+  @Override
+  public void returnToListing() {
+    photoGalleryView.hide();
+    ListingItemInfo currActiveItem = sharedData.getCurrentActiveItem();
+    transitDraweeView.startShrinkAnimation(currActiveItem.getItemRect(), getWidgetFullRect(), shrinkAnimationListener, shrinkAnimationUpdateListener);
+    photoListingView.toggleActiveItems();
+    photoGalleryView.zoomPrimaryItem(new Matrix());
+  }
+
+  private RectF getWidgetFullRect() {
+    Rect fullRect = new Rect();
+    getDrawingRect(fullRect);
+    return new RectF(fullRect);
+  }
+
+  private ValueAnimator.AnimatorUpdateListener revealAnimUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+    @Override
+    public void onAnimationUpdate(ValueAnimator animation) {
+      transitBackdrop.updateAlphaOnRevealAnimationUpdate(animation.getAnimatedFraction());
+    }
+  };
+
+  private class RevealAnimationListener extends AnimatorListenerAdapter {
+    private String photoId;
+
+    @Override
+    public void onAnimationStart(Animator animation) {
+      sharedData.setCurrentTransitionState(TRANS_TO_GALLERY);
+    }
+
+    @Override
+    public void onAnimationEnd(Animator animation) {
+      sharedData.setCurrentTransitionState(TRANS_GALLERY);
+      photoGalleryView.setCurrentPhoto(photoId);
+      photoGalleryView.translate(0, 0);
+      photoGalleryView.show();
+      transitDraweeView.hide();
+    }
+
+    public void setPhotoId(String photoId) {
+      this.photoId = photoId;
+    }
+  };
 }
