@@ -5,9 +5,9 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="AppTheme.MainActivity" parent="AppTheme"></style>
+    <style name="AppTheme.MainActivity" parent="AppTheme"/>
 
-    <style name="AppTheme.SplashActivity" parent="AppTheme"></style>
+    <style name="AppTheme.SplashActivity" parent="AppTheme"/>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 
