@@ -271,20 +271,12 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     return false;
   }
 
-  public void setListingAdapter(IListingAdapter photoAdapter) {
+  public void setPhotoAdapter(IListingAdapter photoAdapter) {
     this.photoAdapter = photoAdapter;
     adapterPhotoGallery.setListingViewAdapter(photoAdapter);
     if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
       adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
     }
-  }
-
-  public void setEventBus(LightEventBus eventBus) {
-    this.eventBus = eventBus;
-  }
-
-  public void setSharedData(SharedData sharedData) {
-    this.sharedData = sharedData;
   }
 
   @Override

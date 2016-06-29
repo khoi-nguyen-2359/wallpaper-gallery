@@ -81,7 +81,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     addOnScrollListener(rcvPagingListener);
   }
 
-  @Override
   public void setPhotoAdapter(IListingAdapter<RecyclerListingViewHolder> adapter) {
     this.listingAdapter = adapter;
     adapterPhotos.setListingAdapter(listingAdapter);
@@ -133,14 +132,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   public void toggleActiveItems() {
     updateActiveItemRect();
     changeActiveItemHighlight();
-  }
-
-  public void setEventBus(LightEventBus eventBus) {
-    this.eventBus = eventBus;
-  }
-
-  public void setSharedData(SharedData sharedData) {
-    this.sharedData = sharedData;
   }
 
   @Override

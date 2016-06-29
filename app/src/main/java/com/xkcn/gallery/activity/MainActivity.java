@@ -161,7 +161,7 @@ public abstract class MainActivity extends BaseActivity
 
   private void initViews() {
     photoListingView.setPhotoAdapter(photoListingAdapter);
-    photoGalleryView.setListingAdapter(photoGalleryAdapter);
+    photoGalleryView.setPhotoAdapter(photoGalleryAdapter);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
 
     photoKitWidget.setPagingListener(listingPagingListener);

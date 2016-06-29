@@ -9,8 +9,6 @@ import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
  * Created by khoinguyen on 5/13/16.
  */
 public interface IPhotoListingView<D, VH extends IViewHolder> extends IPhotoViewerKitComponent<D>, IPageableListingView {
-  void setPhotoAdapter(IListingAdapter<VH> adapter);
-
   void toggleActiveItems();
 
   void activatePhotoItem(int position);

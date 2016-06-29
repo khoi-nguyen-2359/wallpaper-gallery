@@ -80,14 +80,6 @@ public class PhotoTransitionView extends ClippingRevealDraweeView implements IPh
     displayPhoto(event.getPhotoDisplayInfo());
   }
 
-  public void setEventBus(LightEventBus eventBus) {
-    this.eventBus = eventBus;
-  }
-
-  public void setSharedData(SharedData sharedData) {
-    this.sharedData = sharedData;
-  }
-
   @Override
   public void attach(IPhotoViewerKitWidget<SharedData> widget) {
     sharedData = widget.getSharedData();
