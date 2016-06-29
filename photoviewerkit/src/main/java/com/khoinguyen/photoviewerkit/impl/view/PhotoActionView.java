@@ -157,28 +157,6 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     this.eventListener = eventListener;
   }
 
-//  private void onShareClicked() {
-//    String sendText = null;
-//    Resources resources = getResources();
-//    if (TextUtils.isEmpty(photo.getPermalinkMeta())) {
-//      sendText = resources.getString(R.string.send_to_trailing_text, photo.getPermalink());
-//    } else {
-//      Spanned spanned = Html.fromHtml(photo.getPermalinkMeta());
-//      sendText = resources.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photo.getPermalink());
-//    }
-//
-//    Intent i = new Intent();
-//    i.setAction(Intent.ACTION_SEND);
-//    i.putExtra(Intent.EXTRA_TEXT, sendText);
-//    i.setType("text/plain");
-//
-//    getContext().startActivity(Intent.createChooser(i, resources.getString(R.string.send_to)));
-//  }
-//
-//  private void onSetWallpaperClicked() {
-//    EventBus.getDefault().post(new SetWallpaperClicked(photo));
-//  }
-
   public interface PhotoActionEventListener {
     void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo);
   }

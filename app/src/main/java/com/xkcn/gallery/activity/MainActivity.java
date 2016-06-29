@@ -2,6 +2,8 @@ package com.xkcn.gallery.activity;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Intent;
+import android.content.res.Resources;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -15,6 +17,9 @@ import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
+import android.text.Html;
+import android.text.Spanned;
+import android.text.TextUtils;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.FrameLayout;
@@ -40,7 +45,6 @@ import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
-import com.xkcn.gallery.event.SetWallpaperClicked;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
@@ -79,7 +83,7 @@ public abstract class MainActivity extends BaseActivity
   @Bind(R.id.photokit_photo_overlay)
   PhotoOverlayView photoOverlayView;
 
-  protected MainViewPresenter presenter;
+  protected MainViewPresenter mainViewPresenter;
   private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
   protected Dialog proDlg;
 
@@ -102,8 +106,51 @@ public abstract class MainActivity extends BaseActivity
     @Override
     public void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo) {
       L.get().d("onPhotoActionSelect %d %s", actionId, photo.getPhotoId());
+      switch (actionId) {
+        case PhotoActionAdapter.TYPE_SHARE: {
+          sharePhoto(photo);
+          break;
+        }
+
+        case PhotoActionAdapter.TYPE_SET_WALLPAPER: {
+          setWallpaper(photo);
+          break;
+        }
+      }
     }
   };
+
+  private void sharePhoto(PhotoDisplayInfo photo) {
+    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
+    if (photoDetails == null) {
+      return;
+    }
+
+    String sendText = null;
+    Resources resources = getResources();
+    if (TextUtils.isEmpty(photoDetails.getPermalinkMeta())) {
+      sendText = resources.getString(R.string.send_to_trailing_text, photoDetails.getPermalink());
+    } else {
+      Spanned spanned = Html.fromHtml(photoDetails.getPermalinkMeta());
+      sendText = resources.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photoDetails.getPermalink());
+    }
+
+    Intent i = new Intent();
+    i.setAction(Intent.ACTION_SEND);
+    i.putExtra(Intent.EXTRA_TEXT, sendText);
+    i.setType("text/plain");
+
+    startActivity(Intent.createChooser(i, resources.getString(R.string.send_to)));
+  }
+
+  private void setWallpaper(PhotoDisplayInfo photo) {
+    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
+    if (photoDetails == null) {
+      return;
+    }
+
+    mainViewPresenter.loadWallpaperSetting(photoDetails);
+  }
 
   private PhotoActionAdapter photoActionAdapter;
 
@@ -135,9 +182,10 @@ public abstract class MainActivity extends BaseActivity
         ListingItem photoListingItem = new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO));
         listingItems.add(photoListingItem);
       }
+
       return listingItems;
     }
-  };
+  }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -151,7 +199,7 @@ public abstract class MainActivity extends BaseActivity
   @Override
   protected void onStart() {
     super.onStart();
-    presenter.checkToCrawlPhoto();
+    mainViewPresenter.checkToCrawlPhoto();
     EventBus.getDefault().register(this);
     photoViewerKitEventBus.register(photoKitEventListener);
   }
@@ -186,7 +234,7 @@ public abstract class MainActivity extends BaseActivity
   }
 
   private void initData() {
-    presenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
+    mainViewPresenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
     photoListingPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
     photoListingPresenter.setView(this);
 
@@ -281,12 +329,6 @@ public abstract class MainActivity extends BaseActivity
   @Subscribe(threadMode = ThreadMode.MAIN)
   public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
     photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
-  }
-
-  @Subscribe(threadMode = ThreadMode.MAIN)
-  public void onEventMainThread(SetWallpaperClicked event) {
-    PhotoDetails photoDetails = event.getPhoto();
-    presenter.loadWallpaperSetting(photoDetails);
   }
 
   /***
