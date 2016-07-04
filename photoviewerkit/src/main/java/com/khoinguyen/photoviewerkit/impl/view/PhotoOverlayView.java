@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.constraint.ConstraintLayout;
 import android.text.Html;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
 import android.view.ViewGroup;
@@ -80,7 +81,13 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
 
   @Override
   public void bindPhoto(PhotoDisplayInfo photoDisplayInfo) {
-    tvPhotoDescription.setText(Html.fromHtml(photoDisplayInfo.getDescription()));
+    String photoDesc = photoDisplayInfo.getDescription();
+    if (TextUtils.isEmpty(photoDesc)) {
+      tvPhotoDescription.setText("");
+    } else {
+      tvPhotoDescription.setText(Html.fromHtml(photoDesc));
+    }
+    
     viewPhotoAction.setPhoto(photoDisplayInfo);
   }
 
