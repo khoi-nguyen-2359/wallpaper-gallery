@@ -56,7 +56,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   protected boolean isDragging;
   protected float lastDraggingY;
   protected float lastDraggingX;
-  protected IListingAdapter photoAdapter;
   protected AdapterPhotoFinder adapterPhotoFinder;
 
   protected IEventBus eventBus;
@@ -90,7 +89,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   }
 
   private void checkPagingNext(int position) {
-    if (!pagingNextHasFired && position >= photoAdapter.getCount() - PAGING_OFFSET) {
+    if (!pagingNextHasFired && position >= adapterPhotoGallery.getCount() - PAGING_OFFSET) {
       photoKitWidget.onPagingNext(this);
       pagingNextHasFired = true;
     }
@@ -277,7 +276,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   }
 
   public void setPhotoAdapter(IListingAdapter photoAdapter) {
-    this.photoAdapter = photoAdapter;
     adapterPhotoGallery.setListingViewAdapter(photoAdapter);
     if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
       adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
@@ -397,6 +395,11 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   private static class PhotoGalleryPagerAdapter extends PagerListingAdapter {
     int primaryItemAdapterPosition;
+
+    @Override
+    public int getItemPosition(Object object) {
+      return POSITION_NONE;
+    }
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
