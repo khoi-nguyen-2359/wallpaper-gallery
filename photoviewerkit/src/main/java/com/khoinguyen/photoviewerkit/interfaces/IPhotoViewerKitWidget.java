@@ -1,5 +1,7 @@
 package com.khoinguyen.photoviewerkit.interfaces;
 
+import android.graphics.RectF;
+
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
@@ -27,7 +29,7 @@ public interface IPhotoViewerKitWidget<D> extends IPageableListingView {
 
   void revealGallery(int itemIndex);
 
-  void returnToListing();
+  void returnToListing(RectF fullRect);
 
   interface PagingListener {
     void onPagingNext(IPhotoViewerKitWidget widget);

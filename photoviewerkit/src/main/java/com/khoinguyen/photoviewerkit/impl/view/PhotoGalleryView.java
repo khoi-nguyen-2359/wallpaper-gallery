@@ -3,6 +3,7 @@ package com.khoinguyen.photoviewerkit.impl.view;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Matrix;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
@@ -25,7 +26,6 @@ import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.photoviewerkit.R;
-import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.photoviewerkit.impl.anim.ZoomToAnimation;
 import com.khoinguyen.photoviewerkit.impl.util.AdapterPhotoFinder;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
@@ -209,10 +209,11 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private void onDragEnd(float endX, float endY) {
     double dragDistance = Math.hypot(endX - lastInterceptX, endY - lastInterceptY);
     if (dragDistance > endDragMinDistance) {
-      photoKitWidget.returnToListing();
+      RectF fullRect = getCurrentRect();
+      photoKitWidget.returnToListing(fullRect);
     } else {
       new ZoomToAnimation()
-          .rects(new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight()), new RectF(0,0,getWidth(),getHeight()))
+          .rects(getCurrentRect(), new RectF(0,0,getWidth(),getHeight()))
           .duration(DURATION_DRAG_CANCEL)
           .target(this)
           .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -223,6 +224,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
           })
           .run();
     }
+  }
+
+  private RectF getCurrentRect() {
+    return new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight());
   }
 
   /**

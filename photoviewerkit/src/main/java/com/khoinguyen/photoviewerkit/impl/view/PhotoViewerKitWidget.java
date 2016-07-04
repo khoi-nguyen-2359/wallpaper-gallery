@@ -172,7 +172,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   public boolean handleBackPress() {
     if (sharedData.getCurrentTransitionState() == TRANS_GALLERY) {
       photoListingView.toggleActiveItems();
-      returnToListing();
+      returnToListing(getWidgetFullRect());
       return true;
     }
 
@@ -235,10 +235,10 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   }
 
   @Override
-  public void returnToListing() {
+  public void returnToListing(RectF fullRect) {
     photoGalleryView.hide();
     ListingItemInfo currActiveItem = sharedData.getCurrentActiveItem();
-    transitDraweeView.startShrinkAnimation(currActiveItem.getItemRect(), getWidgetFullRect(), shrinkAnimationListener, shrinkAnimationUpdateListener);
+    transitDraweeView.startShrinkAnimation(currActiveItem.getItemRect(), fullRect, shrinkAnimationListener, shrinkAnimationUpdateListener);
     photoListingView.toggleActiveItems();
     photoGalleryView.zoomPrimaryItem(new Matrix());
   }
