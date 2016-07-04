@@ -68,10 +68,12 @@ public class LightEventBus implements IEventBus {
 
   private List<SubscriberMethod> findEventMethods(Class<?> subscriberClass) {
     List<SubscriberMethod> subscriberMethods = methodCache.get(subscriberClass);
-    if (subscriberMethods == null) {
-      subscriberMethods = new ArrayList<>();
-      methodCache.put(subscriberClass, subscriberMethods);
+    if (subscriberMethods != null) {
+      return subscriberMethods;
     }
+
+    subscriberMethods = new ArrayList<>();
+    methodCache.put(subscriberClass, subscriberMethods);
 
     Method[] methods;
     try {
