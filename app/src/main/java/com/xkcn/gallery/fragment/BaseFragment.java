@@ -8,7 +8,7 @@ import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
-import com.xkcn.gallery.di.ApplicationComponent;
+import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
 
 import javax.inject.Inject;

@@ -17,7 +17,7 @@ def configs = rootProject.extensions.getByName("ext")
 repositories {
     jcenter()
     maven { url 'https://maven.fabric.io/public' }
-    maven { url 'https://dl.bintray.com/akhoi90/maven' }
+//    maven { url 'https://dl.bintray.com/akhoi90/maven' }
 
     flatDir { dirs '../aars'}
 }

@@ -1,4 +1,4 @@
-package com.xkcn.gallery.di;
+package com.xkcn.gallery.di.module;
 
 import android.content.Context;
 
@@ -18,6 +18,8 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import rx.Scheduler;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 1/27/16.
@@ -72,5 +74,11 @@ public class ApplicationModule {
   @Singleton
   PhotoTagRepository providePhotoTagRepository() {
     return new PhotoTagSqliteRepository(dbHelper);
+  }
+
+  @Provides
+  @Singleton
+  Scheduler provideRxIoScheduler() {
+    return Schedulers.io();
   }
 }

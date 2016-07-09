@@ -35,9 +35,7 @@ public class PhotoListingUsecase {
       @Override
       public void call(Subscriber<? super DataPage<PhotoDetails>> subscriber) {
         List<PhotoDetails> photos = photoDetailsRepository.getHotestPhotos(startIndex, perPage);
-        DataPage<PhotoDetails> photoPage = new DataPage<>();
-        photoPage.setData(photos);
-        photoPage.setStartIndex(startIndex);
+        DataPage<PhotoDetails> photoPage = new DataPage<>(photos, startIndex);
         subscriber.onNext(photoPage);
         subscriber.onCompleted();
       }
@@ -49,9 +47,7 @@ public class PhotoListingUsecase {
       @Override
       public void call(Subscriber<? super DataPage<PhotoDetails>> subscriber) {
         List<PhotoDetails> photos = photoDetailsRepository.getLatestPhotos(startIndex, perPage);
-        DataPage<PhotoDetails> photoPage = new DataPage<>();
-        photoPage.setData(photos);
-        photoPage.setStartIndex(startIndex);
+        DataPage<PhotoDetails> photoPage = new DataPage<>(photos, startIndex);
         subscriber.onNext(photoPage);
         subscriber.onCompleted();
       }

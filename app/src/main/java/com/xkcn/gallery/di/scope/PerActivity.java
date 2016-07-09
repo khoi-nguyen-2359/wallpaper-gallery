@@ -1,4 +1,4 @@
-package com.xkcn.gallery.di;
+package com.xkcn.gallery.di.scope;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

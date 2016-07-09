@@ -234,9 +234,12 @@ public abstract class MainActivity extends BaseActivity
   }
 
   private void initData() {
-    mainViewPresenter = new MainViewPresenter(photoDownloader, this, preferenceRepository);
-    photoListingPresenter = new PhotoListingViewPresenter(photoListingUsecase, preferencesUsecase);
+    mainViewPresenter = new MainViewPresenter(this);
+    getApplicationComponent().inject(mainViewPresenter);
+
+    photoListingPresenter = new PhotoListingViewPresenter();
     photoListingPresenter.setView(this);
+    getApplicationComponent().inject(photoListingPresenter);
 
     SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
     kitkatSystemBarConfig = kitkatTintManager.getConfig();

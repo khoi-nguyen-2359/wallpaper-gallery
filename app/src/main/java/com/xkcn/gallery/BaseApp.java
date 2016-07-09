@@ -4,9 +4,9 @@ import android.app.Application;
 
 import com.khoinguyen.photoviewerkit.impl.PhotoViewerKit;
 import com.khoinguyen.util.log.L;
-import com.xkcn.gallery.di.ApplicationComponent;
-import com.xkcn.gallery.di.ApplicationModule;
-import com.xkcn.gallery.di.DaggerApplicationComponent;
+import com.xkcn.gallery.di.component.ApplicationComponent;
+import com.xkcn.gallery.di.component.DaggerApplicationComponent;
+import com.xkcn.gallery.di.module.ApplicationModule;
 
 /**
  * Created by khoinguyen on 12/25/14.

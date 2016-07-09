@@ -1,4 +1,4 @@
-package com.xkcn.gallery.di;
+package com.xkcn.gallery.di.module;
 
 import dagger.Module;
 

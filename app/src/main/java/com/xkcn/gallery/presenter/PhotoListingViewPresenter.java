@@ -8,8 +8,11 @@ import com.xkcn.gallery.view.MainView;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import rx.Observable;
 import rx.Observer;
+import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
@@ -23,19 +26,20 @@ public class PhotoListingViewPresenter {
 
   private MainView view;
 
-  private PhotoListingUsecase photoListingUsecase;
-  private PreferencesUsecase preferencesUsecase;
+  @Inject
+  PhotoListingUsecase photoListingUsecase;
+
+  @Inject
+  PreferencesUsecase preferencesUsecase;
+
+  @Inject
+  Scheduler rxIoScheduler;
 
   private Observable<Integer> photoPerPageObservable;
 
   private int currentListingType;
 
   private DataPage<PhotoDetails> allPages = new DataPage<>();
-
-  public PhotoListingViewPresenter(PhotoListingUsecase photoListingUsecase, PreferencesUsecase preferencesUsecase) {
-    this.photoListingUsecase = photoListingUsecase;
-    this.preferencesUsecase = preferencesUsecase;
-  }
 
   public void setView(MainView view) {
     this.view = view;
@@ -46,11 +50,11 @@ public class PhotoListingViewPresenter {
   }
 
   /**
-   *
-   * @param startIndex start item to load
+   * @param startIndex  start item to load
    * @param listingType type of current listing
    */
   public void loadPhotoPage(final int startIndex, final int listingType) {
+    currentListingType = listingType;
     getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<DataPage<PhotoDetails>>>() {
       @Override
       public Observable<DataPage<PhotoDetails>> call(Integer perPage) {
@@ -71,12 +75,15 @@ public class PhotoListingViewPresenter {
         return photoQueryObservable;
       }
     })
-        .subscribeOn(Schedulers.newThread())
+        .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<DataPage<PhotoDetails>>() {
           @Override
           public void onCompleted() {
-
+            view.onPagingLoaded();
+            if (!allPages.hasEnded()) {
+              view.enablePaging();
+            }
           }
 
           @Override
@@ -86,15 +93,10 @@ public class PhotoListingViewPresenter {
 
           @Override
           public void onNext(DataPage<PhotoDetails> photoPage) {
-            currentListingType = listingType;
-            if (photoPage.getStartIndex() == 0) {
-              allPages.clear();
+            if (photoPage.getStart() == 0) {
+              allPages.reset();
             }
             allPages.append(photoPage);
-            view.onPagingLoaded();
-            if (photoPage.getData() != null && photoPage.getData().size() != 0) {
-              view.enablePaging();
-            }
           }
         });
   }
@@ -104,7 +106,7 @@ public class PhotoListingViewPresenter {
   }
 
   public void loadNextPhotoPage() {
-    loadPhotoPage(allPages.getNextStartIndex(), currentListingType);
+    loadPhotoPage(allPages.getNextStart(), currentListingType);
   }
 
   public PhotoDetails findPhoto(String photoId) {

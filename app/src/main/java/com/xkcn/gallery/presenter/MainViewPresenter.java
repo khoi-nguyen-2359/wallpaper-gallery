@@ -1,34 +1,45 @@
 package com.xkcn.gallery.presenter;
 
+import com.facebook.common.executors.HandlerExecutorServiceImpl;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
+import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.imageloader.PhotoDownloader;
+import com.xkcn.gallery.util.LooperPreparedHandler;
 import com.xkcn.gallery.view.MainView;
 
 import java.io.File;
 
+import javax.inject.Inject;
+
 import rx.Observer;
+import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import rx.android.schedulers.HandlerScheduler;
 
 /**
  * Created by khoinguyen on 12/14/15.
  */
 public class MainViewPresenter {
-  private PhotoDownloader photoDownloader;
   private MainView view;
-  private PreferenceRepository prefDataStore;
 
-  public MainViewPresenter(PhotoDownloader photoDownloader, MainView view, PreferenceRepository prefDataStore) {
-    this.photoDownloader = photoDownloader;
+  @Inject
+  PhotoDownloader photoDownloader;
+
+  @Inject
+  PreferenceRepository prefDataStore;
+
+  @Inject
+  Scheduler rxIoScheduler;
+
+  public MainViewPresenter(MainView view) {
     this.view = view;
-    this.prefDataStore = prefDataStore;
   }
 
   public void loadWallpaperSetting(PhotoDetails photoDetails) {
     view.showLoading();
     photoDownloader.getPhotoDownloadObservable(photoDetails)
-        .subscribeOn(Schedulers.newThread())
+        .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<File>() {
           @Override
@@ -45,9 +56,9 @@ public class MainViewPresenter {
           @Override
           public void onNext(File photoUrl) {
             view.showWallpaperChooser(photoUrl);
-
           }
         });
+
   }
 
   public void checkToCrawlPhoto() {

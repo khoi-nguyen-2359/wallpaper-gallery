@@ -1,9 +1,12 @@
 package com.xkcn.gallery.imageloader;
 
 import android.content.Context;
+import android.content.Intent;
 import android.net.Uri;
+import android.os.Handler;
 
 import com.facebook.common.executors.CallerThreadExecutor;
+import com.facebook.common.executors.HandlerExecutorServiceImpl;
 import com.facebook.common.references.CloseableReference;
 import com.facebook.datasource.BaseDataSubscriber;
 import com.facebook.datasource.DataSource;
@@ -17,6 +20,7 @@ import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.util.AndroidUtils;
+import com.xkcn.gallery.util.LooperPreparedHandler;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -25,6 +29,9 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Executor;
+
+import javax.inject.Inject;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -71,7 +78,7 @@ public final class PhotoDownloader {
     Observable<File> saveFileFromFrescoObservable = Observable.create(new Observable.OnSubscribe<File>() {
       @Override
       public void call(Subscriber<? super File> subscriber) {
-        logger.d("photo is beging fetched from fresco");
+        logger.d("photo is being fetched by fresco thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
         ImageRequest request = ImageRequestBuilder
             .newBuilderWithSource(Uri.parse(downloadUrl))
             .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
@@ -80,6 +87,8 @@ public final class PhotoDownloader {
         ImagePipeline imagePipeline = Fresco.getImagePipeline();
         DataSource<CloseableReference<PooledByteBuffer>> dataSource = imagePipeline.fetchEncodedImage(request, this);
         dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, downloadUrl), CallerThreadExecutor.getInstance());
+
+        logger.d("dataSource=%s", dataSource.isFinished());
       }
     });
 
@@ -110,6 +119,7 @@ public final class PhotoDownloader {
 
     @Override
     protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
+      logger.d("onNewResultImpl thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
       if (!dataSource.isFinished()) {
         return;
       }

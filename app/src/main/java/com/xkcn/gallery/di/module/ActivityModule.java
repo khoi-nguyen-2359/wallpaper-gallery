@@ -1,6 +1,8 @@
-package com.xkcn.gallery.di;
+package com.xkcn.gallery.di.module;
 
 import android.app.Activity;
+
+import com.xkcn.gallery.di.scope.PerActivity;
 
 import dagger.Module;
 import dagger.Provides;

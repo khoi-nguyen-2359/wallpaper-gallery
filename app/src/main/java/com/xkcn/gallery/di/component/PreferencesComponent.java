@@ -1,4 +1,8 @@
-package com.xkcn.gallery.di;
+package com.xkcn.gallery.di.component;
+
+import com.xkcn.gallery.di.module.ActivityModule;
+import com.xkcn.gallery.di.scope.PerActivity;
+import com.xkcn.gallery.di.module.PreferencesModule;
 
 import dagger.Component;
 
