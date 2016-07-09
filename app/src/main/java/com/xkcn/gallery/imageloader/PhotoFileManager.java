@@ -25,6 +25,7 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -135,6 +136,7 @@ public final class PhotoFileManager {
     });
 
     Observable<Float> result = Observable.concat(getFileFromDiskObservable, saveFileFromFrescoObservable)
+        .sample(300, TimeUnit.MILLISECONDS)
         .takeUntil(new Func1<Float, Boolean>() {
           @Override
           public Boolean call(Float progress) {
