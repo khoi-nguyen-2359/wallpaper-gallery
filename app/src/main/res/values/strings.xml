@@ -26,5 +26,6 @@
     <string name="debug_clear_fresco_cache">Clear Fresco cache</string>
     <string name="photo_action_set_wallpaper">Set Wallpaper</string>
     <string name="photo_action_share">Share</string>
+    <string name="photo_action_download">Download</string>
 
 </resources>

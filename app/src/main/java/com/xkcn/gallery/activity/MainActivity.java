@@ -116,9 +116,23 @@ public abstract class MainActivity extends BaseActivity
           setWallpaper(photo);
           break;
         }
+
+        case PhotoActionAdapter.TYPE_DOWNLOAD: {
+          downloadPhoto(photo);
+          break;
+        }
       }
     }
   };
+
+  private void downloadPhoto(PhotoDisplayInfo photo) {
+    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
+    if (photoDetails == null) {
+      return;
+    }
+
+    mainViewPresenter.downloadPhoto(photoDetails);
+  }
 
   private void sharePhoto(PhotoDisplayInfo photo) {
     PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
@@ -251,8 +265,9 @@ public abstract class MainActivity extends BaseActivity
     photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
 
     photoActionAdapter = new PhotoActionAdapter();
-    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.ShareItemType(PhotoActionAdapter.TYPE_SHARE));
-    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.SetWallpaperItemType(PhotoActionAdapter.TYPE_SET_WALLPAPER));
+    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.ShareItemType());
+    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.SetWallpaperItemType());
+    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.DownloadItemType());
   }
 
   protected void initTemplateViews() {

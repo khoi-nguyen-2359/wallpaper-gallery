@@ -10,7 +10,7 @@ import com.xkcn.gallery.data.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.repo.PhotoTagSqliteRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepositoryImpl;
-import com.xkcn.gallery.imageloader.PhotoDownloader;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 
@@ -66,8 +66,8 @@ public class ApplicationModule {
 
   @Provides
   @Singleton
-  PhotoDownloader providePhotoDownloader() {
-    return new PhotoDownloader(baseApp);
+  PhotoFileManager providePhotoFileManager() {
+    return new PhotoFileManager(baseApp);
   }
 
   @Provides

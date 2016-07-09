@@ -18,6 +18,7 @@ import java.util.List;
 public class PhotoActionAdapter extends PartitionedListingAdapter {
   public static final int TYPE_SET_WALLPAPER = 2;
   public static final int TYPE_SHARE = 1;
+  public static final int TYPE_DOWNLOAD = 3;
 
   @Override
   public int getItemId(int itemIndex) {
@@ -33,13 +34,15 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
     allItems.add(shareItem);
     ListingItem setWallpaperItem = new ListingItem(null, getListingItemType(TYPE_SET_WALLPAPER));
     allItems.add(setWallpaperItem);
+    ListingItem downloadItem = new ListingItem(null, getListingItemType(TYPE_DOWNLOAD));
+    allItems.add(downloadItem);
     return allItems;
   }
 
   public static class ShareItemType extends ListingItemType {
 
-    public ShareItemType(int viewType) {
-      super(viewType);
+    public ShareItemType() {
+      super(TYPE_SHARE);
     }
 
     @Override
@@ -57,14 +60,31 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
 
   public static class SetWallpaperItemType extends ListingItemType {
 
-    public SetWallpaperItemType(int viewType) {
-      super(viewType);
+    public SetWallpaperItemType() {
+      super(TYPE_SET_WALLPAPER);
     }
 
     @Override
     public View createView(ViewGroup container) {
       LayoutInflater layoutInflater = getLayoutInflater(container);
       return layoutInflater.inflate(R.layout.photo_action_set_wallpaper, container, false);
+    }
+
+    @Override
+    public IViewHolder createViewHolder(View view) {
+      return new BaseViewHolder(view);
+    }
+  }
+
+  public static class DownloadItemType extends ListingItemType {
+
+    public DownloadItemType() {
+      super(TYPE_DOWNLOAD);
+    }
+
+    @Override
+    public View createView(ViewGroup container) {
+      return getLayoutInflater(container).inflate(R.layout.photo_action_download, container, false);
     }
 
     @Override

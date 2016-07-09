@@ -9,7 +9,7 @@ import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.di.component.ApplicationComponent;
-import com.xkcn.gallery.imageloader.PhotoDownloader;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
 
 import javax.inject.Inject;
 
@@ -24,7 +24,7 @@ public abstract class BaseFragment extends Fragment {
   @Inject
   PhotoTagRepository photoTagRepository;
   @Inject
-  PhotoDownloader photoDownloader;
+  PhotoFileManager photoFileManager;
 
   @Override
   public void onCreate(@Nullable Bundle savedInstanceState) {

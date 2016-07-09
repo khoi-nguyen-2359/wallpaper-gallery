@@ -8,7 +8,7 @@ import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.di.component.ApplicationComponent;
-import com.xkcn.gallery.imageloader.PhotoDownloader;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 
@@ -25,7 +25,7 @@ public abstract class BaseActivity extends AppCompatActivity {
   @Inject
   PhotoTagRepository photoTagRepository;
   @Inject
-  PhotoDownloader photoDownloader;
+  PhotoFileManager photoFileManager;
   @Inject
   PhotoListingUsecase photoListingUsecase;
   @Inject
