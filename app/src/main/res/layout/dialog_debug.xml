@@ -26,6 +26,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
+        <Button
+            android:text="@string/debug_clear_photo_files"
+            android:id="@+id/bt_delete_downloaded_photos"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </LinearLayout>
 
 </ScrollView>

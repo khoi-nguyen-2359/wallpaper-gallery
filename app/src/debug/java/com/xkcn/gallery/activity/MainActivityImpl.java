@@ -6,6 +6,7 @@ import android.view.MenuItem;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.fragment.DebugOptionsDialog;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 
 import org.greenrobot.eventbus.EventBus;
@@ -54,6 +55,10 @@ public class MainActivityImpl extends MainActivity {
     }
 
     return super.onNavigationItemSelected(item);
+  }
+
+  public PhotoFileManager getPhotoFileManager() {
+    return photoFileManager;
   }
 
     /* event bus */

@@ -27,5 +27,6 @@
     <string name="photo_action_set_wallpaper">Set Wallpaper</string>
     <string name="photo_action_share">Share</string>
     <string name="photo_action_download">Download</string>
+    <string name="debug_clear_photo_files">Delete all downloaded photos</string>
 
 </resources>

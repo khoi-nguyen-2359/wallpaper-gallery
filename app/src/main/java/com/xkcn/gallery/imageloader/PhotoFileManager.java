@@ -31,28 +31,75 @@ import rx.Subscriber;
 import rx.functions.Action0;
 import rx.functions.Func1;
 
-import static rx.Observable.concat;
-
 /**
  * Created by khoinguyen on 2/4/15.
  */
 public final class PhotoFileManager {
   public static final String SUFF_DOWNLOAD_TMP_FILE = ".downloading";
 
-  private final String externalFileDirPath;
-  private final String photoDirPath;
+  private File externalPhotoDir;
+  private File internalPhotoDir;
+
   private L logger;
 
   private Map<String, Observable<Float>> mapWorkingObservables;
 
+  private BaseApp baseApp;
+
   public PhotoFileManager(BaseApp baseApp) {
-    externalFileDirPath = baseApp.getExternalFilesDir(null).getAbsolutePath();
-    photoDirPath = baseApp.getDir("photo", Context.MODE_PRIVATE).getAbsolutePath();
+    this.baseApp = baseApp;
+    resolveExternalPhotoDir(baseApp);
+    resolveInternalPhotoDir(baseApp);
     logger = L.get(this);
     mapWorkingObservables = new HashMap<>();
   }
 
-  public Observable<Float> getPhotoFileObservable(final String photoUrl) {
+  private File resolveInternalPhotoDir(BaseApp baseApp) {
+    if (internalPhotoDir != null) {
+      return internalPhotoDir;
+    }
+
+    if (baseApp == null) {
+      return null;
+    }
+
+    //// TODO: 7/9/16 TEST THIS
+    try {
+      internalPhotoDir = baseApp.getDir("photo", Context.MODE_PRIVATE);
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+
+    return internalPhotoDir;
+  }
+
+  private File resolveExternalPhotoDir(BaseApp baseApp) {
+    if (externalPhotoDir != null) {
+      return externalPhotoDir;
+    }
+
+    if (baseApp == null) {
+      return null;
+    }
+
+    File externalFilesDir = baseApp.getExternalFilesDir(null);
+    if (externalFilesDir == null) {
+      return null;
+    }
+
+    try {
+      externalPhotoDir = new File(externalFilesDir.getAbsolutePath() + "/photo");
+      if (!externalPhotoDir.exists()) {
+        externalPhotoDir.mkdirs();
+      }
+    } catch (Exception ex) {
+      ex.printStackTrace();
+    }
+
+    return externalPhotoDir;
+  }
+
+  private Observable<Float> getPhotoFileObservable(final String photoUrl) {
     Observable<Float> workingObservable = mapWorkingObservables.get(photoUrl);
     if (workingObservable != null) {
       logger.d("photo is being downloaded");
@@ -192,27 +239,21 @@ public final class PhotoFileManager {
     return fixedFile;
   }
 
-  private File getExternalPhotoDir() {
-    File photoDir = new File(externalFileDirPath + "/photo");
-    if (!photoDir.exists()) {
-      //todo: what if failed to mkdirs
-      photoDir.mkdirs();
+  public File getPhotoDir() {
+    resolveExternalPhotoDir(baseApp);
+    // check this in case there are errors in creating the external dir while external storage is writable.
+    if (AndroidUtils.isExternalStorageWritable() && externalPhotoDir != null && externalPhotoDir.exists()) {
+      return externalPhotoDir;
     }
 
-    return photoDir;
+    return resolveInternalPhotoDir(baseApp);
   }
 
   private File getDownloadFileWithFileName(String fileName) {
-    // first check app external storage
-    if (AndroidUtils.isExternalStorageWritable()) {
-      return new File(String.format(Locale.US, "%s/%s", getExternalPhotoDir().getAbsolutePath(), fileName));
-    }
-
-    // second check app internal storage
-    return new File(String.format(Locale.US, "%s/%s", photoDirPath, fileName));
+    return new File(String.format(Locale.US, "%s/%s", getPhotoDir().getAbsolutePath(), fileName));
   }
 
-  public File getDownloadFile(String downloadUrl) {
+  private File getDownloadFile(String downloadUrl) {
     String fileName = AndroidUtils.getResourceName(downloadUrl);
     return getDownloadFileWithFileName(fileName);
   }

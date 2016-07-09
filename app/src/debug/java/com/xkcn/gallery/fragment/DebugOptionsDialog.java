@@ -1,5 +1,6 @@
 package com.xkcn.gallery.fragment;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -11,11 +12,18 @@ import android.view.ViewGroup;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
+import com.khoinguyen.util.log.L;
+import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.activity.BaseActivity;
+import com.xkcn.gallery.activity.MainActivityImpl;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.service.UpdateService;
 
 import org.greenrobot.eventbus.EventBus;
+
+import java.io.File;
 
 /**
  * Created by khoinguyen on 1/14/16.
@@ -44,6 +52,22 @@ public class DebugOptionsDialog extends DialogFragment {
       public void onClick(View v) {
         ImagePipeline imgPipeline = Fresco.getImagePipeline();
         imgPipeline.clearCaches();
+      }
+    });
+
+    root.findViewById(R.id.bt_delete_downloaded_photos).setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        Activity activity = getActivity();
+        if (activity instanceof MainActivityImpl) {
+          PhotoFileManager photoFileManager = ((MainActivityImpl) activity).getPhotoFileManager();
+          File[] files = photoFileManager.getPhotoDir().listFiles();
+          if (files.length > 0) {
+            for (File f : files) {
+              L.get().d("delete %s, %s", f.getName(), f.delete());
+            }
+          }
+        }
       }
     });
 
