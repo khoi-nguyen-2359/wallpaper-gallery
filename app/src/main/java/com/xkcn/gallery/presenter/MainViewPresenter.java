@@ -6,6 +6,9 @@ import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.view.MainView;
 
+import java.util.Map;
+import java.util.UUID;
+
 import javax.inject.Inject;
 
 import rx.Observer;
@@ -67,30 +70,31 @@ public class MainViewPresenter {
     }
   }
 
-  public void downloadPhoto(PhotoDetails photoDetails) {
+  public void downloadPhoto(final PhotoDetails photoDetails) {
     if (photoDetails == null) {
       return;
     }
 
-    view.showLoading();
     photoFileManager.getPhotoFileObservable(photoDetails)
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<Float>() {
           @Override
           public void onCompleted() {
-            view.hideLoading();
+            L.get().d("download onCompleted");
+            view.showDownloadComplete(photoDetails);
           }
 
           @Override
           public void onError(Throwable e) {
-            view.hideLoading();
-            view.showToast(e.getMessage());
+            L.get().d("download onError");
+            view.showDownloadError(photoDetails, e.getMessage());
           }
 
           @Override
           public void onNext(Float progress) {
-
+            L.get().d("download onNext %s", progress);
+            view.updateDownloadProgress(photoDetails, progress);
           }
         });
   }

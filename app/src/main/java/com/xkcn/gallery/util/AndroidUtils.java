@@ -38,8 +38,8 @@ public final class AndroidUtils {
   public static void startSetWallpaperChooser(Activity activity, Uri uriImg) {
     Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
     intent.addCategory(Intent.CATEGORY_DEFAULT);
-    intent.setDataAndType(uriImg, "image/jpeg");
-    intent.putExtra("mimeType", "image/jpeg");
+    intent.setDataAndType(uriImg, "image/*");
+    intent.putExtra("mimeType", "image/*");
 
     activity.startActivity(Intent.createChooser(intent, activity.getString(R.string.photo_actions_set_wp_chooser)));
   }

@@ -1,6 +1,8 @@
 package com.xkcn.gallery.activity;
 
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -16,6 +18,7 @@ import android.support.v4.view.ViewCompat;
 import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.Spanned;
@@ -43,6 +46,7 @@ import com.khoinguyen.util.log.L;
 import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
+import com.xkcn.gallery.data.PhotoDownloadNotificationsInfo;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.MainViewPresenter;
@@ -94,6 +98,9 @@ public abstract class MainActivity extends BaseActivity
   protected IEventBus photoViewerKitEventBus;
   private PhotoListingAdapter photoListingAdapter;
   private PhotoGalleryAdapter photoGalleryAdapter;
+
+  private PhotoDownloadNotificationsInfo downloadNotificationsInfo = new PhotoDownloadNotificationsInfo();
+  private NotificationCompat.Builder downloadNotificationBuilder;
 
   private IPhotoViewerKitWidget.PagingListener listingPagingListener = new IPhotoViewerKitWidget.PagingListener() {
     @Override
@@ -338,6 +345,57 @@ public abstract class MainActivity extends BaseActivity
   @Override
   public void enablePaging() {
     photoKitWidget.enablePaging();
+  }
+
+  @Override
+  public void updateDownloadProgress(PhotoDetails photoDetails, Float progress) {
+    NotificationManager notificationManager = getNotificationManager();
+    NotificationCompat.Builder notificationBuilder = getDownloadNotificationBuilder()
+        .setContentTitle(getString(R.string.download_notification_title, photoDetails.getIdentifierAsString()))
+        .setContentText(getString(R.string.download_notification_downloading_message))
+        .setOngoing(true)
+        .setProgress(100, (int) (progress * 100), false);
+
+    notificationManager.notify(downloadNotificationsInfo.getId(photoDetails), notificationBuilder.build());
+  }
+
+  @Override
+  public void showDownloadComplete(PhotoDetails photoDetails) {
+    NotificationManager notificationMan = getNotificationManager();
+
+    Intent resultIntent = new Intent(Intent.ACTION_VIEW);
+    resultIntent.setDataAndType(Uri.fromFile(photoFileManager.getDownloadFile(photoDetails)), "image/*");
+    PendingIntent intentOpenExternal = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    NotificationCompat.Builder notifBuilder = getDownloadNotificationBuilder()
+        .setContentTitle(getString(R.string.download_notification_title, photoDetails.getIdentifierAsString()))
+        .setContentText(getString(R.string.download_notification_completed))
+        .setOngoing(false)
+        .setContentIntent(intentOpenExternal)
+        .setProgress(0, 0, false);
+
+    notificationMan.notify(downloadNotificationsInfo.getId(photoDetails), notifBuilder.build());
+  }
+
+  private NotificationCompat.Builder getDownloadNotificationBuilder() {
+    if (downloadNotificationBuilder == null) {
+      downloadNotificationBuilder = new NotificationCompat.Builder(this)
+          .setSmallIcon(R.drawable.ic_launcher);
+    }
+
+    return downloadNotificationBuilder;
+  }
+
+  @Override
+  public void showDownloadError(PhotoDetails photoDetails, String message) {
+    NotificationManager notificationMan = getNotificationManager();
+    NotificationCompat.Builder notifBuilder = getDownloadNotificationBuilder()
+        .setContentTitle(getString(R.string.download_notification_title, photoDetails.getIdentifierAsString()))
+        .setContentText(getString(R.string.download_notification_error, message))
+        .setOngoing(false)
+        .setProgress(0, 0, false);
+
+    notificationMan.notify(downloadNotificationsInfo.getId(photoDetails), notifBuilder.build());
   }
 
   /***

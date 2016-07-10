@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
+import rx.functions.Func0;
 import rx.functions.Func1;
 
 /**
@@ -43,7 +44,7 @@ public final class PhotoFileManager {
 
   private L logger;
 
-  private Map<String, Observable<Float>> mapWorkingObservables;
+  private Map<String, Observable<Float>> mapDownloadingObservables;
 
   private BaseApp baseApp;
 
@@ -52,7 +53,7 @@ public final class PhotoFileManager {
     resolveExternalPhotoDir(baseApp);
     resolveInternalPhotoDir(baseApp);
     logger = L.get(this);
-    mapWorkingObservables = new HashMap<>();
+    mapDownloadingObservables = new HashMap<>();
   }
 
   private File resolveInternalPhotoDir(BaseApp baseApp) {
@@ -101,29 +102,23 @@ public final class PhotoFileManager {
   }
 
   private Observable<Float> getPhotoFileObservable(final String photoUrl) {
-    Observable<Float> workingObservable = mapWorkingObservables.get(photoUrl);
+    Observable<Float> workingObservable = mapDownloadingObservables.get(photoUrl);
     if (workingObservable != null) {
       logger.d("photo is being downloaded");
       return workingObservable.cache();
     }
 
-    Observable<Float> getFileFromDiskObservable = Observable.create(new Observable.OnSubscribe<Float>() {
+    Observable<Float> getFileObservable = Observable.create(new Observable.OnSubscribe<Float>() {
       @Override
       public void call(Subscriber<? super Float> subscriber) {
-        logger.d("photo is being searched in disk");
         File downloadedFile = getDownloadFile(photoUrl);
         if (downloadedFile.exists()) {
-          subscriber.onNext(0f);
-          subscriber.onNext(1f);
+          logger.d("photo's already been downloaded");
+          subscriber.onCompleted();
+          return;
         }
-        subscriber.onCompleted();
-      }
-    });
 
-    Observable<Float> saveFileFromFrescoObservable = Observable.create(new Observable.OnSubscribe<Float>() {
-      @Override
-      public void call(Subscriber<? super Float> subscriber) {
-        logger.d("photo is being fetched by fresco thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
+        logger.d("photo is being fetched by fresco");// thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
         ImageRequest request = ImageRequestBuilder
             .newBuilderWithSource(Uri.parse(photoUrl))
             .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
@@ -133,28 +128,19 @@ public final class PhotoFileManager {
         DataSource<CloseableReference<PooledByteBuffer>> dataSource = imagePipeline.fetchEncodedImage(request, this);
         dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, photoUrl), CallerThreadExecutor.getInstance());
       }
-    });
-
-    Observable<Float> result = Observable.concat(getFileFromDiskObservable, saveFileFromFrescoObservable)
-        .sample(300, TimeUnit.MILLISECONDS)
-        .takeUntil(new Func1<Float, Boolean>() {
-          @Override
-          public Boolean call(Float progress) {
-            // each observable, one by one, must emit progress values in [0..1], so use "1" to indicate the download file is ready to use and stop the stream.
-            return progress == 1;
-          }
-        })
+    })
+        .throttleFirst(300, TimeUnit.MILLISECONDS)
         .doOnTerminate(new Action0() {
           @Override
           public void call() {
-            mapWorkingObservables.remove(photoUrl);
+            mapDownloadingObservables.remove(photoUrl);
             logger.d("end photo fetching");
           }
         });
 
-    mapWorkingObservables.put(photoUrl, result);
+    mapDownloadingObservables.put(photoUrl, getFileObservable);
 
-    return result;
+    return getFileObservable;
   }
 
   public File getDownloadFile(PhotoDetails photoDetails) {
@@ -174,11 +160,7 @@ public final class PhotoFileManager {
     @Override
     public void onProgressUpdate(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
       float progress = dataSource.getProgress();
-//      logger.d("onProgressUpdate %f thread=%s id=%s", progress, Thread.currentThread().getName(), Thread.currentThread().getId());
-      if (progress < 1) {
-        // save value "1" for after saving file to disk
-        subscriber.onNext(progress);
-      }
+      subscriber.onNext(progress);
     }
 
     @Override
@@ -195,7 +177,6 @@ public final class PhotoFileManager {
         PooledByteBufferInputStream is = new PooledByteBufferInputStream(buffer);
         savePhoto(is, downloadUrl);
         is.close();
-        subscriber.onNext(1f);
         subscriber.onCompleted();
       } catch (Exception e) {
         e.printStackTrace();

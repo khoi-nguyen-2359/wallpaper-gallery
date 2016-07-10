@@ -242,7 +242,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     @Override
     public void bind(PhotoDisplayInfo data) {
       ivPhoto.setAspectRatio(1.5f);
-      ivPhoto.setImageURI(Uri.parse(data.getLowResUrl()));
+      ivPhoto.setImageURI(data.getLowResUri());
     }
   }
 

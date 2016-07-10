@@ -28,5 +28,11 @@
     <string name="photo_action_share">Share</string>
     <string name="photo_action_download">Download</string>
     <string name="debug_clear_photo_files">Delete all downloaded photos</string>
+    <string name="download_notification_title">Download photo %1$s</string>
+    <string name="download_notification_downloading_message">Please wait a few secs</string>
+    <string name="download_notification_completed">Completed. Please touch to open in external
+        viewer.
+    </string>
+    <string name="download_notification_error">Error: %1$s</string>
 
 </resources>

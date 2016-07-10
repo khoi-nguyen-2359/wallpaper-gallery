@@ -16,4 +16,10 @@ public interface MainView extends ScreenView {
   void showWallpaperChooser(File photoFile);
 
   void enablePaging();
+
+  void updateDownloadProgress(PhotoDetails photoDetails, Float progress);
+
+  void showDownloadComplete(PhotoDetails photoDetails);
+
+  void showDownloadError(PhotoDetails photoDetails, String message);
 }
