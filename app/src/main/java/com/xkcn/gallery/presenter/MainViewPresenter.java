@@ -6,9 +6,6 @@ import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.view.MainView;
 
-import java.util.Map;
-import java.util.UUID;
-
 import javax.inject.Inject;
 
 import rx.Observer;
@@ -45,7 +42,7 @@ public class MainViewPresenter {
             L.get().d("set wallpaper onCompleted");
 
             view.hideLoading();
-            view.showWallpaperChooser(photoFileManager.getDownloadFile(photoDetails));
+            view.showWallpaperChooser(photoFileManager.getPhotoFile(photoDetails));
           }
 
           @Override

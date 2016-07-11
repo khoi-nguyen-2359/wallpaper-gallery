@@ -8,7 +8,6 @@ import android.text.Html;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.util.AttributeSet;
-import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
@@ -88,7 +87,7 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
       tvPhotoDescription.setText(Html.fromHtml(photoDesc));
     }
     
-    viewPhotoAction.setPhoto(photoDisplayInfo);
+    viewPhotoAction.bindPhoto(photoDisplayInfo);
   }
 
   @Override

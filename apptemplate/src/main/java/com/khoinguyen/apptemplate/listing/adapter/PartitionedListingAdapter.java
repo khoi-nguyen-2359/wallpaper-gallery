@@ -65,6 +65,8 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> extends 
   @Override
   public VH getViewHolder(View itemView, int viewType) {
     ListingItemType<VH> viewCreator = itemTypeRegistry.get(viewType);
-    return viewCreator.createViewHolder(itemView);
+    VH viewHolder = viewCreator.createViewHolder(itemView);
+    viewHolder.setViewType(viewType);
+    return viewHolder;
   }
 }

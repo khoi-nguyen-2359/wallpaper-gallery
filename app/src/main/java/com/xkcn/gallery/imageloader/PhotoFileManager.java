@@ -30,8 +30,6 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
-import rx.functions.Func0;
-import rx.functions.Func1;
 
 /**
  * Created by khoinguyen on 2/4/15.
@@ -111,7 +109,7 @@ public final class PhotoFileManager {
     Observable<Float> getFileObservable = Observable.create(new Observable.OnSubscribe<Float>() {
       @Override
       public void call(Subscriber<? super Float> subscriber) {
-        File downloadedFile = getDownloadFile(photoUrl);
+        File downloadedFile = getPhotoFile(photoUrl);
         if (downloadedFile.exists()) {
           logger.d("photo's already been downloaded");
           subscriber.onCompleted();
@@ -143,8 +141,16 @@ public final class PhotoFileManager {
     return getFileObservable;
   }
 
-  public File getDownloadFile(PhotoDetails photoDetails) {
-    return getDownloadFile(photoDetails.getDefaultDownloadUrl());
+  public File getPhotoFile(PhotoDetails photoDetails) {
+    if (photoDetails == null) {
+      return new File("");
+    }
+
+    return getPhotoFile(photoDetails.getDefaultDownloadUrl());
+  }
+
+  public boolean isPhotoFileExist(PhotoDetails photoDetails) {
+    return getPhotoFile(photoDetails).exists();
   }
 
   class PhotoDownloadSubscriber extends BaseDataSubscriber<CloseableReference<PooledByteBuffer>> {
@@ -236,7 +242,7 @@ public final class PhotoFileManager {
     return new File(String.format(Locale.US, "%s/%s", getPhotoDir().getAbsolutePath(), fileName));
   }
 
-  private File getDownloadFile(String downloadUrl) {
+  private File getPhotoFile(String downloadUrl) {
     String fileName = AndroidUtils.getResourceName(downloadUrl);
     return getDownloadFileWithFileName(fileName);
   }

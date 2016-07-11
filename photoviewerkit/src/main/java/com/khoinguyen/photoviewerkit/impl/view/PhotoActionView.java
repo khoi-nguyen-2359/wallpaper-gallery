@@ -11,12 +11,14 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitComponent;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
@@ -72,8 +74,9 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     setDividerDrawable(divider);
   }
 
-  public void setPhoto(PhotoDisplayInfo photo) {
+  public void bindPhoto(PhotoDisplayInfo photo) {
     this.photo = photo;
+    populateAdapterItems();
   }
 
 //  private void initViews() {
@@ -109,7 +112,6 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
   };
 
   private void populateAdapterItems() {
-    removeAllViews();
     if (listingAdapter == null) {
       return;
     }
@@ -117,16 +119,22 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     final int nItem = listingAdapter.getCount();
     for (int i = 0; i < nItem; ++i) {
       int viewType = listingAdapter.getViewType(i);
-      View itemView = addAdapterItemView(viewType);
-      bindAdapterItemView(i, itemView, viewType);
+      View currentChildView = getChildAt(i);
+      IViewHolder currentViewHolder = currentChildView == null ? null : (IViewHolder) currentChildView.getTag(R.id.photoaction_tag_viewholder);
+      View itemView = currentChildView;
+      if (currentViewHolder == null || currentViewHolder.getViewType() != viewType) {
+        itemView = addAdapterItemView(viewType);
+      }
+
+      bindAdapterItemView(i, itemView);
     }
   }
 
-  private void bindAdapterItemView(int i, View itemView, int viewType) {
-    IViewHolder viewHolder = listingAdapter.getViewHolder(itemView, viewType);
+  private void bindAdapterItemView(int i, View itemView) {
     Object data = listingAdapter.getData(i);
+    IViewHolder viewHolder = (IViewHolder) itemView.getTag(R.id.photoaction_tag_viewholder);
     viewHolder.bind(data);
-    itemView.setTag(R.id.photoaction_id_tag, listingAdapter.getItemId(i));
+    itemView.setTag(R.id.photoaction_tag_id, listingAdapter.getItemId(i));
     // TODO: 6/29/16 what if the itemView has been setOnClickListener already?
     itemView.setOnClickListener(onItemClicked);
   }
@@ -134,7 +142,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
   private OnClickListener onItemClicked = new OnClickListener() {
     @Override
     public void onClick(View v) {
-      triggerOnItemSelect(v.getTag(R.id.photoaction_id_tag));
+      triggerOnItemSelect(v.getTag(R.id.photoaction_tag_id));
     }
   };
 
@@ -148,6 +156,8 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
 
   private View addAdapterItemView(int viewType) {
     View itemView = listingAdapter.getView(this, viewType);
+    IViewHolder viewHolder = listingAdapter.getViewHolder(itemView, viewType);
+    itemView.setTag(R.id.photoaction_tag_viewholder, viewHolder);
     addView(itemView);
 
     return itemView;

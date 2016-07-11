@@ -17,4 +17,14 @@ public class RecyclerListingViewHolder<DATA> extends RecyclerView.ViewHolder imp
   public void bind(DATA data) {
     // do nothing to use this as a dummy view holder
   }
+
+  @Override
+  public void setViewType(int viewType) {
+    // can not set, RecyclerView.Adapter does this job.
+  }
+
+  @Override
+  public int getViewType() {
+    return getItemViewType();
+  }
 }

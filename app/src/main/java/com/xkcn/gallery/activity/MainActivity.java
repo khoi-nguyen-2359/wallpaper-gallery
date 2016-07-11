@@ -33,6 +33,7 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoActionView;
@@ -274,7 +275,7 @@ public abstract class MainActivity extends BaseActivity
     photoActionAdapter = new PhotoActionAdapter();
     photoActionAdapter.registerListingItemType(new PhotoActionAdapter.ShareItemType());
     photoActionAdapter.registerListingItemType(new PhotoActionAdapter.SetWallpaperItemType());
-    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.DownloadItemType());
+    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.DownloadItemType(photoFileManager));
   }
 
   protected void initTemplateViews() {
@@ -364,7 +365,7 @@ public abstract class MainActivity extends BaseActivity
     NotificationManager notificationMan = getNotificationManager();
 
     Intent resultIntent = new Intent(Intent.ACTION_VIEW);
-    resultIntent.setDataAndType(Uri.fromFile(photoFileManager.getDownloadFile(photoDetails)), "image/*");
+    resultIntent.setDataAndType(Uri.fromFile(photoFileManager.getPhotoFile(photoDetails)), "image/*");
     PendingIntent intentOpenExternal = PendingIntent.getActivity(this, 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
     NotificationCompat.Builder notifBuilder = getDownloadNotificationBuilder()
@@ -436,6 +437,12 @@ public abstract class MainActivity extends BaseActivity
     @com.khoinguyen.apptemplate.eventbus.Subscribe
     public void handleOnPhotoListingItemClick(OnPhotoListingItemActivate event) {
       appBarLayout.setExpanded(false, false);
+    }
+
+    @com.khoinguyen.apptemplate.eventbus.Subscribe
+    public void handleOnPhotoGalleryPhotoSelect(OnPhotoGalleryPhotoSelect event) {
+      photoActionAdapter.updateCurrentActivePhoto(photoListingPresenter.findPhoto(event.getPhotoDisplayInfo().getPhotoId()));
+      photoActionAdapter.notifyDataSetChanged();
     }
   };
 }

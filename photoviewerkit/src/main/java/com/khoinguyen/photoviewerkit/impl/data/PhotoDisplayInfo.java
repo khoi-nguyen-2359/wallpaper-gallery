@@ -2,6 +2,8 @@ package com.khoinguyen.photoviewerkit.impl.data;
 
 import android.net.Uri;
 
+import java.io.File;
+
 /**
  * Created by khoinguyen on 4/29/16.
  */

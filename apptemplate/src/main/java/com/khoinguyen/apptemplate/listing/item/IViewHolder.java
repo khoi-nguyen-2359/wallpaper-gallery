@@ -5,4 +5,8 @@ package com.khoinguyen.apptemplate.listing.item;
  */
 public interface IViewHolder<DATA> {
   void bind(DATA data);
+
+  void setViewType(int viewType);
+
+  int getViewType();
 }
