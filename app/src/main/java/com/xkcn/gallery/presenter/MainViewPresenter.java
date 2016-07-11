@@ -95,4 +95,32 @@ public class MainViewPresenter {
           }
         });
   }
+
+  public void sharePhoto(final PhotoDetails photoDetails) {
+    if (photoDetails == null) {
+      return;
+    }
+
+    view.showLoading();
+    photoFileManager.getPhotoFileObservable(photoDetails)
+        .subscribeOn(rxIoScheduler)
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Observer<Float>() {
+          @Override
+          public void onCompleted() {
+            view.hideLoading();
+            view.showSharingChooser(photoDetails);
+          }
+
+          @Override
+          public void onError(Throwable e) {
+            view.hideLoading();
+            view.showToast(e.getMessage());
+          }
+
+          @Override
+          public void onNext(Float aFloat) {
+          }
+        });
+  }
 }

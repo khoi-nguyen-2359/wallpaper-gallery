@@ -22,4 +22,6 @@ public interface MainView extends ScreenView {
   void showDownloadComplete(PhotoDetails photoDetails);
 
   void showDownloadError(PhotoDetails photoDetails, String message);
+
+  void showSharingChooser(PhotoDetails photoDetails);
 }

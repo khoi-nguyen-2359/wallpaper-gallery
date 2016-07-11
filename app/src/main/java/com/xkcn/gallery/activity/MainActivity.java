@@ -142,27 +142,23 @@ public abstract class MainActivity extends BaseActivity
     mainViewPresenter.downloadPhoto(photoDetails);
   }
 
+  @Override
+  public void showSharingChooser(PhotoDetails photoDetails) {
+    Intent i = new Intent();
+    i.setAction(Intent.ACTION_SEND);
+    i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFileManager.getPhotoFile(photoDetails)));
+    i.setType("image/*");
+
+    startActivity(Intent.createChooser(i, getResources().getString(R.string.send_to)));
+  }
+
   private void sharePhoto(PhotoDisplayInfo photo) {
     PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
     if (photoDetails == null) {
       return;
     }
 
-    String sendText = null;
-    Resources resources = getResources();
-    if (TextUtils.isEmpty(photoDetails.getPermalinkMeta())) {
-      sendText = resources.getString(R.string.send_to_trailing_text, photoDetails.getPermalink());
-    } else {
-      Spanned spanned = Html.fromHtml(photoDetails.getPermalinkMeta());
-      sendText = resources.getString(R.string.send_to_trailing_text, spanned.toString() + " " + photoDetails.getPermalink());
-    }
-
-    Intent i = new Intent();
-    i.setAction(Intent.ACTION_SEND);
-    i.putExtra(Intent.EXTRA_TEXT, sendText);
-    i.setType("text/plain");
-
-    startActivity(Intent.createChooser(i, resources.getString(R.string.send_to)));
+    mainViewPresenter.sharePhoto(photoDetails);
   }
 
   private void setWallpaper(PhotoDisplayInfo photo) {
