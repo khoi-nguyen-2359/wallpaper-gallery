@@ -425,8 +425,13 @@ public abstract class MainActivity extends BaseActivity
 
   @Override
   public void showWallpaperChooser(File photoFile) {
-    Uri uri = Uri.fromFile(photoFile);
-    AndroidUtils.startSetWallpaperChooser(this, uri);
+    Uri uriImg = Uri.fromFile(photoFile);
+    Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
+    intent.addCategory(Intent.CATEGORY_DEFAULT);
+    intent.setDataAndType(uriImg, "image/*");
+    intent.putExtra("mimeType", "image/*");
+
+    startActivity(Intent.createChooser(intent, getString(R.string.photo_actions_set_wp_chooser)));
   }
 
   protected Object photoKitEventListener = new Object() {
