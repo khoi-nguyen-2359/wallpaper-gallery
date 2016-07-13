@@ -8,16 +8,16 @@
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/constraintLayout">
+        android:id="@+id/main_container">
 
         <com.khoinguyen.photoviewerkit.impl.view.PhotoActionView
             android:layout_width="0dp"
             tools:layout_height="150dp"
             android:layout_height="wrap_content"
             android:id="@+id/view_photo_action"
-            app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
-            app:layout_constraintRight_toRightOf="@+id/constraintLayout"
-            app:layout_constraintBottom_toBottomOf="@+id/constraintLayout"/>
+            app:layout_constraintLeft_toLeftOf="@+id/main_container"
+            app:layout_constraintRight_toRightOf="@+id/main_container"
+            app:layout_constraintBottom_toBottomOf="@+id/main_container"/>
 
         <TextView
             android:textColorLink="#fff"
@@ -26,8 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/tv_photo_description"
-            app:layout_constraintLeft_toLeftOf="@+id/constraintLayout"
-            app:layout_constraintRight_toRightOf="@+id/constraintLayout"
+            app:layout_constraintLeft_toLeftOf="@+id/main_container"
+            app:layout_constraintRight_toRightOf="@+id/main_container"
             app:layout_constraintBottom_toTopOf="@+id/view_photo_action"
             android:layout_marginBottom="8dp"/>
 

@@ -13,7 +13,7 @@ android {
     buildToolsVersion configs.androidBuildToolVersion
 
     defaultConfig {
-        minSdkVersion 11
+        minSdkVersion configs.androidMinSdk
         targetSdkVersion configs.androidMaxSdk
         versionCode 1
         versionName "1.0"

@@ -1,7 +1,9 @@
 package com.xkcn.gallery;
 
 import android.app.Application;
+import android.util.Log;
 
+import com.facebook.common.logging.FLog;
 import com.khoinguyen.photoviewerkit.impl.PhotoViewerKit;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.di.component.ApplicationComponent;
@@ -20,7 +22,7 @@ public class BaseApp extends Application {
     initInjector();
     PhotoViewerKit.init(this);
     L.setClassLoggable(BuildConfig.LOGGABLE);
-//    FLog.setMinimumLoggingLevel(Log.VERBOSE);
+    FLog.setMinimumLoggingLevel(Log.VERBOSE);
   }
 
   private void initInjector() {

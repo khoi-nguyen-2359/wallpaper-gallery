@@ -3,11 +3,11 @@ package com.khoinguyen.photoviewerkit.impl.view;
 import android.animation.ValueAnimator;
 import android.content.Context;
 import android.graphics.Matrix;
-import android.graphics.Rect;
 import android.graphics.RectF;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -79,8 +79,9 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     }
   };
 
-  private void onPagerPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+  private GestureDetector clickDetector;
 
+  private void onPagerPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
   }
 
   private void onPagerPageSelected(int position) {
@@ -135,10 +136,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    return interceptTouchToDrag(ev) || super.onInterceptTouchEvent(ev);
+    return interceptTouchForDragging(ev) || super.onInterceptTouchEvent(ev);
   }
 
-  private boolean interceptTouchToDrag(MotionEvent ev) {
+  private boolean interceptTouchForDragging(MotionEvent ev) {
     log.d("onInterceptTouchEvent TRY");
 
     int action = ev.getActionMasked();
@@ -174,6 +175,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
+    return handleTouchForDragging(ev) || super.onTouchEvent(ev);
+  }
+
+  private boolean handleTouchForDragging(MotionEvent ev) {
     int action = ev.getActionMasked();
     switch (action) {
       case MotionEvent.ACTION_MOVE: {
@@ -202,7 +207,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
       }
     }
 
-    return super.onTouchEvent(ev);
+    return false;
   }
 
   private void onDragEnd(float endX, float endY) {
@@ -397,6 +402,11 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     int primaryItemAdapterPosition;
 
     @Override
+    public Object instantiateItem(ViewGroup container, int position) {
+      return super.instantiateItem(container, position);
+    }
+
+    @Override
     public int getItemPosition(Object object) {
       return POSITION_NONE;
     }
@@ -407,6 +417,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
       if (object instanceof View) {
         View itemView = (View) object;
+        // // TODO: 7/12/16 what if this tag is used by other source
         itemView.setTag(position);
         primaryItemAdapterPosition = position;
       }

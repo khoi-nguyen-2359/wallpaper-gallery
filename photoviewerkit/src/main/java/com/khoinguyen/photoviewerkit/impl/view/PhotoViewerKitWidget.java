@@ -10,8 +10,10 @@ import android.graphics.Rect;
 import android.graphics.RectF;
 import android.os.Build;
 import android.support.annotation.IntDef;
+import android.support.v4.view.GestureDetectorCompat;
 import android.util.AttributeSet;
-import android.view.View;
+import android.view.GestureDetector;
+import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
@@ -30,11 +32,14 @@ import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoOverlayView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoTransitionView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
+import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
 public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewerKitWidget<SharedData> {
+
+  private OverlayFadingGestureListener overlayFadingGestureListener;
 
   @IntDef({TRANS_LISTING, TRANS_TO_GALLERY, TRANS_GALLERY, TRANS_TO_LISTING})
   public @interface TransitionState {}
@@ -57,6 +62,9 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   private IPhotoViewerKitWidget.PagingListener pagingListener;
 
   private RevealAnimationListener revealAnimationListener = new RevealAnimationListener();
+
+  private GestureDetectorCompat overlayFadingClickDetector;
+  private boolean overlayFadingEnabled;
 
   public PhotoViewerKitWidget(Context context) {
     super(context);
@@ -83,6 +91,8 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   }
 
   private void init() {
+    overlayFadingGestureListener = new OverlayFadingGestureListener();
+    overlayFadingClickDetector = new GestureDetectorCompat(getContext(), overlayFadingGestureListener);
   }
 
   @Override
@@ -103,6 +113,12 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     super.onDetachedFromWindow();
 
     unregisterEvents();
+  }
+
+  @Override
+  public boolean dispatchTouchEvent(MotionEvent ev) {
+    overlayFadingClickDetector.onTouchEvent(ev);
+    return super.dispatchTouchEvent(ev);
   }
 
   private void readAttrs(AttributeSet attrs) {
@@ -131,13 +147,6 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     pageableListingViews.add(photoListingView);
     pageableListingViews.add(photoGalleryView);
   }
-
-  private OnClickListener onActionButtonClicked = new OnClickListener() {
-    @Override
-    public void onClick(View v) {
-
-    }
-  };
 
   public void registerEvents() {
     eventBus.register(photoGalleryView);
@@ -189,7 +198,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   private AnimatorListenerAdapter shrinkAnimationListener = new AnimatorListenerAdapter() {
     @Override
     public void onAnimationStart(Animator animation) {
-      overlayView.hide();
+      hideOverlay();
       transitDraweeView.show();
       sharedData.setCurrentTransitionState(TRANS_TO_LISTING);
     }
@@ -271,7 +280,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
       photoGalleryView.translate(0, 0);
       photoGalleryView.show();
       transitDraweeView.hide();
-      overlayView.show();
+      showOverlay();
     }
 
     public void setPhotoId(String photoId) {
@@ -279,8 +288,38 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     }
   }
 
+  private void showOverlay() {
+    overlayView.show();
+    overlayFadingGestureListener.enabled = true;
+  }
+
+  private void hideOverlay() {
+    overlayView.hide();
+    overlayFadingGestureListener.enabled = false;
+  }
+
   @Subscribe
   public void onPhotoGalleryPageSelect(OnPhotoGalleryPhotoSelect event) {
     overlayView.bindPhoto(event.getPhotoDisplayInfo());
+  }
+
+  private class OverlayFadingGestureListener extends GestureDetector.SimpleOnGestureListener {
+    boolean enabled = false;
+    boolean hasLastDownEventEnabled = false;
+
+    @Override
+    public boolean onDown(MotionEvent e) {
+      return hasLastDownEventEnabled = enabled;
+    }
+
+    @Override
+    public boolean onSingleTapConfirmed(MotionEvent e) {
+      if (!hasLastDownEventEnabled) {   // prevent a single tap confirmed from a down event while reveal animation not yet finished.
+        return false;
+      }
+
+      overlayView.toggleFading();
+      return true;
+    }
   }
 }

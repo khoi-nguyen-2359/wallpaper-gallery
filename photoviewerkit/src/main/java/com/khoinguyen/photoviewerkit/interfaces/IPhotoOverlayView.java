@@ -15,6 +15,8 @@ public interface IPhotoOverlayView<D> extends IPhotoViewerKitComponent<D> {
 
   void bindPhoto(PhotoDisplayInfo photoDisplayInfo);
 
+  void toggleFading();
+
   void show();
   void hide();
 }

@@ -36,7 +36,6 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
   @Override
   public int getItemId(int itemIndex) {
     int actionId = getViewType(itemIndex);
-    L.get().d("actionId=%d", actionId);
     return actionId;
   }
 
