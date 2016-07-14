@@ -1,4 +1,4 @@
-package com.xkcn.gallery.data.model;
+package com.khoinguyen.photoviewerkit.impl.util;
 
 import com.facebook.common.internal.Supplier;
 

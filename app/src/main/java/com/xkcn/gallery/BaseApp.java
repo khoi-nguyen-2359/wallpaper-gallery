@@ -22,7 +22,7 @@ public class BaseApp extends Application {
     initInjector();
     PhotoViewerKit.init(this);
     L.setClassLoggable(BuildConfig.LOGGABLE);
-    FLog.setMinimumLoggingLevel(Log.VERBOSE);
+//    FLog.setMinimumLoggingLevel(Log.VERBOSE);
   }
 
   private void initInjector() {

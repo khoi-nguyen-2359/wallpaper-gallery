@@ -34,7 +34,6 @@ public class RecyclerListingAdapter extends RecyclerView.Adapter<RecyclerListing
 
   @Override
   public RecyclerListingViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-    L.get("debug").d("RecyclerView onCreateViewHolder viewType=%s", viewType);
     return listingAdapter.getViewHolder(listingAdapter.getView(parent, viewType), viewType);
   }
 

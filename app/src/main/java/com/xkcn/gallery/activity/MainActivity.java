@@ -98,6 +98,8 @@ public abstract class MainActivity extends BaseActivity
   private PhotoDownloadNotificationsInfo downloadNotificationsInfo = new PhotoDownloadNotificationsInfo();
   private NotificationCompat.Builder downloadNotificationBuilder;
 
+  private PhotoActionAdapter photoActionAdapter;
+
   private IPhotoViewerKitWidget.PagingListener listingPagingListener = new IPhotoViewerKitWidget.PagingListener() {
     @Override
     public void onPagingNext(IPhotoViewerKitWidget widget) {
@@ -164,8 +166,6 @@ public abstract class MainActivity extends BaseActivity
 
     mainViewPresenter.loadWallpaperSetting(photoDetails);
   }
-
-  private PhotoActionAdapter photoActionAdapter;
 
   private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
     public static final int TYPE_PHOTO = 2;

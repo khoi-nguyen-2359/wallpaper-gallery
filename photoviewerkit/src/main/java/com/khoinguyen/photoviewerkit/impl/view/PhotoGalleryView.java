@@ -11,7 +11,6 @@ import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -35,6 +34,7 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRecenterAnimationUpdate;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.apptemplate.listing.adapter.PagerListingAdapter;
+import com.khoinguyen.photoviewerkit.impl.util.ViewDragHelper;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.util.log.L;
@@ -48,14 +48,8 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private static final int END_DRAG_MIN_DISTANCE_DPS = 75;
   private static final long DURATION_DRAG_CANCEL = 200;
 
-  protected L log = L.get("DefaultPhotoGalleryView");
-  protected int touchSlop;
-  protected float endDragMinDistance;
-  protected float lastInterceptY;
-  protected float lastInterceptX;
-  protected boolean isDragging;
-  protected float lastDraggingY;
-  protected float lastDraggingX;
+  protected L log = L.get("PhotoGalleryView");
+
   protected AdapterPhotoFinder adapterPhotoFinder;
 
   protected IEventBus eventBus;
@@ -67,6 +61,9 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   protected SharedData sharedData;
 
   private boolean pagingNextHasFired = false;
+
+  protected ViewDragHelper viewDragHelper;
+  protected float endDragMinDistance;
 
   private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
     @Override
@@ -80,6 +77,38 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   };
 
   private GestureDetector clickDetector;
+  private ViewDragHelper.DragEventListener dragEventListener = new ViewDragHelper.DragEventListener() {
+    @Override
+    public void onDragStart() {
+      eventBus.post(new OnPhotoGalleryDragStart());
+    }
+
+    @Override
+    public void onDragEnd(float totalDistanceX, float totalDistanceY) {
+      double dragDistance = Math.hypot(totalDistanceX, totalDistanceY);
+      if (dragDistance > endDragMinDistance) {
+        RectF fullRect = getCurrentRect();
+        photoKitWidget.returnToListing(fullRect);
+      } else {
+        new ZoomToAnimation()
+            .rects(getCurrentRect(), new RectF(0,0,getWidth(),getHeight()))
+            .duration(DURATION_DRAG_CANCEL)
+            .target(PhotoGalleryView.this)
+            .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+              @Override
+              public void onAnimationUpdate(ValueAnimator animation) {
+                eventBus.post(new OnPhotoRecenterAnimationUpdate(animation.getAnimatedFraction()));
+              }
+            })
+            .run();
+      }
+    }
+
+    @Override
+    public void onDragUpdate(float translationX, float translationY) {
+      translate(getTranslationX() + translationX, getTranslationY() + translationY);
+    }
+  };
 
   private void onPagerPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
   }
@@ -121,13 +150,11 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private void init() {
     setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
 
-    ViewConfiguration vc = ViewConfiguration.get(getContext());
-    touchSlop = vc.getScaledTouchSlop();
-
     DisplayMetrics dm = getResources().getDisplayMetrics();
     endDragMinDistance = dm.density * END_DRAG_MIN_DISTANCE_DPS;
 
-    isDragging = false;
+    viewDragHelper = new ViewDragHelper(getContext());
+    viewDragHelper.setDragEventListener(dragEventListener);
 
     addOnPageChangeListener(internalOnPageChangeListener);
     adapterPhotoGallery = new PhotoGalleryPagerAdapter();
@@ -136,148 +163,27 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   @Override
   public boolean onInterceptTouchEvent(MotionEvent ev) {
-    return interceptTouchForDragging(ev) || super.onInterceptTouchEvent(ev);
-  }
-
-  private boolean interceptTouchForDragging(MotionEvent ev) {
-    log.d("onInterceptTouchEvent TRY");
-
-    int action = ev.getActionMasked();
-    switch (action) {
-      case MotionEvent.ACTION_DOWN: {
-        lastInterceptX = ev.getRawX();
-        lastInterceptY = ev.getRawY();
-        break;
-      }
-
-      case MotionEvent.ACTION_MOVE: {
-        if (isDragging) {
-          return true;
-        }
-
-        detectDrag(ev.getRawX(), ev.getRawY());
-        if (isDragging) {
-          return true;
-        }
-
-        break;
-      }
-
-      case MotionEvent.ACTION_UP:
-      case MotionEvent.ACTION_CANCEL: {
-        isDragging = false;
-        break;
-      }
+    if (super.onInterceptTouchEvent(ev)) {
+      viewDragHelper.reset();
+      return true;
     }
 
-    return false;
+    return viewDragHelper.onInterceptTouchEvent(ev);
   }
 
   @Override
   public boolean onTouchEvent(MotionEvent ev) {
-    return handleTouchForDragging(ev) || super.onTouchEvent(ev);
-  }
-
-  private boolean handleTouchForDragging(MotionEvent ev) {
-    int action = ev.getActionMasked();
-    switch (action) {
-      case MotionEvent.ACTION_MOVE: {
-        if (isDragging) {
-          dragTo(ev.getRawX(), ev.getRawY());
-          return true;
-        }
-
-        detectDrag(ev.getRawX(), ev.getRawY());
-        if (isDragging) {
-          return true;
-        }
-
-        break;
-      }
-
-      case MotionEvent.ACTION_CANCEL:
-      case MotionEvent.ACTION_UP: {
-        if (isDragging) {
-          // end of a scroll
-          isDragging = false;
-
-          onDragEnd(ev.getRawX(), ev.getRawY());
-        }
-        break;
-      }
-    }
-
-    return false;
-  }
-
-  private void onDragEnd(float endX, float endY) {
-    double dragDistance = Math.hypot(endX - lastInterceptX, endY - lastInterceptY);
-    if (dragDistance > endDragMinDistance) {
-      RectF fullRect = getCurrentRect();
-      photoKitWidget.returnToListing(fullRect);
-    } else {
-      new ZoomToAnimation()
-          .rects(getCurrentRect(), new RectF(0,0,getWidth(),getHeight()))
-          .duration(DURATION_DRAG_CANCEL)
-          .target(this)
-          .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator animation) {
-              eventBus.post(new OnPhotoRecenterAnimationUpdate(animation.getAnimatedFraction()));
-            }
-          })
-          .run();
-    }
+    return viewDragHelper.onTouchEvent(ev) || super.onTouchEvent(ev);
   }
 
   private RectF getCurrentRect() {
     return new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight());
   }
 
-  /**
-   * Drag this view to new position by translating its x and y
-   * @param draggingX new x
-   * @param draggingY new y
-   */
-  private void dragTo(float draggingX, float draggingY) {
-    float xTranslate = draggingX - lastDraggingX;
-    float yTranslate = draggingY - lastDraggingY;
-    translate(getTranslationX() + xTranslate, getTranslationY() + yTranslate);
-    lastDraggingX = draggingX;
-    lastDraggingY = draggingY;
-  }
-
   @Override
   public void translate(float x, float y) {
     setTranslationX(x);
     setTranslationY(y);
-  }
-
-  /**
-   * Check if these new values of x,y will start a drag on this view
-   * @param draggingX new x
-   * @param draggingY new y
-   * @return true if a drag has started, otherwise false
-   */
-  private boolean detectDrag(float draggingX, float draggingY) {
-    if (isDragging) {
-      return true;
-    }
-
-    float xDiff = Math.abs(draggingX - lastInterceptX);
-    float yDiff = Math.abs(draggingY - lastInterceptY);
-    if (yDiff > touchSlop && yDiff * 0.5f > xDiff) {
-      log.d("dragging CATCHED");
-      isDragging = true;
-      lastDraggingX = draggingX;
-      lastDraggingY = draggingY;
-
-      eventBus.post(new OnPhotoGalleryDragStart());
-
-      return true;
-    }
-
-    return false;
   }
 
   public void setPhotoAdapter(IListingAdapter photoAdapter) {
@@ -423,4 +329,5 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
       }
     }
   }
+
 }

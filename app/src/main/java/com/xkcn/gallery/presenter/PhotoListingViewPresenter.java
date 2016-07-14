@@ -1,5 +1,6 @@
 package com.xkcn.gallery.presenter;
 
+import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
@@ -93,6 +94,7 @@ public class PhotoListingViewPresenter {
 
           @Override
           public void onNext(DataPage<PhotoDetails> photoPage) {
+            L.get().d("next page %d %d", photoPage.getStart(), photoPage.getData().size());
             if (photoPage.getStart() == 0) {
               allPages.reset();
             }

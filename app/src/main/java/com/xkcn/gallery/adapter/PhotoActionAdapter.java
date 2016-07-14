@@ -5,19 +5,16 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.facebook.common.internal.Supplier;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
-import com.khoinguyen.util.log.L;
+import com.khoinguyen.photoviewerkit.impl.util.SimpleSupplier;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.model.SimpleSupplier;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 
-import java.lang.ref.Reference;
 import java.util.ArrayList;
 import java.util.List;
 
