@@ -2,6 +2,7 @@ package com.khoinguyen.photoviewerkit.impl.view;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
 import android.support.annotation.Nullable;
@@ -99,9 +100,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   private static RectF createItemViewLocation(View itemView) {
     // // TODO: 6/28/16 what if itemView is null, which is in case that the requested photo item hasn't been laid out as view. Should return a rect to be ignored.
     if (itemView != null) {
-      int[] location = new int[2];
-      itemView.getLocationInWindow(location);
-      return new RectF(location[0], location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
+      return new RectF(itemView.getLeft(), itemView.getTop(), itemView.getRight(), itemView.getBottom());//new RectF(location., location[1], location[0] + itemView.getWidth(), location[1] + itemView.getHeight());
     }
 
     return new RectF();

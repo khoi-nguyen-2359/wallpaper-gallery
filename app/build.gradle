@@ -35,8 +35,8 @@ android {
     }
 
     dexOptions {
-        maxProcessCount 2
-        javaMaxHeapSize "2g"
+        maxProcessCount 4
+        javaMaxHeapSize "4g"
     }
 
     buildTypes {
