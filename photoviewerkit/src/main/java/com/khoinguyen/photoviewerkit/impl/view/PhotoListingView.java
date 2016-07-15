@@ -42,7 +42,7 @@ import com.khoinguyen.util.log.L;
  * Created by khoinguyen on 3/29/16.
  */
 public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData, RecyclerListingViewHolder> {
-  private static final int PAGING_OFFSET = 10;
+  private static final int PAGING_OFFSET = 20;
   protected StaggeredGridLayoutManager rcvLayoutMan;
   protected IListingAdapter<RecyclerListingViewHolder> listingAdapter;
   protected AdapterPhotoFinder photoFinder;

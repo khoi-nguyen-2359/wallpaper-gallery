@@ -307,15 +307,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private static class PhotoGalleryPagerAdapter extends PagerListingAdapter {
     int primaryItemAdapterPosition;
 
-    @Override
-    public Object instantiateItem(ViewGroup container, int position) {
-      return super.instantiateItem(container, position);
-    }
-
-    @Override
-    public int getItemPosition(Object object) {
-      return POSITION_NONE;
-    }
+//    @Override
+//    public int getItemPosition(Object object) {
+//      return POSITION_NONE;
+//    }
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {
