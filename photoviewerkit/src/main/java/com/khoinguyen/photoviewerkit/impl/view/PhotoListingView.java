@@ -2,10 +2,9 @@ package com.khoinguyen.photoviewerkit.impl.view;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Rect;
 import android.graphics.RectF;
-import android.net.Uri;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
@@ -18,7 +17,6 @@ import com.facebook.drawee.generic.GenericDraweeHierarchy;
 import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
@@ -43,7 +41,7 @@ import com.khoinguyen.util.log.L;
  */
 public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData, RecyclerListingViewHolder> {
   private static final int PAGING_OFFSET = 20;
-  protected StaggeredGridLayoutManager rcvLayoutMan;
+  protected GridLayoutManager rcvLayoutMan;
   protected IListingAdapter<RecyclerListingViewHolder> listingAdapter;
   protected AdapterPhotoFinder photoFinder;
 
@@ -72,7 +70,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   private void init() {
     Resources resources = getResources();
     final int nLayoutCol = 2;   //resources.getInteger(R.integer.photo_page_col);
-    rcvLayoutMan = new StaggeredGridLayoutManager(nLayoutCol, StaggeredGridLayoutManager.VERTICAL);
+    rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
     setLayoutManager(rcvLayoutMan);
     addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
@@ -108,7 +106,8 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
   @Subscribe
   public void handlePhotoGalleryPageSelected(OnPhotoGalleryPhotoSelect event) {
-    scrollToPosition(event.getItemIndex());
+    rcvLayoutMan.scrollToPosition(event.getItemIndex());
+    toggleActiveItems();
   }
 
   private void changeActiveItemHighlight() {
@@ -173,8 +172,8 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
       return;
     }
 
-    sharedData.resetActiveItemInfo(photoData);
-    updateActiveItemRect();
+    sharedData.activePhoto(photoData);
+    toggleActiveItems();
   }
 
   private void updateActiveItemRect() {

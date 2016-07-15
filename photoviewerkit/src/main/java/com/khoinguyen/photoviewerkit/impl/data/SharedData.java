@@ -20,16 +20,8 @@ public class SharedData {
     return lastActiveItem;
   }
 
-  public void setLastActiveItem(ListingItemInfo lastActiveItem) {
-    this.lastActiveItem = lastActiveItem;
-  }
-
   public ListingItemInfo getCurrentActiveItem() {
     return currentActiveItem;
-  }
-
-  public void setCurrentActiveItem(ListingItemInfo currentActiveItem) {
-    this.currentActiveItem = currentActiveItem;
   }
 
   public int getCurrentTransitionState() {
@@ -40,13 +32,9 @@ public class SharedData {
     this.currentTransitionState = currentTransitionState;
   }
 
-  public void resetActiveItemInfo(PhotoDisplayInfo activeItem) {
-    if (activeItem == null) {
-      return;
-    }
-
-    lastActiveItem.setPhoto(null);
-    lastActiveItem.updateItemRect(new RectF());
+  public void activePhoto(PhotoDisplayInfo activeItem) {
+    lastActiveItem.setPhoto(currentActiveItem.getPhoto());
+    lastActiveItem.updateItemRect(currentActiveItem.getItemRect());
 
     currentActiveItem.setPhoto(activeItem);
   }

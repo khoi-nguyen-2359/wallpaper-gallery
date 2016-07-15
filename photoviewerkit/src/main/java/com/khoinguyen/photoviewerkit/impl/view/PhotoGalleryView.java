@@ -76,7 +76,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     }
   };
 
-  private GestureDetector clickDetector;
   private ViewDragHelper.DragEventListener dragEventListener = new ViewDragHelper.DragEventListener() {
     @Override
     public void onDragStart() {
@@ -131,8 +130,7 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
       return;
     }
 
-    ListingItemInfo currentSelectedItem = sharedData.getCurrentActiveItem();
-    currentSelectedItem.setPhoto(photoDisplayInfo);
+    sharedData.activePhoto(photoDisplayInfo);
 
     eventBus.post(new OnPhotoGalleryPhotoSelect(position, photoDisplayInfo));
   }
@@ -307,11 +305,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   private static class PhotoGalleryPagerAdapter extends PagerListingAdapter {
     int primaryItemAdapterPosition;
-
-//    @Override
-//    public int getItemPosition(Object object) {
-//      return POSITION_NONE;
-//    }
 
     @Override
     public void setPrimaryItem(ViewGroup container, int position, Object object) {

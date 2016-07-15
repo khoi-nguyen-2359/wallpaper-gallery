@@ -180,7 +180,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
   @Override
   public boolean handleBackPress() {
     if (sharedData.getCurrentTransitionState() == TRANS_GALLERY) {
-      photoListingView.toggleActiveItems();
+//      photoListingView.toggleActiveItems();
       returnToListing(getWidgetFullRect());
       return true;
     }
@@ -207,8 +207,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     public void onAnimationEnd(Animator animation) {
       transitDraweeView.hide();
       sharedData.setCurrentTransitionState(TRANS_LISTING);
-      sharedData.getLastActiveItem().setPhoto(sharedData.getCurrentActiveItem().getPhoto());
-      sharedData.getCurrentActiveItem().setPhoto(null);
+      sharedData.activePhoto(null);
       photoListingView.toggleActiveItems();
     }
   };
@@ -248,7 +247,7 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
     photoGalleryView.hide();
     ListingItemInfo currActiveItem = sharedData.getCurrentActiveItem();
     transitDraweeView.startShrinkAnimation(currActiveItem.getItemRect(), fullRect, shrinkAnimationListener, shrinkAnimationUpdateListener);
-    photoListingView.toggleActiveItems();
+//    photoListingView.toggleActiveItems();
     photoGalleryView.zoomPrimaryItem(new Matrix());
   }
 
