@@ -243,10 +243,11 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     @Override
     public void bind(PhotoDisplayInfo data) {
       DraweeController controller = Fresco.newDraweeControllerBuilder()
+          .setRetainImageOnFailure(true)
           .setLowResImageRequest(ImageRequest.fromUri(data.getLowResUri()))
           .setImageRequest(ImageRequest.fromUri(data.getHighResUri()))
           .setOldController(draweeView.getController())
-          .setCallerContext(this)
+//          .setCallerContext(this)
           .build();
       draweeView.setController(controller);
     }
