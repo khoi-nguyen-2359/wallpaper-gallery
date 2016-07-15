@@ -185,20 +185,20 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   }
 
   private void highlightClickedItemView(int itemIndex) {
-    if (itemIndex < 0 || itemIndex >= listingAdapter.getCount()) {
+    View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
+    if (itemView == null) {
       return;
     }
 
-    View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
     itemView.setVisibility(View.INVISIBLE);
   }
 
   private void unhighlightClickedItemView(int itemIndex) {
-    if (itemIndex < 0 || itemIndex >= listingAdapter.getCount()) {
+    View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
+    if (itemView == null) {
       return;
     }
 
-    View itemView = rcvLayoutMan.findViewByPosition(itemIndex);
     itemView.setVisibility(View.VISIBLE);
   }
 
