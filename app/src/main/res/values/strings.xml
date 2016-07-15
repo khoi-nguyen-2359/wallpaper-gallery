@@ -17,13 +17,23 @@
     <string name="font_noto_b">NotoSans-Bold.ttf</string>
     <string name="font_noto_bi">NotoSans-BoldItalic.ttf</string>
     <string name="font_noto_i">NotoSans-Italic.ttf</string>
-    <string name="sidebar_latest_update_at">Cập nhật lần cuối</string>
-    <string name="title_activity_main">MainActivity</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
     <string name="nav_item_debug">Debug Options</string>
     <string name="debug_force_crawling">Force Crawling</string>
     <string name="debug_refresh_photo_list">Refresh photo listing pager</string>
+    <string name="debug_clear_fresco_cache">Clear Fresco cache</string>
+    <string name="photo_action_set_wallpaper">Set Wallpaper</string>
+    <string name="photo_action_share">Share</string>
+    <string name="photo_action_download">Download</string>
+    <string name="debug_clear_photo_files">Delete all downloaded photos</string>
+    <string name="download_notification_title">Download photo %1$s</string>
+    <string name="download_notification_downloading_message">Please wait a few secs</string>
+    <string name="download_notification_completed">Completed. Please touch to open in external
+        viewer.
+    </string>
+    <string name="download_notification_error">Error: %1$s</string>
+    <string name="photo_action_downloaded_already">Downloaded</string>
 
 </resources>

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:app="http://schemas.android.com/apk/res-auto"
+       xmlns:tools="http://schemas.android.com/tools">
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/main_container">
+
+        <com.khoinguyen.photoviewerkit.impl.view.PhotoActionView
+            android:layout_width="0dp"
+            tools:layout_height="150dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/view_photo_action"
+            app:layout_constraintLeft_toLeftOf="@+id/main_container"
+            app:layout_constraintRight_toRightOf="@+id/main_container"
+            app:layout_constraintBottom_toBottomOf="@+id/main_container"/>
+
+        <TextView
+            android:textColorLink="#fff"
+            android:textColor="#fff"
+            tools:text="TextView\nasdasdasd\nLine3\nLine4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/tv_photo_description"
+            app:layout_constraintLeft_toLeftOf="@+id/main_container"
+            app:layout_constraintRight_toRightOf="@+id/main_container"
+            app:layout_constraintBottom_toTopOf="@+id/view_photo_action"
+            android:layout_marginBottom="8dp"/>
+
+    </android.support.constraint.ConstraintLayout>
+</merge>

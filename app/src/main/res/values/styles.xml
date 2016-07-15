@@ -5,23 +5,9 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="AppTheme.PhotoListPagerActivity" parent="AppTheme"></style>
+    <style name="AppTheme.MainActivity" parent="AppTheme"/>
 
-    <style name="AppTheme.SplashActivity" parent="AppTheme"></style>
-
-    <style name="AppTheme.SinglePhotoActivity" parent="AppTheme"></style>
-
-    <style name="AppTheme.PhotoActionText">
-        <item name="android:textColor">@color/photo_action_bg_stroke</item>
-        <item name="android:paddingLeft">20dp</item>
-        <item name="android:paddingRight">20dp</item>
-        <item name="android:paddingBottom">10dp</item>
-        <item name="android:paddingTop">10dp</item>
-        <item name="android:background">@drawable/bg_photo_action_text</item>
-        <item name="android:gravity">center</item>
-    </style>
-
-    <color name="sidebar_tagcloud_text">#fff</color>
+    <style name="AppTheme.SplashActivity" parent="AppTheme"/>
 
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.ActionBar" />
 

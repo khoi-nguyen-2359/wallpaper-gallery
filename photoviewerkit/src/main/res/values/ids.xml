@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="photokit_photo_listing" type="id"/>
+    <item name="photokit_photo_gallery" type="id"/>
+    <item name="photokit_photo_overlay" type="id"/>
+    <item name="photokit_photo_backdrop" type="id"/>
+    <item name="photokit_photo_transition" type="id"/>
+    <item name="photoaction_tag_id" type="id"/>
+    <item name="photoaction_tag_viewholder" type="id"/>
+</resources>
