@@ -1,12 +1,15 @@
 package com.xkcn.gallery.presenter;
 
+import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.model.DataPage;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.view.MainView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -32,6 +35,9 @@ public class PhotoListingViewPresenter {
 
   @Inject
   PreferencesUsecase preferencesUsecase;
+
+  @Inject
+  PhotoFileManager photoFileManager;
 
   @Inject
   Scheduler rxIoScheduler;
@@ -105,6 +111,26 @@ public class PhotoListingViewPresenter {
 
   public List<PhotoDetails> getAllPhotos() {
     return allPages.getData();
+  }
+
+  public List<PhotoDisplayInfo> getAllPhotoDisplayInfos() {
+    List<PhotoDetails> allPhotos = getAllPhotos();
+    List<PhotoDisplayInfo> allPhotoDisplayInfos = new ArrayList<>();
+
+    if (allPhotos != null && !allPhotos.isEmpty()) {
+      for (PhotoDetails photoDetails : allPhotos) {
+        PhotoDisplayInfo displayInfo = new PhotoDisplayInfo();
+        displayInfo.setPhotoId(photoDetails.getIdentifierAsString());
+        displayInfo.setDescription(photoDetails.getPermalinkMeta());
+        displayInfo.setLowResUrl(photoDetails.getLowResUrl());
+        displayInfo.setHighResUrl(photoDetails.getHighResUrl());
+        displayInfo.setLocalFile(photoFileManager.getPhotoFile(photoDetails));
+
+        allPhotoDisplayInfos.add(displayInfo);
+      }
+    }
+
+    return allPhotoDisplayInfos;
   }
 
   public void loadNextPhotoPage() {

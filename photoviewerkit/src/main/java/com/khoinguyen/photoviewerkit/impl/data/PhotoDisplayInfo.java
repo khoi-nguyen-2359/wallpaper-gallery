@@ -13,6 +13,7 @@ public class PhotoDisplayInfo {
   private String lowResUrl;
   private float ratio;
   private String description;
+  private File localFile;
 
   public static PhotoDisplayInfo create(String photoId, String highResUrl, String lowResUrl, float ratio) {
     PhotoDisplayInfo photo = new PhotoDisplayInfo();
@@ -49,7 +50,7 @@ public class PhotoDisplayInfo {
   }
 
   public Uri getHighResUri() {
-    return Uri.parse(getHighResUrl());
+    return localFile != null && localFile.exists() ? Uri.fromFile(localFile) : Uri.parse(getHighResUrl());
   }
 
   public Uri getLowResUri() {
@@ -70,5 +71,13 @@ public class PhotoDisplayInfo {
 
   public void setDescription(String description) {
     this.description = description;
+  }
+
+  public File getLocalFile() {
+    return localFile;
+  }
+
+  public void setLocalFile(File localFile) {
+    this.localFile = localFile;
   }
 }

@@ -173,10 +173,9 @@ public abstract class MainActivity extends BaseActivity
     @Override
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
-      for (PhotoDetails photoDetails : photoListingPresenter.getAllPhotos()) {
-        PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
-        photoDisplayInfo.setDescription(photoDetails.getPermalinkMeta());
-        listingItems.add(new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO)));
+      List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPhotoDisplayInfos();
+      for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
+        listingItems.add(new ListingItem(displayInfo, getListingItemType(TYPE_PHOTO)));
       }
 
       return listingItems;
@@ -189,10 +188,9 @@ public abstract class MainActivity extends BaseActivity
     @Override
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
-      for (PhotoDetails photoDetails : photoListingPresenter.getAllPhotos()) {
-        PhotoDisplayInfo photoDisplayInfo = PhotoDisplayInfo.create(photoDetails.getIdentifierAsString(), photoDetails.getHighResUrl(), photoDetails.getLowResUrl(), 0);
-        photoDisplayInfo.setDescription(photoDetails.getPermalinkMeta());
-        ListingItem photoListingItem = new ListingItem(photoDisplayInfo, getListingItemType(TYPE_PHOTO));
+      List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPhotoDisplayInfos();
+      for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
+        ListingItem photoListingItem = new ListingItem(displayInfo, getListingItemType(TYPE_PHOTO));
         listingItems.add(photoListingItem);
       }
 
