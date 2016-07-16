@@ -1,5 +1,7 @@
 package com.khoinguyen.photoviewerkit.impl.view;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.os.Build;
@@ -108,11 +110,22 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
       fadeContentAnimator = ObjectAnimator.ofFloat(this, "alpha", 0);
       fadeContentAnimator.setDuration(DURATION_FADE_CONTENT);
       fadeContentAnimator.setInterpolator(new AccelerateInterpolator());
+      fadeContentAnimator.addListener(new AnimatorListenerAdapter() {
+        @Override
+        public void onAnimationEnd(Animator animation) {
+          if (getAlpha() == 0) {
+            setVisibility(GONE);
+          }
+        }
+      });
     }
 
     final float alpha = getAlpha();
     if (alpha == 1f || alpha == 0f) {
       fadeContentAnimator.setFloatValues(1 - alpha);
+      if (alpha == 0) {
+        setVisibility(VISIBLE);
+      }
     }
 
     fadeContentAnimator.start();
@@ -130,6 +143,6 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
   }
 
   public boolean isVisible() {
-    return getVisibility() == VISIBLE;
+    return getVisibility() == GONE;
   }
 }
