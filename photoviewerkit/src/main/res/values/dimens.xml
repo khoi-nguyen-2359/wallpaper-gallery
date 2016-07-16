@@ -3,4 +3,6 @@
     <dimen name="photo_list_pager_photo_item_hor_margin">5dp</dimen>
     <dimen name="item_photo_corner_radius">5dp</dimen>
     <dimen name="photo_list_pager_item_offset">3dp</dimen>
+    <dimen name="photo_gallery_end_drag_distance">75dp</dimen>
+    <dimen name="photo_gallery_page_margin">20dp</dimen>
 </resources>

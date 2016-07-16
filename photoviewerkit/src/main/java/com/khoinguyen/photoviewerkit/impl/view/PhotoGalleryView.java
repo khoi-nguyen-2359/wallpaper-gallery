@@ -2,6 +2,7 @@ package com.khoinguyen.photoviewerkit.impl.view;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.support.v4.view.ViewPager;
@@ -45,7 +46,6 @@ import com.khoinguyen.util.log.L;
 public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<SharedData> {
   private static final int PAGING_OFFSET = 3;
   private static final int DEF_OFFSCREEN_PAGE = 1;
-  private static final int END_DRAG_MIN_DISTANCE_DPS = 75;
   private static final long DURATION_DRAG_CANCEL = 200;
 
   protected L log = L.get("PhotoGalleryView");
@@ -67,12 +67,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
   private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
     @Override
-    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-      if (positionOffset == 0) {
-        onPagerPageSelected(position);
-      } else {
-        onPagerPageScrolled(position, positionOffset, positionOffsetPixels);
-      }
+    public void onPageSelected(int position) {
+      super.onPageSelected(position);
+
+      onPagerPageSelected(position);
     }
   };
 
@@ -148,8 +146,8 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   private void init() {
     setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
 
-    DisplayMetrics dm = getResources().getDisplayMetrics();
-    endDragMinDistance = dm.density * END_DRAG_MIN_DISTANCE_DPS;
+    Resources resources = getResources();
+    endDragMinDistance = resources.getDimensionPixelSize(R.dimen.photo_gallery_end_drag_distance);
 
     viewDragHelper = new ViewDragHelper(getContext());
     viewDragHelper.setDragEventListener(dragEventListener);
@@ -157,6 +155,10 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     addOnPageChangeListener(internalOnPageChangeListener);
     adapterPhotoGallery = new PhotoGalleryPagerAdapter();
     setAdapter(adapterPhotoGallery);
+
+    int pageMargin = resources.getDimensionPixelSize(R.dimen.photo_gallery_page_margin);
+    setPageMargin(pageMargin);
+//    setPageMarginDrawable(R.drawable.photo_gallery_page_margin);
   }
 
   @Override
