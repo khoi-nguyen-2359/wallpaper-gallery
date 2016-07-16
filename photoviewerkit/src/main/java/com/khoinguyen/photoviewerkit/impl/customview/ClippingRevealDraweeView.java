@@ -2,8 +2,10 @@ package com.khoinguyen.photoviewerkit.impl.customview;
 
 import android.animation.ValueAnimator;
 import android.content.Context;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.net.Uri;
+import android.transition.Scene;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.animation.DecelerateInterpolator;
@@ -20,7 +22,7 @@ import com.khoinguyen.photoviewerkit.impl.anim.ZoomToAnimation;
  * Created by khoinguyen on 4/11/16.
  */
 public class ClippingRevealDraweeView extends SimpleDraweeView {
-  private static final long DUR_ANIMATION = 200;
+  private static final long DUR_ANIMATION = 150;
   private ScalingUtils.InterpolatingScaleType actualScaleType;
 
   public ClippingRevealDraweeView(Context context, GenericDraweeHierarchy hierarchy) {
@@ -71,7 +73,14 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
     setController(controller);
   }
 
+  public Rect fromRectF(RectF rectF) {
+    return new Rect(0, 0, (int)rectF.width(), (int)rectF.height());
+  }
+
   public CompoundViewAnimation createRevealAnimation(RectF startRect, RectF endRect) {
+    actualScaleType = new ScalingUtils.InterpolatingScaleType(ScalingUtils.ScaleType.CENTER_CROP, ScalingUtils.ScaleType.FIT_CENTER,
+        fromRectF(startRect), fromRectF(endRect));
+    getHierarchy().setActualImageScaleType(actualScaleType);
     return new ZoomToAnimation()
         .rects(startRect, endRect)
         .duration(DUR_ANIMATION)
@@ -86,6 +95,9 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
   }
 
   public CompoundViewAnimation createShrinkAnimation(RectF startRect, RectF endRect) {
+    actualScaleType = new ScalingUtils.InterpolatingScaleType(ScalingUtils.ScaleType.FIT_CENTER, ScalingUtils.ScaleType.CENTER_CROP,
+        fromRectF(startRect), fromRectF(endRect));
+    getHierarchy().setActualImageScaleType(actualScaleType);
     return new ZoomToAnimation()
         .rects(startRect, endRect)
         .duration(DUR_ANIMATION)
@@ -94,7 +106,7 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
         .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
           @Override
           public void onAnimationUpdate(ValueAnimator animation) {
-            actualScaleType.setValue(1 - animation.getAnimatedFraction());
+            actualScaleType.setValue(animation.getAnimatedFraction());
           }
         });
   }
