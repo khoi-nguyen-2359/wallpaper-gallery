@@ -152,27 +152,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     rcvPagingListener.setEnable(true);
   }
 
-  /**
-   * Created by khoinguyen on 12/22/14.
-   */
-//  public class ListingViewRecyclerAdapter extends RecyclerListingAdapter {
-//    @Override
-//    public void onBindViewHolder(final RecyclerListingViewHolder viewHolder, int position) {
-//      super.onBindViewHolder(viewHolder, position);
-//
-//      //// TODO: 6/27/16 what if the itemView has already set onClickListener before?
-//        viewHolder.itemView.setOnClickListener(new OnClickListener() {
-//          @Override
-//          public void onClick(View v) {
-//            int position = rcvLayoutMan.getPosition(v);
-//            photoKitWidget.revealGallery(position);
-//
-//            eventBus.post(new OnPhotoListingItemActivate());
-//          }
-//        });
-//      }
-//  }
-
   @Override
   public void activatePhotoItem(int position) {
     PhotoDisplayInfo photoData = photoFinder.getPhoto(position);
