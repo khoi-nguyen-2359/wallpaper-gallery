@@ -21,7 +21,6 @@ import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
-import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
@@ -31,6 +30,7 @@ import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoOverlayView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
+import com.khoinguyen.photoviewerkit.impl.util.BottomLoadingIndicatorAdapter;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
@@ -160,7 +160,7 @@ public abstract class MainActivity extends BaseActivity
     mainViewPresenter.loadWallpaperSetting(photoDetails);
   }
 
-  private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
+  private class PhotoListingAdapter extends BottomLoadingIndicatorAdapter {
     public static final int TYPE_PHOTO = 2;
 
     @Override

@@ -18,7 +18,6 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
-import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.adapter.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
@@ -32,6 +31,7 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
+import com.khoinguyen.photoviewerkit.impl.util.BottomLoadingIndicatorAdapter;
 import com.khoinguyen.photoviewerkit.impl.util.RecyclerViewPagingListener;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.khoinguyen.util.log.L;
@@ -42,7 +42,7 @@ import com.khoinguyen.util.log.L;
 public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData, RecyclerListingViewHolder> {
   private static final int PAGING_OFFSET = 20;
   protected GridLayoutManager rcvLayoutMan;
-  protected IListingAdapter<RecyclerListingViewHolder> listingAdapter;
+  protected BottomLoadingIndicatorAdapter listingAdapter;
   protected AdapterPhotoFinder photoFinder;
 
   protected IEventBus eventBus;
@@ -71,6 +71,13 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     Resources resources = getResources();
     final int nLayoutCol = 2;   //resources.getInteger(R.integer.photo_page_col);
     rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
+    rcvLayoutMan.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+      @Override
+      public int getSpanSize(int position) {
+        return listingAdapter.isIndicator(position) ? rcvLayoutMan.getSpanCount() : 1;
+      }
+    });
+
     setLayoutManager(rcvLayoutMan);
     addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
@@ -80,7 +87,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     addOnScrollListener(rcvPagingListener);
   }
 
-  public void setPhotoAdapter(IListingAdapter<RecyclerListingViewHolder> adapter) {
+  public void setPhotoAdapter(BottomLoadingIndicatorAdapter adapter) {
     this.listingAdapter = adapter;
     adapterPhotos.setListingAdapter(listingAdapter);
     updatePhotoFinder();
@@ -141,6 +148,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
   @Override
   public void enablePaging() {
+    listingAdapter.showIndicator(false);
     rcvPagingListener.setEnable(true);
   }
 
@@ -258,7 +266,11 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   private RecyclerViewPagingListener rcvPagingListener = new RecyclerViewPagingListener(PAGING_OFFSET) {
     @Override
     public void onNext(RecyclerView recyclerView) {
-        photoKitWidget.onPagingNext(PhotoListingView.this);
-      }
+      photoKitWidget.onPagingNext(PhotoListingView.this);
+      listingAdapter.showIndicator(true);
+      listingAdapter.updateDataSet();
+      listingAdapter.notifyDataSetChanged();
+    }
   };
+
 }

@@ -2,10 +2,7 @@ package com.khoinguyen.photoviewerkit.impl.util;
 
 import android.content.Context;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewConfiguration;
-
-import com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView;
 
 /**
  * Created by khoinguyen on 7/14/16.
