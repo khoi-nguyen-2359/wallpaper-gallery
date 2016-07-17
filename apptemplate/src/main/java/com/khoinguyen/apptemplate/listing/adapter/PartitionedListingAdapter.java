@@ -32,8 +32,18 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> extends 
     dataSet.addAll(newDataSet);
   }
 
+  /**
+   * This method throws Exception if there's duplicate type's value
+   * @param listingItemType
+   */
   public void registerListingItemType(ListingItemType<VH> listingItemType) {
-    itemTypeRegistry.put(listingItemType.getViewType(), listingItemType);
+    int viewType = listingItemType.getViewType();
+    ListingItemType<VH> registeredType = itemTypeRegistry.get(viewType);
+    if (registeredType == null) {
+      itemTypeRegistry.put(viewType, listingItemType);
+    } else if (registeredType != listingItemType) {
+      throw new IllegalArgumentException("The item type value has already been registered by a different type instance");
+    }
   }
 
   public ListingItemType<VH> getListingItemType(int viewType) {
