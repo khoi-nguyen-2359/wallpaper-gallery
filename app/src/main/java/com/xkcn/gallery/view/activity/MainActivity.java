@@ -194,8 +194,8 @@ public abstract class MainActivity extends BaseActivity
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    initData();
     initTemplateViews();
+    initData();
     initViews();
     photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
   }
@@ -245,7 +245,7 @@ public abstract class MainActivity extends BaseActivity
     photoListingPresenter.setView(this);
 
     photoListingAdapter = new PhotoListingAdapter();
-    photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
+    photoListingAdapter.registerListingItemType(photoListingView.new PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
 
     photoGalleryAdapter = new PhotoGalleryAdapter();
     photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));

@@ -47,7 +47,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
   protected IEventBus eventBus;
   protected SharedData sharedData;
-  protected RecyclerViewAdapter adapterPhotos;
+  protected RecyclerListingAdapter adapterPhotos;
 
   private L log = L.get("DefaultPhotoListingView");
   protected IPhotoViewerKitWidget<SharedData> photoKitWidget;
@@ -74,7 +74,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     setLayoutManager(rcvLayoutMan);
     addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
 
-    adapterPhotos = new RecyclerViewAdapter();
+    adapterPhotos = new RecyclerListingAdapter();
     setAdapter(adapterPhotos);
 
     addOnScrollListener(rcvPagingListener);
@@ -147,23 +147,23 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
   /**
    * Created by khoinguyen on 12/22/14.
    */
-  public class RecyclerViewAdapter extends RecyclerListingAdapter {
-    @Override
-    public void onBindViewHolder(final RecyclerListingViewHolder viewHolder, int position) {
-      super.onBindViewHolder(viewHolder, position);
-
-      //// TODO: 6/27/16 what if the itemView has already set onClickListener before?
-        viewHolder.itemView.setOnClickListener(new OnClickListener() {
-          @Override
-          public void onClick(View v) {
-            int position = rcvLayoutMan.getPosition(v);
-            photoKitWidget.revealGallery(position);
-
-            eventBus.post(new OnPhotoListingItemActivate());
-          }
-        });
-      }
-  }
+//  public class ListingViewRecyclerAdapter extends RecyclerListingAdapter {
+//    @Override
+//    public void onBindViewHolder(final RecyclerListingViewHolder viewHolder, int position) {
+//      super.onBindViewHolder(viewHolder, position);
+//
+//      //// TODO: 6/27/16 what if the itemView has already set onClickListener before?
+//        viewHolder.itemView.setOnClickListener(new OnClickListener() {
+//          @Override
+//          public void onClick(View v) {
+//            int position = rcvLayoutMan.getPosition(v);
+//            photoKitWidget.revealGallery(position);
+//
+//            eventBus.post(new OnPhotoListingItemActivate());
+//          }
+//        });
+//      }
+//  }
 
   @Override
   public void activatePhotoItem(int position) {
@@ -202,7 +202,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     itemView.setVisibility(View.VISIBLE);
   }
 
-  public static class PhotoItemType extends ListingItemType<RecyclerListingViewHolder> {
+  public class PhotoItemType extends ListingItemType<RecyclerListingViewHolder> {
     private LayoutInflater layoutInflater;
 
     public PhotoItemType(int viewType) {
@@ -224,7 +224,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     }
   }
 
-  public static class PhotoListingItemViewHolder extends RecyclerListingViewHolder<PhotoDisplayInfo> {
+  private class PhotoListingItemViewHolder extends RecyclerListingViewHolder<PhotoDisplayInfo> {
     protected final SimpleDraweeView ivPhoto;
 
     public PhotoListingItemViewHolder(View itemView) {
@@ -241,6 +241,17 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
     public void bind(PhotoDisplayInfo data) {
       ivPhoto.setAspectRatio(1.5f);
       ivPhoto.setImageURI(data.getLowResUri());
+
+      //// TODO: 6/27/16 what if the itemView has already set onClickListener before?
+      itemView.setOnClickListener(new OnClickListener() {
+        @Override
+        public void onClick(View v) {
+          int position = rcvLayoutMan.getPosition(v);
+          photoKitWidget.revealGallery(position);
+
+          eventBus.post(new OnPhotoListingItemActivate());
+        }
+      });
     }
   }
 
