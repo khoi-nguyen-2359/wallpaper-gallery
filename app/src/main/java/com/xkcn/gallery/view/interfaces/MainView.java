@@ -1,6 +1,5 @@
-package com.xkcn.gallery.view;
+package com.xkcn.gallery.view.interfaces;
 
-import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.data.model.PhotoDetails;
 
 import java.io.File;

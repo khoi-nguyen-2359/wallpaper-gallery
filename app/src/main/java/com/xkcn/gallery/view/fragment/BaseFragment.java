@@ -1,4 +1,4 @@
-package com.xkcn.gallery.fragment;
+package com.xkcn.gallery.view.fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;

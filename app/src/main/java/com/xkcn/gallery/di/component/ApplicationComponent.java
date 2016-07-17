@@ -1,8 +1,8 @@
 package com.xkcn.gallery.di.component;
 
-import com.xkcn.gallery.activity.BaseActivity;
+import com.xkcn.gallery.view.activity.BaseActivity;
 import com.xkcn.gallery.di.module.ApplicationModule;
-import com.xkcn.gallery.fragment.BaseFragment;
+import com.xkcn.gallery.view.fragment.BaseFragment;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;

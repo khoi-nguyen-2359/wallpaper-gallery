@@ -1,4 +1,4 @@
-package com.xkcn.gallery.activity;
+package com.xkcn.gallery.view.activity;
 
 import android.app.Dialog;
 import android.app.NotificationManager;
@@ -40,7 +40,6 @@ import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
-import com.readystatesoftware.systembartint.SystemBarTintManager;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
 import com.xkcn.gallery.data.PhotoDownloadNotificationsInfo;
@@ -49,7 +48,7 @@ import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
-import com.xkcn.gallery.view.MainView;
+import com.xkcn.gallery.view.interfaces.MainView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -84,8 +83,8 @@ public abstract class MainActivity extends BaseActivity
   PhotoOverlayView photoOverlayView;
 
   protected MainViewPresenter mainViewPresenter;
-  private SystemBarTintManager.SystemBarConfig kitkatSystemBarConfig;
   protected Dialog proDlg;
+//  private Dialog
 
   L log = L.get(this);
 
@@ -252,9 +251,6 @@ public abstract class MainActivity extends BaseActivity
     photoListingPresenter.setView(this);
     getApplicationComponent().inject(photoListingPresenter);
 
-    SystemBarTintManager kitkatTintManager = new SystemBarTintManager(this);
-    kitkatSystemBarConfig = kitkatTintManager.getConfig();
-
     photoListingAdapter = new PhotoListingAdapter();
     photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
 
@@ -281,25 +277,6 @@ public abstract class MainActivity extends BaseActivity
     toggle.syncState();
 
     viewNavigation.setNavigationItemSelectedListener(this);
-
-    applyWindowInsets();
-  }
-
-  private void applyWindowInsets() {
-    ViewCompat.setOnApplyWindowInsetsListener(toolbarContainerLayout, new OnApplyWindowInsetsListener() {
-      @Override
-      public WindowInsetsCompat onApplyWindowInsets(View v, final WindowInsetsCompat insets) {
-        toolbarContainerLayout.setPadding(0, insets.getSystemWindowInsetTop(), 0, 0);
-        photoListingView.setPadding(0, 0, 0, insets.getSystemWindowInsetBottom());
-
-        return insets;
-      }
-    });
-
-    if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.KITKAT) {
-      toolbarContainerLayout.setPadding(0, kitkatSystemBarConfig.getPixelInsetTop(false), 0, 0);
-      photoListingView.setPadding(0, 0, 0, kitkatSystemBarConfig.getPixelInsetBottom());
-    }
   }
 
   @SuppressWarnings("StatementWithEmptyBody")

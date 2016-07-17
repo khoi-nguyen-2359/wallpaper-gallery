@@ -1,4 +1,4 @@
-package com.xkcn.gallery.fragment;
+package com.xkcn.gallery.view.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -13,10 +13,8 @@ import android.view.ViewGroup;
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.facebook.imagepipeline.core.ImagePipeline;
 import com.khoinguyen.util.log.L;
-import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.activity.BaseActivity;
-import com.xkcn.gallery.activity.MainActivityImpl;
+import com.xkcn.gallery.view.activity.MainActivityImpl;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.service.UpdateService;

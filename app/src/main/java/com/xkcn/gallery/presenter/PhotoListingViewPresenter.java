@@ -7,7 +7,7 @@ import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
-import com.xkcn.gallery.view.MainView;
+import com.xkcn.gallery.view.interfaces.MainView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +19,6 @@ import rx.Observer;
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Func1;
-import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 12/18/15.

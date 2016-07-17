@@ -1,4 +1,4 @@
-package com.xkcn.gallery.activity;
+package com.xkcn.gallery.view.activity;
 
 import android.app.NotificationManager;
 import android.os.Bundle;

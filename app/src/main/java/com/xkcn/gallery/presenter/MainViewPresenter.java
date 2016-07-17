@@ -4,7 +4,7 @@ import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
-import com.xkcn.gallery.view.MainView;
+import com.xkcn.gallery.view.interfaces.MainView;
 
 import javax.inject.Inject;
 

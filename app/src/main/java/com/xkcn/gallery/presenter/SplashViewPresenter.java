@@ -1,7 +1,7 @@
 package com.xkcn.gallery.presenter;
 
 import com.xkcn.gallery.data.repo.PreferenceRepository;
-import com.xkcn.gallery.view.SplashView;
+import com.xkcn.gallery.view.interfaces.SplashView;
 
 /**
  * Created by khoinguyen on 12/14/15.
