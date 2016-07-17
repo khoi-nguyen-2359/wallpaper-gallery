@@ -1,6 +1,7 @@
 package com.xkcn.gallery.presenter;
 
 import com.khoinguyen.util.log.L;
+import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
@@ -10,6 +11,7 @@ import javax.inject.Inject;
 
 import rx.Observer;
 import rx.Scheduler;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 
 /**
@@ -27,13 +29,18 @@ public class MainViewPresenter {
   @Inject
   Scheduler rxIoScheduler;
 
+  /**
+   * MainView has one task that is requisite and block the UI
+   */
+  private Subscription blockingTask;
+
   public MainViewPresenter(MainView view) {
     this.view = view;
   }
 
   public void loadWallpaperSetting(final PhotoDetails photoDetails) {
-    view.showLoading();
-    photoFileManager.getPhotoFileObservable(photoDetails)
+    view.showProgressLoading(R.string.photo_gallery_downloading_message);
+    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails)
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<Float>() {
@@ -56,6 +63,7 @@ public class MainViewPresenter {
           @Override
           public void onNext(Float progress) {
             L.get().d("set wallpaper progress = %f", progress);
+            view.updateProgressLoading((int) (progress * 100));
           }
         });
 
@@ -101,8 +109,8 @@ public class MainViewPresenter {
       return;
     }
 
-    view.showLoading();
-    photoFileManager.getPhotoFileObservable(photoDetails)
+    view.showProgressLoading(R.string.photo_gallery_downloading_message);
+    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails)
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<Float>() {
@@ -120,7 +128,16 @@ public class MainViewPresenter {
 
           @Override
           public void onNext(Float aFloat) {
+            view.updateProgressLoading((int) (aFloat * 100));
           }
         });
+  }
+
+  public void cancelBlockingTask() {
+    if (blockingTask != null) {
+      blockingTask.unsubscribe();
+    }
+
+    view.hideLoading();
   }
 }

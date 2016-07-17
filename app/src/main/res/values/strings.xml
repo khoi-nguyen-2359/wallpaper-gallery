@@ -35,5 +35,7 @@
     </string>
     <string name="download_notification_error">Error: %1$s</string>
     <string name="photo_action_downloaded_already">Downloaded</string>
+    <string name="text_cancel">Cancel</string>
+    <string name="photo_gallery_downloading_message">Downloading photo ...</string>
 
 </resources>

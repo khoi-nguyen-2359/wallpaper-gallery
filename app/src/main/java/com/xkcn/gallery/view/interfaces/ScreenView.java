@@ -6,7 +6,12 @@ package com.xkcn.gallery.view.interfaces;
 public interface ScreenView {
   void showToast(String message);
 
-  void showLoading();
+  void showProgressLoading(int messageResId);
+
+  /**
+   * @param progress [0 100]
+   */
+  void updateProgressLoading(int progress);
 
   void hideLoading();
 }

@@ -1,26 +1,19 @@
 package com.xkcn.gallery.view.activity;
 
-import android.app.Dialog;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.view.OnApplyWindowInsetsListener;
-import android.support.v4.view.ViewCompat;
-import android.support.v4.view.WindowInsetsCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.Toast;
 
@@ -48,6 +41,7 @@ import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
+import com.xkcn.gallery.view.dialog.CustomProgressDialog;
 import com.xkcn.gallery.view.interfaces.MainView;
 
 import org.greenrobot.eventbus.EventBus;
@@ -83,7 +77,7 @@ public abstract class MainActivity extends BaseActivity
   PhotoOverlayView photoOverlayView;
 
   protected MainViewPresenter mainViewPresenter;
-  protected Dialog proDlg;
+  protected CustomProgressDialog proDlg;
 //  private Dialog
 
   L log = L.get(this);
@@ -384,8 +378,29 @@ public abstract class MainActivity extends BaseActivity
   }
 
   @Override
-  public void showLoading() {
-    proDlg = ProgressDialog.show(this, null, getString(R.string.msg_wait_a_moment), true);
+  public void updateProgressLoading(int progress) {
+    if (proDlg == null || !proDlg.isShowing()) {
+      return;
+    }
+
+    proDlg.setProgress(progress);
+  }
+
+  @Override
+  public void showProgressLoading(int messageResId) {
+    proDlg  = new CustomProgressDialog(this);
+    proDlg.setMessage(getString(messageResId));
+    proDlg.setIndeterminate(false);
+    proDlg.setCancelable(false);
+    proDlg.setMax(100);
+    proDlg.setOnCancelClickListener(new CustomProgressDialog.OnCancelClickListener() {
+      @Override
+      public void onCancelClick(CustomProgressDialog dialog) {
+        proDlg.dismiss();
+        mainViewPresenter.cancelBlockingTask();
+      }
+    });
+    proDlg.show();
   }
 
   @Override
