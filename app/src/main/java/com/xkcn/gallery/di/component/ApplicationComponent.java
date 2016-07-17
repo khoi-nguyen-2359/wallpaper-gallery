@@ -1,5 +1,6 @@
 package com.xkcn.gallery.di.component;
 
+import com.xkcn.gallery.data.model.PhotoDetailsDataPage;
 import com.xkcn.gallery.view.activity.BaseActivity;
 import com.xkcn.gallery.di.module.ApplicationModule;
 import com.xkcn.gallery.view.fragment.BaseFragment;
@@ -26,4 +27,6 @@ public interface ApplicationComponent {
   void inject(MainViewPresenter mainViewPresenter);
 
   void inject(PhotoListingViewPresenter photoListingViewPresenter);
+
+  void inject(PhotoDetailsDataPage allPages);
 }

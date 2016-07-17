@@ -241,9 +241,8 @@ public abstract class MainActivity extends BaseActivity
     mainViewPresenter = new MainViewPresenter(this);
     getApplicationComponent().inject(mainViewPresenter);
 
-    photoListingPresenter = new PhotoListingViewPresenter();
+    photoListingPresenter = new PhotoListingViewPresenter(getApplicationComponent());
     photoListingPresenter.setView(this);
-    getApplicationComponent().inject(photoListingPresenter);
 
     photoListingAdapter = new PhotoListingAdapter();
     photoListingAdapter.registerListingItemType(new PhotoListingView.PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));

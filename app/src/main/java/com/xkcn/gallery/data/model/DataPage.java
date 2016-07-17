@@ -45,10 +45,18 @@ public class DataPage<T> {
       return;
     }
 
+    if (nextPage.getStart() == 0) {
+      reset();
+    }
+
     append(nextPage.getData());
   }
 
   public void prepend(DataPage<T> prevPage) {
+    if (prevPage == null) {
+      return;
+    }
+
     data.addAll(0, prevPage.data);
     start = prevPage.start;
   }

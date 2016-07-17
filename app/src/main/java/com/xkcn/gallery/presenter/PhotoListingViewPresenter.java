@@ -4,12 +4,13 @@ import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.model.DataPage;
+import com.xkcn.gallery.data.model.PhotoDetailsDataPage;
+import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.view.interfaces.MainView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -18,6 +19,7 @@ import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
 import rx.functions.Func1;
 
 /**
@@ -45,7 +47,12 @@ public class PhotoListingViewPresenter {
 
   private int currentListingType;
 
-  private DataPage<PhotoDetails> allPages = new DataPage<>();
+  private PhotoDetailsDataPage photoDetailsPages = new PhotoDetailsDataPage();
+
+  public PhotoListingViewPresenter(ApplicationComponent component) {
+    component.inject(this);
+    component.inject(photoDetailsPages);
+  }
 
   public void setView(MainView view) {
     this.view = view;
@@ -81,13 +88,19 @@ public class PhotoListingViewPresenter {
         return photoQueryObservable;
       }
     })
+        .doOnNext(new Action1<DataPage<PhotoDetails>>() {
+          @Override
+          public void call(DataPage<PhotoDetails> photoDetailsDataPage) {
+            photoDetailsPages.append(photoDetailsDataPage);
+          }
+        })    // call append in doOnNext because it takes much time to finish
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Observer<DataPage<PhotoDetails>>() {
           @Override
           public void onCompleted() {
             view.onPagingLoaded();
-            if (!allPages.hasEnded()) {
+            if (!photoDetailsPages.hasEnded()) {
               view.enablePaging();
             }
           }
@@ -100,44 +113,20 @@ public class PhotoListingViewPresenter {
           @Override
           public void onNext(DataPage<PhotoDetails> photoPage) {
             L.get().d("next page %d %d", photoPage.getStart(), photoPage.getData().size());
-            if (photoPage.getStart() == 0) {
-              allPages.reset();
-            }
-            allPages.append(photoPage);
           }
         });
   }
 
-  public List<PhotoDetails> getAllPhotos() {
-    return allPages.getData();
-  }
-
   public List<PhotoDisplayInfo> getAllPhotoDisplayInfos() {
-    List<PhotoDetails> allPhotos = getAllPhotos();
-    List<PhotoDisplayInfo> allPhotoDisplayInfos = new ArrayList<>();
-
-    if (allPhotos != null && !allPhotos.isEmpty()) {
-      for (PhotoDetails photoDetails : allPhotos) {
-        PhotoDisplayInfo displayInfo = new PhotoDisplayInfo();
-        displayInfo.setPhotoId(photoDetails.getIdentifierAsString());
-        displayInfo.setDescription(photoDetails.getPermalinkMeta());
-        displayInfo.setLowResUrl(photoDetails.getLowResUrl());
-        displayInfo.setHighResUrl(photoDetails.getHighResUrl());
-        displayInfo.setLocalFile(photoFileManager.getPhotoFile(photoDetails));
-
-        allPhotoDisplayInfos.add(displayInfo);
-      }
-    }
-
-    return allPhotoDisplayInfos;
+    return photoDetailsPages.getAllDisplayInfos();
   }
 
   public void loadNextPhotoPage() {
-    loadPhotoPage(allPages.getNextStart(), currentListingType);
+    loadPhotoPage(photoDetailsPages.getNextStart(), currentListingType);
   }
 
   public PhotoDetails findPhoto(String photoId) {
-    List<PhotoDetails> allPhotos = getAllPhotos();
+    List<PhotoDetails> allPhotos = photoDetailsPages.getData();
     for (PhotoDetails photo : allPhotos) {
       if (photo.getIdentifierAsString().equals(photoId)) {
         return photo;
