@@ -60,7 +60,7 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
 
     @Override
     public View createView(ViewGroup container) {
-      LayoutInflater layoutInflater = getLayoutInflater(container);
+      LayoutInflater layoutInflater = getLayoutInflater(container.getContext());
 
       return layoutInflater.inflate(R.layout.photo_action_share, container, false);
     }
@@ -79,7 +79,7 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
 
     @Override
     public View createView(ViewGroup container) {
-      LayoutInflater layoutInflater = getLayoutInflater(container);
+      LayoutInflater layoutInflater = getLayoutInflater(container.getContext());
       return layoutInflater.inflate(R.layout.photo_action_set_wallpaper, container, false);
     }
 
@@ -100,7 +100,7 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
 
     @Override
     public View createView(ViewGroup container) {
-      return getLayoutInflater(container).inflate(R.layout.photo_action_download, container, false);
+      return getLayoutInflater(container.getContext()).inflate(R.layout.photo_action_download, container, false);
     }
 
     @Override

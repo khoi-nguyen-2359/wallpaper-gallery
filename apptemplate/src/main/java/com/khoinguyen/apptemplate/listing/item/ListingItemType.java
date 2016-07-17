@@ -1,5 +1,6 @@
 package com.khoinguyen.apptemplate.listing.item;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,8 +12,8 @@ public abstract class ListingItemType<VH extends IViewHolder> {
   protected int viewType;
   protected LayoutInflater layoutInflater;
 
-  protected LayoutInflater getLayoutInflater(View view) {
-    return layoutInflater == null ? layoutInflater = LayoutInflater.from(view.getContext()) : layoutInflater;
+  protected LayoutInflater getLayoutInflater(Context context) {
+    return layoutInflater == null ? layoutInflater = LayoutInflater.from(context) : layoutInflater;
   }
 
   public ListingItemType(int viewType) {
