@@ -10,7 +10,7 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
-import com.khoinguyen.photoviewerkit.impl.util.SimpleSupplier;
+import com.khoinguyen.photoviewerkit.util.SimpleSupplier;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.imageloader.PhotoFileManager;

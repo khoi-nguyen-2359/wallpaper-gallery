@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.impl.util;
+package com.khoinguyen.photoviewerkit.util;
 
 import com.facebook.common.internal.Supplier;
 

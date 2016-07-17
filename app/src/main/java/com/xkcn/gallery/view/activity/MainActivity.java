@@ -30,7 +30,7 @@ import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoOverlayView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
-import com.khoinguyen.photoviewerkit.impl.util.BottomLoadingIndicatorAdapter;
+import com.khoinguyen.photoviewerkit.util.BottomLoadingIndicatorAdapter;
 import com.khoinguyen.ui.UiUtils;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;

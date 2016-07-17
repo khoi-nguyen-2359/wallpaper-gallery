@@ -1,4 +1,4 @@
-package com.khoinguyen.photoviewerkit.impl.util;
+package com.khoinguyen.photoviewerkit.util;
 
 import android.text.TextUtils;
 
