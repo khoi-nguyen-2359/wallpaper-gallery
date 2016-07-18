@@ -172,7 +172,11 @@ public final class PhotoFileManager {
     @Override
     protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
 //      logger.d("onNewResultImpl thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
-      if (!dataSource.isFinished()) {
+      if (!dataSource.isFinished() || subscriber.isUnsubscribed()) {
+        if (subscriber.isUnsubscribed()) {
+          dataSource.close();
+        }
+
         return;
       }
 
