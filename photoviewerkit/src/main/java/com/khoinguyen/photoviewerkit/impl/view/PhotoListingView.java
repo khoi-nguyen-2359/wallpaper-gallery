@@ -69,7 +69,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
   private void init() {
     Resources resources = getResources();
-    final int nLayoutCol = 2;   //resources.getInteger(R.integer.photo_page_col);
+    final int nLayoutCol = 4;   //resources.getInteger(R.integer.photo_page_col);
     rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
     rcvLayoutMan.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
       @Override
