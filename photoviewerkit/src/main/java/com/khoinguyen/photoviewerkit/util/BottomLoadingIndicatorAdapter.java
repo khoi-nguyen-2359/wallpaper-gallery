@@ -11,6 +11,8 @@ import com.khoinguyen.photoviewerkit.R;
 
 /**
  * Created by khoinguyen on 7/17/16.
+ *
+ * This adapter can be toggled to add a loading indicator item at end of data set.
  */
 public abstract class BottomLoadingIndicatorAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
   private boolean showIndicator = false;

@@ -155,7 +155,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
 
     int pageMargin = resources.getDimensionPixelSize(R.dimen.photo_gallery_page_margin);
     setPageMargin(pageMargin);
-//    setPageMarginDrawable(R.drawable.photo_gallery_page_margin);
   }
 
   @Override
