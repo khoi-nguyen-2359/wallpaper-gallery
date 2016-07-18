@@ -19,47 +19,35 @@ package com.xkcn.gallery.view.dialog;
 import android.animation.ObjectAnimator;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.AccelerateDecelerateInterpolator;
-import android.view.animation.AccelerateInterpolator;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
-import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
 
-public class CustomProgressDialog extends Dialog {
+public class PhotoDownloadProgressDialog extends Dialog {
 
   private ProgressBar mProgress;
 
-  private int mMax;
+  private int mMax = 100;
   private int mProgressVal;
-  private boolean mIndeterminate;
+  private boolean mIndeterminate = false;
 
   private boolean mHasStarted;
   private TextView tvMessage;
-  private ImageButton btCancel;
   private String message;
 
-  private OnCancelClickListener cancelListener;
-
-  public CustomProgressDialog(Context context) {
-    super(context, R.style.HeightAdjustableDialog);
+  public PhotoDownloadProgressDialog(Context context) {
+    super(context);
   }
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
-    Context mContext = getContext();
     setContentView(R.layout.dialog_custom_progress);
     mProgress = (ProgressBar) findViewById(R.id.progress);
     tvMessage = (TextView) findViewById(R.id.tv_message);
-    btCancel = (ImageButton) findViewById(R.id.bt_cancel);
 
     if (mMax > 0) {
       setMax(mMax);
@@ -74,21 +62,8 @@ public class CustomProgressDialog extends Dialog {
       tvMessage.setVisibility(View.GONE);
     }
 
-    btCancel.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (cancelListener != null) {
-          cancelListener.onCancelClick(CustomProgressDialog.this);
-        }
-      }
-    });
-
     setIndeterminate(mIndeterminate);
     super.onCreate(savedInstanceState);
-  }
-
-  public void setOnCancelClickListener(OnCancelClickListener listener) {
-    cancelListener = listener;
   }
 
   @Override
@@ -132,9 +107,5 @@ public class CustomProgressDialog extends Dialog {
 
   public void setMessage(String message) {
     this.message = message;
-  }
-
-  public interface OnCancelClickListener {
-    void onCancelClick(CustomProgressDialog dialog);
   }
 }

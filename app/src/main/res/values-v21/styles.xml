@@ -2,8 +2,4 @@
     <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:statusBarColor">#000</item>
     </style>
-
-    <style name="AppDialog" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:statusBarColor">#000</item>
-    </style>
 </resources>
