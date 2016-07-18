@@ -9,10 +9,13 @@ import com.xkcn.gallery.view.interfaces.MainView;
 
 import javax.inject.Inject;
 
+import rx.Observable;
 import rx.Observer;
 import rx.Scheduler;
+import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
+import rx.observables.ConnectableObservable;
 
 /**
  * Created by khoinguyen on 12/14/15.
@@ -40,33 +43,29 @@ public class MainViewPresenter {
 
   public void loadWallpaperSetting(final PhotoDetails photoDetails) {
     view.showProgressLoading(R.string.photo_gallery_downloading_message);
+
     blockingTask = photoFileManager.getPhotoFileObservable(photoDetails)
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<Float>() {
+        .subscribe(new Subscriber<Float>() {
           @Override
           public void onCompleted() {
-            L.get().d("set wallpaper onCompleted");
-
             view.hideLoading();
             view.showWallpaperChooser(photoFileManager.getPhotoFile(photoDetails));
           }
 
           @Override
           public void onError(Throwable e) {
-            L.get().d("set wallpaper onError");
-
             view.hideLoading();
             view.showToast(e.getMessage());
           }
 
           @Override
           public void onNext(Float progress) {
-            L.get().d("set wallpaper progress = %f", progress);
+            L.get().d("load wallpaper onNext %f", progress);
             view.updateProgressLoading((int) (progress * 100));
           }
         });
-
   }
 
   public void checkToCrawlPhoto() {
@@ -83,22 +82,20 @@ public class MainViewPresenter {
     photoFileManager.getPhotoFileObservable(photoDetails)
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<Float>() {
+        .subscribe(new Subscriber<Float>() {
           @Override
           public void onCompleted() {
-            L.get().d("download onCompleted");
             view.showDownloadComplete(photoDetails);
           }
 
           @Override
           public void onError(Throwable e) {
-            L.get().d("download onError");
             view.showDownloadError(photoDetails, e.getMessage());
           }
 
           @Override
           public void onNext(Float progress) {
-            L.get().d("download onNext %s", progress);
+            L.get().d("download onNext %f", progress);
             view.updateDownloadProgress(photoDetails, progress);
           }
         });
@@ -113,7 +110,7 @@ public class MainViewPresenter {
     blockingTask = photoFileManager.getPhotoFileObservable(photoDetails)
         .subscribeOn(rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<Float>() {
+        .subscribe(new Subscriber<Float>() {
           @Override
           public void onCompleted() {
             view.hideLoading();
@@ -127,15 +124,18 @@ public class MainViewPresenter {
           }
 
           @Override
-          public void onNext(Float aFloat) {
-            view.updateProgressLoading((int) (aFloat * 100));
+          public void onNext(Float progress) {
+            L.get().d("share onNext %f", progress);
+            view.updateProgressLoading((int) (progress * 100));
           }
         });
   }
 
   public void cancelBlockingTask() {
     if (blockingTask != null) {
+      L.get().d("cancel blocking task");
       blockingTask.unsubscribe();
+      blockingTask = null;
     }
 
     view.hideLoading();

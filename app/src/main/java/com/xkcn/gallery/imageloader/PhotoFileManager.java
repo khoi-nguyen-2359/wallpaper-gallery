@@ -30,6 +30,7 @@ import java.util.concurrent.TimeUnit;
 import rx.Observable;
 import rx.Subscriber;
 import rx.functions.Action0;
+import rx.observables.ConnectableObservable;
 
 /**
  * Created by khoinguyen on 2/4/15.
@@ -101,44 +102,47 @@ public final class PhotoFileManager {
 
   private Observable<Float> getPhotoFileObservable(final String photoUrl) {
     Observable<Float> workingObservable = mapDownloadingObservables.get(photoUrl);
-    if (workingObservable != null) {
+    if (workingObservable == null) {
+      Observable<Float> getFileObservable = Observable.create(new Observable.OnSubscribe<Float>() {
+        @Override
+        public void call(Subscriber<? super Float> subscriber) {
+          File downloadedFile = getPhotoFile(photoUrl);
+          if (downloadedFile.exists()) {
+            logger.d("photo's already been downloaded");
+            subscriber.onCompleted();
+            return;
+          }
+
+          logger.d("photo is being fetched by fresco");// thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
+          ImageRequest request = ImageRequestBuilder
+              .newBuilderWithSource(Uri.parse(photoUrl))
+              .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
+              .build();
+
+          ImagePipeline imagePipeline = Fresco.getImagePipeline();
+          DataSource<CloseableReference<PooledByteBuffer>> dataSource = imagePipeline.fetchEncodedImage(request, this);
+          dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, photoUrl), CallerThreadExecutor.getInstance());
+        }
+      })
+          .throttleFirst(300, TimeUnit.MILLISECONDS)
+          .doOnTerminate(new Action0() {
+            @Override
+            public void call() {
+              mapDownloadingObservables.remove(photoUrl);
+              logger.d("end photo fetching");
+            }
+          });
+
+      ConnectableObservable<Float> publishObservable = getFileObservable.replay();
+      publishObservable.connect();
+      mapDownloadingObservables.put(photoUrl, publishObservable);
+
+      workingObservable = publishObservable;
+    } else {
       logger.d("photo is being downloaded");
-      return workingObservable.cache();
     }
 
-    Observable<Float> getFileObservable = Observable.create(new Observable.OnSubscribe<Float>() {
-      @Override
-      public void call(Subscriber<? super Float> subscriber) {
-        File downloadedFile = getPhotoFile(photoUrl);
-        if (downloadedFile.exists()) {
-          logger.d("photo's already been downloaded");
-          subscriber.onCompleted();
-          return;
-        }
-
-        logger.d("photo is being fetched by fresco");// thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
-        ImageRequest request = ImageRequestBuilder
-            .newBuilderWithSource(Uri.parse(photoUrl))
-            .setLowestPermittedRequestLevel(ImageRequest.RequestLevel.FULL_FETCH)
-            .build();
-
-        ImagePipeline imagePipeline = Fresco.getImagePipeline();
-        DataSource<CloseableReference<PooledByteBuffer>> dataSource = imagePipeline.fetchEncodedImage(request, this);
-        dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, photoUrl), CallerThreadExecutor.getInstance());
-      }
-    })
-        .throttleFirst(300, TimeUnit.MILLISECONDS)
-        .doOnTerminate(new Action0() {
-          @Override
-          public void call() {
-            mapDownloadingObservables.remove(photoUrl);
-            logger.d("end photo fetching");
-          }
-        });
-
-    mapDownloadingObservables.put(photoUrl, getFileObservable);
-
-    return getFileObservable;
+    return workingObservable;
   }
 
   public File getPhotoFile(PhotoDetails photoDetails) {
@@ -172,11 +176,8 @@ public final class PhotoFileManager {
     @Override
     protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
 //      logger.d("onNewResultImpl thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
-      if (!dataSource.isFinished() || subscriber.isUnsubscribed()) {
-        if (subscriber.isUnsubscribed()) {
-          dataSource.close();
-        }
-
+      L.get().d("onNewResultImpl");
+      if (!dataSource.isFinished()) {
         return;
       }
 
@@ -185,7 +186,10 @@ public final class PhotoFileManager {
         cf = dataSource.getResult();
         PooledByteBuffer buffer = cf.get();
         PooledByteBufferInputStream is = new PooledByteBufferInputStream(buffer);
-        savePhoto(is, downloadUrl);
+        File checkFile = getPhotoFile(downloadUrl);
+        if (!checkFile.exists()) {
+          savePhoto(is, downloadUrl);
+        }
         is.close();
         subscriber.onCompleted();
       } catch (Exception e) {
