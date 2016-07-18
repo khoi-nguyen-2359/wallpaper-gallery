@@ -8,6 +8,8 @@ import android.net.Uri;
 import android.transition.Scene;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
+import android.view.animation.AccelerateInterpolator;
+import android.view.animation.AnticipateOvershootInterpolator;
 import android.view.animation.DecelerateInterpolator;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
@@ -22,7 +24,7 @@ import com.khoinguyen.photoviewerkit.impl.anim.ZoomToAnimation;
  * Created by khoinguyen on 4/11/16.
  */
 public class ClippingRevealDraweeView extends SimpleDraweeView {
-  private static final long DUR_ANIMATION = 150;
+  private static final long DUR_ANIMATION = 190;
   private ScalingUtils.InterpolatingScaleType actualScaleType;
 
   public ClippingRevealDraweeView(Context context, GenericDraweeHierarchy hierarchy) {
@@ -85,7 +87,7 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
         .rects(startRect, endRect)
         .duration(DUR_ANIMATION)
         .target(this)
-        .interpolator(new DecelerateInterpolator())
+        .interpolator(new AccelerateInterpolator())
         .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
           @Override
           public void onAnimationUpdate(ValueAnimator animation) {
@@ -102,7 +104,7 @@ public class ClippingRevealDraweeView extends SimpleDraweeView {
         .rects(startRect, endRect)
         .duration(DUR_ANIMATION)
         .target(this)
-        .interpolator(new DecelerateInterpolator())
+        .interpolator(new AccelerateInterpolator())
         .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
           @Override
           public void onAnimationUpdate(ValueAnimator animation) {
