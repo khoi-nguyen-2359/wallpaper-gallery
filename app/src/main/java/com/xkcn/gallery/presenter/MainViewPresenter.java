@@ -44,8 +44,7 @@ public class MainViewPresenter {
   public void loadWallpaperSetting(final PhotoDetails photoDetails) {
     view.showProgressLoading(R.string.photo_gallery_downloading_message);
 
-    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails)
-        .subscribeOn(rxIoScheduler)
+    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Subscriber<Float>() {
           @Override
@@ -79,8 +78,7 @@ public class MainViewPresenter {
       return;
     }
 
-    photoFileManager.getPhotoFileObservable(photoDetails)
-        .subscribeOn(rxIoScheduler)
+    photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Subscriber<Float>() {
           @Override
@@ -107,8 +105,7 @@ public class MainViewPresenter {
     }
 
     view.showProgressLoading(R.string.photo_gallery_downloading_message);
-    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails)
-        .subscribeOn(rxIoScheduler)
+    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe(new Subscriber<Float>() {
           @Override

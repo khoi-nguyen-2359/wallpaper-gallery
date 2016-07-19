@@ -28,9 +28,12 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
+import rx.Scheduler;
 import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
 import rx.functions.Action0;
 import rx.observables.ConnectableObservable;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 2/4/15.
@@ -100,12 +103,20 @@ public final class PhotoFileManager {
     return externalPhotoDir;
   }
 
-  private Observable<Float> getPhotoFileObservable(final String photoUrl) {
+  /**
+   *
+   * @param photoUrl
+   * @param executeScheduler need to give this because the return observable is hot.
+   * @return
+   */
+  private Observable<Float> getPhotoFileObservable(final String photoUrl, Scheduler executeScheduler) {
     Observable<Float> workingObservable = mapDownloadingObservables.get(photoUrl);
     if (workingObservable == null) {
+      L.get().d("CREATE hot observable on %s", Thread.currentThread().getName());
       Observable<Float> getFileObservable = Observable.create(new Observable.OnSubscribe<Float>() {
         @Override
         public void call(Subscriber<? super Float> subscriber) {
+          L.get().d("EXECUTE hot observable on %s", Thread.currentThread().getName());
           File downloadedFile = getPhotoFile(photoUrl);
           if (downloadedFile.exists()) {
             logger.d("photo's already been downloaded");
@@ -124,6 +135,7 @@ public final class PhotoFileManager {
           dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, photoUrl), CallerThreadExecutor.getInstance());
         }
       })
+          .subscribeOn(executeScheduler)
           .throttleFirst(300, TimeUnit.MILLISECONDS)
           .doOnTerminate(new Action0() {
             @Override
@@ -131,7 +143,8 @@ public final class PhotoFileManager {
               mapDownloadingObservables.remove(photoUrl);
               logger.d("end photo fetching");
             }
-          });
+          })
+          ;
 
       ConnectableObservable<Float> publishObservable = getFileObservable.replay();
       publishObservable.connect();
@@ -175,7 +188,6 @@ public final class PhotoFileManager {
 
     @Override
     protected void onNewResultImpl(DataSource<CloseableReference<PooledByteBuffer>> dataSource) {
-//      logger.d("onNewResultImpl thread=%s id=%s", Thread.currentThread().getName(), Thread.currentThread().getId());
       L.get().d("onNewResultImpl");
       if (!dataSource.isFinished()) {
         return;
@@ -206,9 +218,9 @@ public final class PhotoFileManager {
     }
   }
 
-  public Observable<Float> getPhotoFileObservable(final PhotoDetails photoDetails) {
+  public Observable<Float> getPhotoFileObservable(final PhotoDetails photoDetails, Scheduler executeScheduler) {
     final String downloadUrl = photoDetails.getDefaultDownloadUrl();
-    return getPhotoFileObservable(downloadUrl);
+    return getPhotoFileObservable(downloadUrl, executeScheduler);
   }
 
   private File savePhoto(InputStream is, String downloadUri) throws Exception {
