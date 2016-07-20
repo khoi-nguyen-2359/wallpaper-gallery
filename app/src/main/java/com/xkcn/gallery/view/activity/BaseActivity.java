@@ -4,7 +4,9 @@ import android.app.NotificationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.xkcn.gallery.BaseApp;
+import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
@@ -31,6 +33,9 @@ public abstract class BaseActivity extends AppCompatActivity {
   PhotoListingUsecase photoListingUsecase;
   @Inject
   PreferencesUsecase preferencesUsecase;
+
+  @Inject
+  AnalyticsCollection analyticsCollection;
 
   private NotificationManager notificationManager;
 

@@ -3,6 +3,8 @@ package com.xkcn.gallery.di.module;
 import android.content.Context;
 
 import com.xkcn.gallery.BaseApp;
+import com.xkcn.gallery.analytics.AnalyticsCollection;
+import com.xkcn.gallery.analytics.FirebaseAnalytics;
 import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.repo.PhotoDetailsSqliteRepository;
@@ -80,5 +82,13 @@ public class ApplicationModule {
   @Singleton
   Scheduler provideRxIoScheduler() {
     return Schedulers.io();
+  }
+
+  @Provides
+  @Singleton
+  AnalyticsCollection provideAnalyticsCollection() {
+    AnalyticsCollection collection = new AnalyticsCollection();
+    collection.addTracker(new FirebaseAnalytics(baseApp));
+    return collection;
   }
 }

@@ -38,9 +38,6 @@ public class PhotoListingViewPresenter {
   PreferencesUsecase preferencesUsecase;
 
   @Inject
-  PhotoFileManager photoFileManager;
-
-  @Inject
   Scheduler rxIoScheduler;
 
   private Observable<Integer> photoPerPageObservable;
