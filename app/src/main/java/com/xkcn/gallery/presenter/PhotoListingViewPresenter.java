@@ -2,11 +2,11 @@ package com.xkcn.gallery.presenter;
 
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
+import com.xkcn.gallery.data.model.PhotoCategory;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.data.model.PhotoDetailsDataPage;
 import com.xkcn.gallery.di.component.ApplicationComponent;
-import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.view.interfaces.MainView;
@@ -26,9 +26,6 @@ import rx.functions.Func1;
  * Created by khoinguyen on 12/18/15.
  */
 public class PhotoListingViewPresenter {
-  public static final int TYPE_HOTEST = 1;
-  public static final int TYPE_LATEST = 2;
-
   private MainView view;
 
   @Inject
@@ -42,13 +39,13 @@ public class PhotoListingViewPresenter {
 
   private Observable<Integer> photoPerPageObservable;
 
-  private int currentListingType;
+  private PhotoCategory currentListingType;
 
-  private PhotoDetailsDataPage photoDetailsPages = new PhotoDetailsDataPage();
+  private PhotoDetailsDataPage allPages = new PhotoDetailsDataPage();
 
   public PhotoListingViewPresenter(ApplicationComponent component) {
     component.inject(this);
-    component.inject(photoDetailsPages);
+    component.inject(allPages);
   }
 
   public void setView(MainView view) {
@@ -61,25 +58,20 @@ public class PhotoListingViewPresenter {
 
   /**
    * @param startIndex  start item to load
-   * @param listingType type of current listing
+   * @param category type of current listing
    */
-  public void loadPhotoPage(final int startIndex, final int listingType) {
-    currentListingType = listingType;
+  public void loadPhotoPage(final int startIndex, final PhotoCategory category) {
+    currentListingType = category;
     getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<DataPage<PhotoDetails>>>() {
       @Override
       public Observable<DataPage<PhotoDetails>> call(Integer perPage) {
         Observable<DataPage<PhotoDetails>> photoQueryObservable = null;
-        switch (listingType) {
-          case TYPE_HOTEST: {
-            photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(startIndex, perPage);
-            break;
-          }
-          case TYPE_LATEST: {
-            photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(startIndex, perPage);
-            break;
-          }
-          default:
-            photoQueryObservable = Observable.empty();
+        if (category.getId() == PhotoCategory.HOSTEST.getId()) {
+          photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(startIndex, perPage);
+        } else if (category.getId() == PhotoCategory.LATEST.getId()) {
+          photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(startIndex, perPage);
+        } else {
+          photoQueryObservable = Observable.empty();
         }
 
         return photoQueryObservable;
@@ -88,7 +80,7 @@ public class PhotoListingViewPresenter {
         .doOnNext(new Action1<DataPage<PhotoDetails>>() {
           @Override
           public void call(DataPage<PhotoDetails> photoDetailsDataPage) {
-            photoDetailsPages.append(photoDetailsDataPage);
+            allPages.append(photoDetailsDataPage);
           }
         })    // call append in doOnNext because it takes much time to finish
         .subscribeOn(rxIoScheduler)
@@ -97,7 +89,7 @@ public class PhotoListingViewPresenter {
           @Override
           public void onCompleted() {
             view.onPagingLoaded();
-            if (!photoDetailsPages.hasEnded()) {
+            if (!allPages.hasEnded()) {
               view.enablePaging();
             }
           }
@@ -114,16 +106,16 @@ public class PhotoListingViewPresenter {
         });
   }
 
-  public List<PhotoDisplayInfo> getAllPhotoDisplayInfos() {
-    return photoDetailsPages.getAllDisplayInfos();
+  public PhotoDetailsDataPage getAllPages() {
+    return allPages;
   }
 
   public void loadNextPhotoPage() {
-    loadPhotoPage(photoDetailsPages.getNextStart(), currentListingType);
+    loadPhotoPage(allPages.getNextStart(), currentListingType);
   }
 
   public PhotoDetails findPhoto(String photoId) {
-    List<PhotoDetails> allPhotos = photoDetailsPages.getData();
+    List<PhotoDetails> allPhotos = allPages.getData();
     for (PhotoDetails photo : allPhotos) {
       if (photo.getIdentifierAsString().equals(photoId)) {
         return photo;
@@ -131,5 +123,9 @@ public class PhotoListingViewPresenter {
     }
 
     return null;
+  }
+
+  public PhotoCategory getCurrentListingType() {
+    return currentListingType;
   }
 }

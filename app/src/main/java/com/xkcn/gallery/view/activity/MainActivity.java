@@ -37,6 +37,7 @@ import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
 import com.xkcn.gallery.data.PhotoDownloadNotificationsInfo;
+import com.xkcn.gallery.data.model.PhotoCategory;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.presenter.MainViewPresenter;
@@ -165,7 +166,7 @@ public abstract class MainActivity extends BaseActivity
     @Override
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
-      List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPhotoDisplayInfos();
+      List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPages().getAllDisplayInfos();
       for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
         listingItems.add(new ListingItem(displayInfo, getListingItemType(TYPE_PHOTO)));
       }
@@ -180,7 +181,7 @@ public abstract class MainActivity extends BaseActivity
     @Override
     protected List<ListingItem> createDataSet() {
       List<ListingItem> listingItems = new ArrayList<>();
-      List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPhotoDisplayInfos();
+      List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPages().getAllDisplayInfos();
       for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
         ListingItem photoListingItem = new ListingItem(displayInfo, getListingItemType(TYPE_PHOTO));
         listingItems.add(photoListingItem);
@@ -196,7 +197,7 @@ public abstract class MainActivity extends BaseActivity
     initTemplateViews();
     initData();
     initViews();
-    photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
+    photoListingPresenter.loadPhotoPage(0, PhotoCategory.LATEST);
   }
 
   @Override
@@ -222,6 +223,17 @@ public abstract class MainActivity extends BaseActivity
     } else if (!photoKitWidget.handleBackPress()) {
       super.onBackPressed();
     }
+  }
+
+  @Override
+  protected void onDestroy() {
+    super.onDestroy();
+
+    trackListingLength();
+  }
+
+  private void trackListingLength() {
+    analyticsCollection.trackListingLength(photoListingPresenter.getCurrentListingType().getName(), photoListingPresenter.getAllPages().getNextStart() - 1);
   }
 
   private void initViews() {
@@ -278,9 +290,11 @@ public abstract class MainActivity extends BaseActivity
     int id = item.getItemId();
 
     if (id == R.id.nav_hotest) {
-      photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_HOTEST);
+      trackListingLength();
+      photoListingPresenter.loadPhotoPage(0, PhotoCategory.HOSTEST);
     } else if (id == R.id.nav_latest) {
-      photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
+      trackListingLength();
+      photoListingPresenter.loadPhotoPage(0, PhotoCategory.LATEST);
     }
 
     DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -363,7 +377,7 @@ public abstract class MainActivity extends BaseActivity
 
   @Subscribe(threadMode = ThreadMode.MAIN)
   public void onEventMainThread(PhotoCrawlingFinishedEvent event) {
-    photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
+    photoListingPresenter.loadPhotoPage(0, PhotoCategory.LATEST);
   }
 
   /***

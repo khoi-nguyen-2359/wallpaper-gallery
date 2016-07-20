@@ -4,6 +4,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.data.model.PhotoCategory;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.view.fragment.DebugOptionsDialog;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
@@ -66,7 +67,7 @@ public class MainActivityImpl extends MainActivity {
   private class DebugEventListener {
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void onEventMainThread(RefreshPhotoListingPager event) {
-      photoListingPresenter.loadPhotoPage(0, PhotoListingViewPresenter.TYPE_LATEST);
+      photoListingPresenter.loadPhotoPage(0, PhotoCategory.LATEST);
     }
   }
 

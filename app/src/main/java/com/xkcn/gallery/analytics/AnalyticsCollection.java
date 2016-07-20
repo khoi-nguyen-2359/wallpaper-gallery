@@ -19,9 +19,9 @@ public class AnalyticsCollection implements IAnalytics {
   }
 
   @Override
-  public void trackListingLoadMore(String categoryName, int pageIndex) {
+  public void trackListingLength(String categoryName, int lastPhotoIndex) {
     for (IAnalytics t : trackers) {
-      t.trackListingLoadMore(categoryName, pageIndex);
+      t.trackListingLength(categoryName, lastPhotoIndex);
     }
   }
 }

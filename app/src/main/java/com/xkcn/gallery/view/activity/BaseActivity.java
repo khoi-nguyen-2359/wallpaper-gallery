@@ -33,7 +33,6 @@ public abstract class BaseActivity extends AppCompatActivity {
   PhotoListingUsecase photoListingUsecase;
   @Inject
   PreferencesUsecase preferencesUsecase;
-
   @Inject
   AnalyticsCollection analyticsCollection;
 

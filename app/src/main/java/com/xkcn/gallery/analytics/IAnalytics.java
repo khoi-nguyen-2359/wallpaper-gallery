@@ -5,5 +5,10 @@ package com.xkcn.gallery.analytics;
  */
 
 public interface IAnalytics {
-  void trackListingLoadMore(String categoryName, int pageIndex);
+  /**
+   * Track how long did user scroll to view photos.
+   * @param categoryName name of showing category to track
+   * @param lastPhotoIndex the photo index at end of listing
+   */
+  void trackListingLength(String categoryName, int lastPhotoIndex);
 }

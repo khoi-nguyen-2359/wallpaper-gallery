@@ -7,14 +7,28 @@ import android.os.Parcelable;
  * Created by khoinguyen on 4/29/16.
  */
 public class PhotoCategory implements Parcelable {
-  String category;
+  public final static PhotoCategory LATEST;
+  public final static PhotoCategory HOSTEST;
 
-  public String getCategory() {
-    return category;
+  static {
+    LATEST = new PhotoCategory(1, "LATEST");
+    HOSTEST = new PhotoCategory(2, "HOTEST");
   }
 
-  public void setCategory(String category) {
-    this.category = category;
+  private int id;
+  private String name;
+
+  public PhotoCategory(int id, String name) {
+    this.id = id;
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override
@@ -24,7 +38,8 @@ public class PhotoCategory implements Parcelable {
 
   @Override
   public void writeToParcel(Parcel dest, int flags) {
-    dest.writeString(category);
+    dest.writeInt(id);
+    dest.writeString(name);
   }
 
   public static final Parcelable.Creator<PhotoCategory> CREATOR
@@ -39,6 +54,11 @@ public class PhotoCategory implements Parcelable {
   };
 
   private PhotoCategory(Parcel in) {
-    category = in.readString();
+    id = in.readInt();
+    name = in.readString();
+  }
+
+  public int getId() {
+    return id;
   }
 }

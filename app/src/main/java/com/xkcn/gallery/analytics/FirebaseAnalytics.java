@@ -9,7 +9,7 @@ import android.os.Bundle;
 
 public class FirebaseAnalytics implements IAnalytics {
 
-  private static final String EVENT_LISTING_LOAD_MORE = "Listing Load More";
+  private static final String EVENT_LISTING_LENGTH = "listing_length";
 
   private com.google.firebase.analytics.FirebaseAnalytics firebaseAnalytics;
 
@@ -18,10 +18,10 @@ public class FirebaseAnalytics implements IAnalytics {
   }
 
   @Override
-  public void trackListingLoadMore(String categoryName, int pageIndex) {
+  public void trackListingLength(String categoryName, int lastPhotoIndex) {
     Bundle params = new Bundle();
-    params.putString("Category Name", categoryName);
-    params.putInt("Page Index", pageIndex);
-    firebaseAnalytics.logEvent(EVENT_LISTING_LOAD_MORE, params);
+    params.putString("category_name", categoryName);
+    params.putInt("last_photo_index", lastPhotoIndex);
+    firebaseAnalytics.logEvent(EVENT_LISTING_LENGTH, params);
   }
 }
