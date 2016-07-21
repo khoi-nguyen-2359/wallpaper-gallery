@@ -25,6 +25,7 @@ import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
+import com.khoinguyen.photoviewerkit.impl.event.OnShrinkTransitionEnd;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoActionView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoGalleryView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
@@ -197,6 +198,7 @@ public abstract class MainActivity extends BaseActivity
     initTemplateViews();
     initData();
     initViews();
+    analyticsCollection.trackListingScreenView();
     photoListingPresenter.loadPhotoPage(0, PhotoCategory.LATEST);
   }
 
@@ -438,6 +440,11 @@ public abstract class MainActivity extends BaseActivity
     public void handleOnPhotoGalleryPhotoSelect(OnPhotoGalleryPhotoSelect event) {
       photoActionAdapter.updateCurrentActivePhoto(photoListingPresenter.findPhoto(event.getPhotoDisplayInfo().getPhotoId()));
       photoActionAdapter.notifyDataSetChanged();
+    }
+
+    @com.khoinguyen.apptemplate.eventbus.Subscribe
+    public void handleOnShrinkTransitionEnd(OnShrinkTransitionEnd event) {
+      analyticsCollection.trackListingScreenView();
     }
   };
 }

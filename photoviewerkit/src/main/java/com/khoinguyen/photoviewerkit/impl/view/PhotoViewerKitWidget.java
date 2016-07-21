@@ -26,6 +26,7 @@ import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
+import com.khoinguyen.photoviewerkit.impl.event.OnShrinkTransitionEnd;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoBackdropView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
@@ -209,6 +210,8 @@ public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewer
       sharedData.setCurrentTransitionState(TRANS_LISTING);
       sharedData.activePhoto(null);
       photoListingView.toggleActiveItems();
+
+      eventBus.post(new OnShrinkTransitionEnd());
     }
   };
 
