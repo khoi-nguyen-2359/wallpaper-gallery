@@ -9,8 +9,6 @@ import android.os.Bundle;
 
 public class FirebaseAnalytics implements IAnalytics {
 
-  private static final String EVENT_LISTING_LENGTH = "listing_length";
-
   private com.google.firebase.analytics.FirebaseAnalytics firebaseAnalytics;
 
   public FirebaseAnalytics(Context context) {
@@ -22,6 +20,17 @@ public class FirebaseAnalytics implements IAnalytics {
     Bundle params = new Bundle();
     params.putString("category_name", categoryName);
     params.putInt("last_photo_index", lastPhotoIndex);
-    firebaseAnalytics.logEvent(EVENT_LISTING_LENGTH, params);
+    firebaseAnalytics.logEvent("listing_length", params);
+  }
+
+  private void trackScreenView(String screenName) {
+    Bundle params = new Bundle();
+    params.putString("screen_name", screenName);
+    firebaseAnalytics.logEvent("screen_view", params);
+  }
+
+  @Override
+  public void trackListingScreenView() {
+    trackScreenView("listing_screen");
   }
 }

@@ -24,4 +24,12 @@ public class AnalyticsCollection implements IAnalytics {
       t.trackListingLength(categoryName, lastPhotoIndex);
     }
   }
+
+  @Override
+  public void trackListingScreenView() {
+    for (IAnalytics t :
+        trackers) {
+      t.trackListingScreenView();
+    }
+  }
 }

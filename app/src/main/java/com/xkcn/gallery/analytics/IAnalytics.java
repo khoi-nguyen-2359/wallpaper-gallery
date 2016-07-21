@@ -11,4 +11,6 @@ public interface IAnalytics {
    * @param lastPhotoIndex the photo index at end of listing
    */
   void trackListingLength(String categoryName, int lastPhotoIndex);
+
+  void trackListingScreenView();
 }

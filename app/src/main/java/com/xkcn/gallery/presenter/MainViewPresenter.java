@@ -2,6 +2,7 @@ package com.xkcn.gallery.presenter;
 
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.repo.PreferenceRepository;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
@@ -31,6 +32,9 @@ public class MainViewPresenter {
 
   @Inject
   Scheduler rxIoScheduler;
+
+  @Inject
+  AnalyticsCollection analyticsCollection;
 
   /**
    * MainView has one task that is requisite and block the UI
