@@ -22,7 +22,7 @@ import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.adapter.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.R;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.util.AdapterPhotoFinder;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
@@ -236,7 +236,7 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
           int position = rcvLayoutMan.getPosition(v);
           photoKitWidget.revealGallery(position);
 
-          eventBus.post(new OnPhotoListingItemActivate());
+          eventBus.post(new OnPhotoListingItemClick());
         }
       });
     }

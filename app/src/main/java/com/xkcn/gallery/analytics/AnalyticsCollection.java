@@ -1,5 +1,7 @@
 package com.xkcn.gallery.analytics;
 
+import com.xkcn.gallery.data.model.PhotoDetails;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,9 +21,9 @@ public class AnalyticsCollection implements IAnalytics {
   }
 
   @Override
-  public void trackListingLength(String categoryName, int lastPhotoIndex) {
+  public void trackListingEndScroll(String categoryName, int lastPhotoIndex) {
     for (IAnalytics t : trackers) {
-      t.trackListingLength(categoryName, lastPhotoIndex);
+      t.trackListingEndScroll(categoryName, lastPhotoIndex);
     }
   }
 
@@ -30,6 +32,38 @@ public class AnalyticsCollection implements IAnalytics {
     for (IAnalytics t :
         trackers) {
       t.trackListingScreenView();
+    }
+  }
+
+  @Override
+  public void trackGalleryScreenView() {
+    for (IAnalytics t :
+        trackers) {
+      t.trackGalleryScreenView();
+    }
+  }
+
+  @Override
+  public void trackShareGalleryPhoto(PhotoDetails photoDetails) {
+    for (IAnalytics t :
+        trackers) {
+      t.trackShareGalleryPhoto(photoDetails);
+    }
+  }
+
+  @Override
+  public void trackSetWallpaperGalleryPhoto(PhotoDetails photoDetails) {
+    for (IAnalytics t :
+        trackers) {
+      t.trackSetWallpaperGalleryPhoto(photoDetails);
+    }
+  }
+
+  @Override
+  public void trackDownloadGalleryPhoto(PhotoDetails photoDetails) {
+    for (IAnalytics t :
+        trackers) {
+      t.trackDownloadGalleryPhoto(photoDetails);
     }
   }
 }

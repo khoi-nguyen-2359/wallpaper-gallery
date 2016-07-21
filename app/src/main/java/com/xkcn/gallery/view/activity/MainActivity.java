@@ -23,7 +23,7 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemActivate;
+import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.event.OnShrinkTransitionEnd;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoActionView;
@@ -235,7 +235,7 @@ public abstract class MainActivity extends BaseActivity
   }
 
   private void trackListingLength() {
-    analyticsCollection.trackListingLength(photoListingPresenter.getCurrentListingType().getName(), photoListingPresenter.getAllPages().getNextStart() - 1);
+    analyticsCollection.trackListingEndScroll(photoListingPresenter.getCurrentListingType().getName(), photoListingPresenter.getAllPages().getNextStart() - 1);
   }
 
   private void initViews() {
@@ -432,8 +432,9 @@ public abstract class MainActivity extends BaseActivity
 
   protected Object photoKitEventListener = new Object() {
     @com.khoinguyen.apptemplate.eventbus.Subscribe
-    public void handleOnPhotoListingItemClick(OnPhotoListingItemActivate event) {
+    public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
       appBarLayout.setExpanded(false, false);
+      analyticsCollection.trackGalleryScreenView();
     }
 
     @com.khoinguyen.apptemplate.eventbus.Subscribe
