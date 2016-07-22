@@ -114,7 +114,12 @@ public class PhotoListingViewPresenter {
     loadPhotoPage(allPages.getNextStart(), currentListingType);
   }
 
-  public PhotoDetails findPhoto(String photoId) {
+  public PhotoDetails findPhoto(PhotoDisplayInfo photoDisplayInfo) {
+    if (photoDisplayInfo == null) {
+      return null;
+    }
+
+    String photoId = photoDisplayInfo.getPhotoId();
     List<PhotoDetails> allPhotos = allPages.getData();
     for (PhotoDetails photo : allPhotos) {
       if (photo.getIdentifierAsString().equals(photoId)) {

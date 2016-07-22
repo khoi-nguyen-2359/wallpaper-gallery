@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
+import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
@@ -79,7 +80,7 @@ public class PhotoOverlayView extends FrameLayout implements IPhotoOverlayView<S
   }
 
   @Override
-  public void setPhotoActionAdapter(IListingAdapter actionAdapter) {
+  public void setPhotoActionAdapter(IListingAdapter<IViewHolder<PhotoDisplayInfo>>  actionAdapter) {
     viewPhotoAction.setActionAdapter(actionAdapter);
   }
 

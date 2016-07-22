@@ -10,6 +10,7 @@ import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
+import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.util.SimpleSupplier;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.model.PhotoDetails;
@@ -20,40 +21,40 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-public class PhotoActionAdapter extends PartitionedListingAdapter {
+public class PhotoActionAdapter extends PartitionedListingAdapter<IViewHolder<PhotoDisplayInfo>> {
   public static final int TYPE_SET_WALLPAPER = 2;
   public static final int TYPE_SHARE = 1;
   public static final int TYPE_DOWNLOAD = 3;
 
-  private SimpleSupplier<PhotoDetails> currentActivePhoto = new SimpleSupplier<>(null);
-
   @Inject
   PhotoFileManager photoFileManager;
 
-  @Override
-  public int getItemId(int itemIndex) {
-    int actionId = getViewType(itemIndex);
-    return actionId;
+  public PhotoActionAdapter() {
+    registerListingItemType(new PhotoActionAdapter.ShareItemType());
+    registerListingItemType(new PhotoActionAdapter.SetWallpaperItemType());
+    registerListingItemType(new PhotoActionAdapter.DownloadItemType());
+    // call this right here because this adapter has a static data set from beginning
+    updateDataSet();
   }
 
-  public void updateCurrentActivePhoto(PhotoDetails currentActivePhoto) {
-    this.currentActivePhoto.set(currentActivePhoto);
+  @Override
+  public int getItemId(int itemIndex) {
+    return getViewType(itemIndex);
   }
 
   @Override
   protected List<ListingItem> createDataSet() {
     List<ListingItem> allItems = new ArrayList<>();
-    ListingItem shareItem = new ListingItem(currentActivePhoto, getListingItemType(TYPE_SHARE));
+    ListingItem shareItem = new ListingItem(null, getListingItemType(TYPE_SHARE));
     allItems.add(shareItem);
-    ListingItem setWallpaperItem = new ListingItem(currentActivePhoto, getListingItemType(TYPE_SET_WALLPAPER));
+    ListingItem setWallpaperItem = new ListingItem(null, getListingItemType(TYPE_SET_WALLPAPER));
     allItems.add(setWallpaperItem);
-    ListingItem downloadItem = new ListingItem(currentActivePhoto, getListingItemType(TYPE_DOWNLOAD));
+    ListingItem downloadItem = new ListingItem(null, getListingItemType(TYPE_DOWNLOAD));
     allItems.add(downloadItem);
     return allItems;
   }
 
   public static class ShareItemType extends ListingItemType {
-
     public ShareItemType() {
       super(TYPE_SHARE);
     }
@@ -89,13 +90,10 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
     }
   }
 
-  public static class DownloadItemType extends ListingItemType {
+  public static class DownloadItemType extends ListingItemType<IViewHolder<PhotoDisplayInfo>> {
 
-    private PhotoFileManager photoFileManager;
-
-    public DownloadItemType(PhotoFileManager photoFileManager) {
+    public DownloadItemType() {
       super(TYPE_DOWNLOAD);
-      this.photoFileManager = photoFileManager;
     }
 
     @Override
@@ -104,24 +102,22 @@ public class PhotoActionAdapter extends PartitionedListingAdapter {
     }
 
     @Override
-    public IViewHolder createViewHolder(View view) {
-      return new DownloadButtonViewHolder(view, photoFileManager);
+    public IViewHolder<PhotoDisplayInfo> createViewHolder(View view) {
+      return new DownloadButtonViewHolder(view);
     }
 
-    private class DownloadButtonViewHolder extends BaseViewHolder<SimpleSupplier<PhotoDetails>> {
+    private class DownloadButtonViewHolder extends BaseViewHolder<PhotoDisplayInfo> {
       private TextView tvDownload;
-      private PhotoFileManager photoFileManager;
 
-      public DownloadButtonViewHolder(View view, PhotoFileManager photoFileManager) {
+      public DownloadButtonViewHolder(View view) {
         super(view);
 
         tvDownload = (TextView) view.findViewById(R.id.tv_download);
-        this.photoFileManager = photoFileManager;
       }
 
       @Override
-      public void bind(SimpleSupplier<PhotoDetails> photoSupplier) {
-        if (photoFileManager.isPhotoFileExist(photoSupplier.get())) {
+      public void bind(PhotoDisplayInfo photoDisplayInfo) {
+        if (photoDisplayInfo.getLocalFile().exists()) {
           tvDownload.setText(R.string.photo_action_downloaded_already);
           tvDownload.setEnabled(false);
         } else {

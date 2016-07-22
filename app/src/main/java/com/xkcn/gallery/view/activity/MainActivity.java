@@ -125,7 +125,7 @@ public abstract class MainActivity extends BaseActivity
   };
 
   private void downloadPhoto(PhotoDisplayInfo photo) {
-    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
+    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo);
     if (photoDetails == null) {
       return;
     }
@@ -146,7 +146,7 @@ public abstract class MainActivity extends BaseActivity
   }
 
   private void sharePhoto(PhotoDisplayInfo photo) {
-    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
+    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo);
     if (photoDetails == null) {
       return;
     }
@@ -155,7 +155,7 @@ public abstract class MainActivity extends BaseActivity
   }
 
   private void setWallpaper(PhotoDisplayInfo photo) {
-    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo.getPhotoId());
+    PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo);
     if (photoDetails == null) {
       return;
     }
@@ -244,8 +244,6 @@ public abstract class MainActivity extends BaseActivity
     photoListingView.setPhotoAdapter(photoListingAdapter);
     photoGalleryView.setPhotoAdapter(photoGalleryAdapter);
     photoOverlayView.setPhotoActionAdapter(photoActionAdapter);
-    photoActionAdapter.updateDataSet();
-    photoActionAdapter.notifyDataSetChanged();
     photoOverlayView.setPhotoActionEventListener(photoActionListener);
     photoViewerKitEventBus = photoKitWidget.getEventBus();
 
@@ -266,9 +264,6 @@ public abstract class MainActivity extends BaseActivity
     photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
 
     photoActionAdapter = new PhotoActionAdapter();
-    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.ShareItemType());
-    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.SetWallpaperItemType());
-    photoActionAdapter.registerListingItemType(new PhotoActionAdapter.DownloadItemType(photoFileManager));
   }
 
   protected void initTemplateViews() {
@@ -447,12 +442,6 @@ public abstract class MainActivity extends BaseActivity
     public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
       appBarLayout.setExpanded(false, false);
       analyticsCollection.trackGalleryScreenView();
-    }
-
-    @com.khoinguyen.apptemplate.eventbus.Subscribe
-    public void handleOnPhotoGalleryPhotoSelect(OnPhotoGalleryPhotoSelect event) {
-      photoActionAdapter.updateCurrentActivePhoto(photoListingPresenter.findPhoto(event.getPhotoDisplayInfo().getPhotoId()));
-      photoActionAdapter.notifyDataSetChanged();
     }
 
     @com.khoinguyen.apptemplate.eventbus.Subscribe

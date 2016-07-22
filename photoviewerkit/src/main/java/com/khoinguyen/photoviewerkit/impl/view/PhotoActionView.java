@@ -34,7 +34,7 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
   private PhotoDisplayInfo photo;
   private IEventBus eventBus;
   private SharedData sharedData;
-  private IListingAdapter listingAdapter;
+  private IListingAdapter<IViewHolder<PhotoDisplayInfo>>  listingAdapter;
   private PhotoActionEventListener eventListener;
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -79,22 +79,13 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
     populateAdapterItems();
   }
 
-//  private void initViews() {
-//    LayoutInflater inflater = LayoutInflater.from(getContext());
-//    if (type == TYPE_ICON) {
-//      inflater.inflate(R.layout.view_photo_actions_icon, this, true);
-//    } else if (type == TYPE_ICON_TEXT) {
-//      inflater.inflate(R.layout.view_photo_actions_text, this, true);
-//    }
-//  }
-
   @Override
   public void attach(IPhotoViewerKitWidget<SharedData> widget) {
     eventBus = widget.getEventBus();
     sharedData = widget.getSharedData();
   }
 
-  public void setActionAdapter(IListingAdapter listingAdapter) {
+  public void setActionAdapter(IListingAdapter<IViewHolder<PhotoDisplayInfo>>  listingAdapter) {
     if (this.listingAdapter != null) {
       this.listingAdapter.unregisterDataObserver(itemDataObserver);
     }
@@ -133,7 +124,9 @@ public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComp
   private void bindAdapterItemView(int i, View itemView) {
     Object data = listingAdapter.getData(i);
     IViewHolder viewHolder = (IViewHolder) itemView.getTag(R.id.photoaction_tag_viewholder);
-    viewHolder.bind(data);
+    if (data != null || photo != null) {
+      viewHolder.bind(data != null ? data : photo);
+    }
     itemView.setTag(R.id.photoaction_tag_id, listingAdapter.getItemId(i));
     // TODO: 6/29/16 what if the itemView has been setOnClickListener already?
     itemView.setOnClickListener(onItemClicked);

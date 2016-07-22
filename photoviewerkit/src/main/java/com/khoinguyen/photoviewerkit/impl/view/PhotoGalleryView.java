@@ -62,74 +62,6 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   protected ViewDragHelper viewDragHelper;
   protected float endDragMinDistance;
 
-  private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
-    @Override
-    public void onPageSelected(int position) {
-      super.onPageSelected(position);
-
-      onPagerPageSelected(position);
-    }
-  };
-
-  private ViewDragHelper.DragEventListener dragEventListener = new ViewDragHelper.DragEventListener() {
-    @Override
-    public void onDragStart() {
-      eventBus.post(new OnPhotoGalleryDragStart());
-    }
-
-    @Override
-    public void onDragEnd(float totalDistanceX, float totalDistanceY) {
-      double dragDistance = Math.hypot(totalDistanceX, totalDistanceY);
-      if (dragDistance > endDragMinDistance) {
-        RectF fullRect = getCurrentRect();
-        photoKitWidget.returnToListing(fullRect);
-      } else {
-        new ZoomToAnimation()
-            .rects(getCurrentRect(), new RectF(0,0,getWidth(),getHeight()))
-            .duration(DURATION_DRAG_CANCEL)
-            .target(PhotoGalleryView.this)
-            .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-              @Override
-              public void onAnimationUpdate(ValueAnimator animation) {
-                eventBus.post(new OnPhotoRecenterAnimationUpdate(animation.getAnimatedFraction()));
-              }
-            })
-            .run();
-      }
-    }
-
-    @Override
-    public void onDragUpdate(float translationX, float translationY) {
-      translate(getTranslationX() + translationX, getTranslationY() + translationY);
-    }
-  };
-
-  private void onPagerPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-  }
-
-  private void onPagerPageSelected(int position) {
-    updateCurrentSelectedItemInfo(position);
-    checkPagingNext(position);
-  }
-
-  private void checkPagingNext(int position) {
-    if (!pagingNextHasFired && position >= adapterPhotoGallery.getCount() - PAGING_OFFSET) {
-      photoKitWidget.onPagingNext(this);
-      pagingNextHasFired = true;
-    }
-  }
-
-  private void updateCurrentSelectedItemInfo(int position) {
-    PhotoDisplayInfo photoDisplayInfo = adapterPhotoFinder.getPhoto(position);
-    if (photoDisplayInfo == null) {
-      return;
-    }
-
-    sharedData.activePhoto(photoDisplayInfo);
-
-    eventBus.post(new OnPhotoGalleryPhotoSelect(position, photoDisplayInfo));
-  }
-
   public PhotoGalleryView(Context context) {
     super(context);
     init();
@@ -172,6 +104,39 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     return viewDragHelper.onTouchEvent(ev) || super.onTouchEvent(ev);
   }
 
+  private ViewDragHelper.DragEventListener dragEventListener = new ViewDragHelper.DragEventListener() {
+    @Override
+    public void onDragStart() {
+      eventBus.post(new OnPhotoGalleryDragStart());
+    }
+
+    @Override
+    public void onDragEnd(float totalDistanceX, float totalDistanceY) {
+      double dragDistance = Math.hypot(totalDistanceX, totalDistanceY);
+      if (dragDistance > endDragMinDistance) {
+        RectF fullRect = getCurrentRect();
+        photoKitWidget.returnToListing(fullRect);
+      } else {
+        new ZoomToAnimation()
+            .rects(getCurrentRect(), new RectF(0,0,getWidth(),getHeight()))
+            .duration(DURATION_DRAG_CANCEL)
+            .target(PhotoGalleryView.this)
+            .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+              @Override
+              public void onAnimationUpdate(ValueAnimator animation) {
+                eventBus.post(new OnPhotoRecenterAnimationUpdate(animation.getAnimatedFraction()));
+              }
+            })
+            .run();
+      }
+    }
+
+    @Override
+    public void onDragUpdate(float translationX, float translationY) {
+      translate(getTranslationX() + translationX, getTranslationY() + translationY);
+    }
+  };
+
   private RectF getCurrentRect() {
     return new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight());
   }
@@ -194,6 +159,38 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
     sharedData = widget.getSharedData();
     eventBus = widget.getEventBus();
     photoKitWidget = widget;
+  }
+
+  private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
+    @Override
+    public void onPageSelected(int position) {
+      super.onPageSelected(position);
+
+      onPagerPageSelected(position);
+    }
+  };
+
+  private void onPagerPageSelected(int position) {
+    updateCurrentSelectedItemInfo(position);
+    checkPagingNext(position);
+  }
+
+  private void checkPagingNext(int position) {
+    if (!pagingNextHasFired && position >= adapterPhotoGallery.getCount() - PAGING_OFFSET) {
+      photoKitWidget.onPagingNext(this);
+      pagingNextHasFired = true;
+    }
+  }
+
+  private void updateCurrentSelectedItemInfo(int position) {
+    PhotoDisplayInfo photoDisplayInfo = adapterPhotoFinder.getPhoto(position);
+    if (photoDisplayInfo == null) {
+      return;
+    }
+
+    sharedData.activePhoto(photoDisplayInfo);
+
+    eventBus.post(new OnPhotoGalleryPhotoSelect(position, photoDisplayInfo));
   }
 
   @Override
@@ -264,6 +261,16 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
   }
 
   @Override
+  public void setCurrentItem(int item, boolean smoothScroll) {
+    if (item == getCurrentItem()) {
+      // This case the current item doesnt change, so onPageSelected wont fire
+      onPagerPageSelected(item);
+    }
+
+    super.setCurrentItem(item, smoothScroll);
+  }
+
+  @Override
   public void setCurrentPhoto(int itemIndex) {
     PhotoDisplayInfo photo = adapterPhotoFinder.getPhoto(itemIndex);
     if (photo == null) {
@@ -314,6 +321,11 @@ public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<Sha
         itemView.setTag(position);
         primaryItemAdapterPosition = position;
       }
+    }
+
+    @Override
+    public float getPageWidth(int position) {
+      return 1;
     }
   }
 
