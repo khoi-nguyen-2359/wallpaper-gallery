@@ -8,4 +8,5 @@ ext {
     gmsVersion = "9.2.1"
     frescoVersion = "0.11.0"
     knUtilsVersion = "0.1.1"
+    firebaseVersion = "9.2.1"
 }
