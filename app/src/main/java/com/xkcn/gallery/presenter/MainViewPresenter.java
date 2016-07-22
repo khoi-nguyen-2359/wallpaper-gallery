@@ -54,7 +54,7 @@ public class MainViewPresenter {
           @Override
           public void onCompleted() {
             view.hideLoading();
-            view.showWallpaperChooser(photoFileManager.getPhotoFile(photoDetails));
+            view.showWallpaperChooser(photoDetails);
           }
 
           @Override

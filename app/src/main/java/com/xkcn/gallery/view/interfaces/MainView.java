@@ -12,7 +12,7 @@ public interface MainView extends ScreenView {
 
   void onPagingLoaded();
 
-  void showWallpaperChooser(File photoFile);
+  void showWallpaperChooser(PhotoDetails photoDetails);
 
   void enablePaging();
 

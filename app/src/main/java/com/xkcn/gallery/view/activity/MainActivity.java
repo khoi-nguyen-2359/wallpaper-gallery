@@ -141,6 +141,8 @@ public abstract class MainActivity extends BaseActivity
     i.setType("image/*");
 
     startActivity(Intent.createChooser(i, getResources().getString(R.string.send_to)));
+
+    analyticsCollection.trackShareGalleryPhoto(photoDetails);
   }
 
   private void sharePhoto(PhotoDisplayInfo photo) {
@@ -350,6 +352,8 @@ public abstract class MainActivity extends BaseActivity
         .setProgress(0, 0, false);
 
     notificationMan.notify(downloadNotificationsInfo.getId(photoDetails), notifBuilder.build());
+
+    analyticsCollection.trackDownloadGalleryPhoto(photoDetails);
   }
 
   private NotificationCompat.Builder getDownloadNotificationBuilder() {
@@ -420,7 +424,13 @@ public abstract class MainActivity extends BaseActivity
   }
 
   @Override
-  public void showWallpaperChooser(File photoFile) {
+  public void showWallpaperChooser(PhotoDetails photoDetails) {
+    File photoFile = photoFileManager.getPhotoFile(photoDetails);
+    if (!photoFile.exists()) {
+      showToast(getString(R.string.general_alert_please_retry));
+      return;
+    }
+
     Uri uriImg = Uri.fromFile(photoFile);
     Intent intent = new Intent(Intent.ACTION_ATTACH_DATA);
     intent.addCategory(Intent.CATEGORY_DEFAULT);
@@ -428,6 +438,8 @@ public abstract class MainActivity extends BaseActivity
     intent.putExtra("mimeType", "image/*");
 
     startActivity(Intent.createChooser(intent, getString(R.string.photo_actions_set_wp_chooser)));
+
+    analyticsCollection.trackSetWallpaperGalleryPhoto(photoDetails);
   }
 
   protected Object photoKitEventListener = new Object() {

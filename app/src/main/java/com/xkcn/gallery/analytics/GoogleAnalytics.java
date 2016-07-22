@@ -22,13 +22,13 @@ public class GoogleAnalytics implements IAnalytics {
 
   private static final int DIMEN_PHOTO_CAT = 1;
   private static final int DIMEN_PHOTO_ID = 2;
-  private static final int DIMEN_PHOTO_INDEX = 3;
   private static final int DIMEN_PHOTO_TITLE = 4;
   private static final int DIMEN_SCREEN_TITLE = 5;
 
+  private static final int METRIC_LAST_PHOTO_INDEX = 1;
+
   private static final String VAL_SCREEN_TITLE_GALLERY = "Gallery Screen";
   private static final String VAL_SCREEN_TITLE_LISTING = "Listing Screen";
-
 
   private Tracker tracker;
 
@@ -57,7 +57,7 @@ public class GoogleAnalytics implements IAnalytics {
         .setAction("Scroll")
         .setLabel("End")
         .setCustomDimension(DIMEN_PHOTO_CAT, categoryName)
-        .setCustomDimension(DIMEN_PHOTO_INDEX, String.valueOf(lastPhotoIndex))
+        .setCustomMetric(METRIC_LAST_PHOTO_INDEX, lastPhotoIndex)
         .build()
     );
   }
