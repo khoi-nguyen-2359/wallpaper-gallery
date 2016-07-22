@@ -171,7 +171,7 @@ public abstract class MainActivity extends BaseActivity
       List<ListingItem> listingItems = new ArrayList<>();
       List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPages().getAllDisplayInfos();
       for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
-        listingItems.add(new ListingItem(displayInfo, getListingItemType(TYPE_PHOTO)));
+        listingItems.add(new ListingItem(displayInfo, TYPE_PHOTO));
       }
 
       return listingItems;
@@ -186,7 +186,7 @@ public abstract class MainActivity extends BaseActivity
       List<ListingItem> listingItems = new ArrayList<>();
       List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPages().getAllDisplayInfos();
       for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
-        ListingItem photoListingItem = new ListingItem(displayInfo, getListingItemType(TYPE_PHOTO));
+        ListingItem photoListingItem = new ListingItem(displayInfo, TYPE_PHOTO);
         listingItems.add(photoListingItem);
       }
 

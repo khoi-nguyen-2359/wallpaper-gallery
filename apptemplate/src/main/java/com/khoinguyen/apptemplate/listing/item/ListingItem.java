@@ -5,18 +5,18 @@ package com.khoinguyen.apptemplate.listing.item;
  */
 public class ListingItem {
   private Object data;
-  private ListingItemType listingItemType;
+  private int viewType;
 
-  public ListingItem(Object data, ListingItemType listingItemType) {
+  public ListingItem(Object data, int viewType) {
     this.data = data;
-    this.listingItemType = listingItemType;
+    this.viewType = viewType;
   }
 
   public Object getData() {
     return data;
   }
 
-  public ListingItemType getListingItemType() {
-    return listingItemType;
+  public int getViewType() {
+    return viewType;
   }
 }

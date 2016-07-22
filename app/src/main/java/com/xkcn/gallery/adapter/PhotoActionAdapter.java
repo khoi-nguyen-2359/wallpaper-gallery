@@ -45,11 +45,11 @@ public class PhotoActionAdapter extends PartitionedListingAdapter<IViewHolder<Ph
   @Override
   protected List<ListingItem> createDataSet() {
     List<ListingItem> allItems = new ArrayList<>();
-    ListingItem shareItem = new ListingItem(null, getListingItemType(TYPE_SHARE));
+    ListingItem shareItem = new ListingItem(null, TYPE_SHARE);
     allItems.add(shareItem);
-    ListingItem setWallpaperItem = new ListingItem(null, getListingItemType(TYPE_SET_WALLPAPER));
+    ListingItem setWallpaperItem = new ListingItem(null, TYPE_SET_WALLPAPER);
     allItems.add(setWallpaperItem);
-    ListingItem downloadItem = new ListingItem(null, getListingItemType(TYPE_DOWNLOAD));
+    ListingItem downloadItem = new ListingItem(null, TYPE_DOWNLOAD);
     allItems.add(downloadItem);
     return allItems;
   }

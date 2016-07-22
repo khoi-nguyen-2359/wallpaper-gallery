@@ -58,7 +58,7 @@ public abstract class PartitionedListingAdapter<VH extends IViewHolder> extends 
   @Override
   public int getViewType(int itemIndex) {
     ListingItem listingItem = dataSet.get(itemIndex);
-    return listingItem.getListingItemType().getViewType();
+    return listingItem.getViewType();
   }
 
   @Override

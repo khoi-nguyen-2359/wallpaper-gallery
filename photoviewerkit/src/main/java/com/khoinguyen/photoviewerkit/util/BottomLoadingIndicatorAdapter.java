@@ -28,7 +28,7 @@ public abstract class BottomLoadingIndicatorAdapter extends PartitionedListingAd
     super.updateDataSet();
 
     if (showIndicator) {
-      ListingItem indicatorItem = new ListingItem(null, new IndicatorType());
+      ListingItem indicatorItem = new ListingItem(null, TYPE_LOADING_INDICATOR);
       dataSet.add(indicatorItem);
     }
   }
