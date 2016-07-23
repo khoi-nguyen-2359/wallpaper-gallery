@@ -3,6 +3,8 @@ package com.xkcn.gallery.data.model;
 import android.net.Uri;
 import android.os.Parcel;
 import android.os.Parcelable;
+import android.text.Html;
+import android.text.TextUtils;
 
 /**
  * Created by khoinguyen on 12/22/14.
@@ -124,6 +126,14 @@ public class PhotoDetails implements Parcelable {
 
   public String getPermalinkMeta() {
     return permalinkMeta;
+  }
+
+  public String getPermalinkMetaAsText() {
+    if (TextUtils.isEmpty(permalinkMeta)) {
+      return "";
+    }
+
+    return Html.fromHtml(permalinkMeta).toString();
   }
 
   public void setPermalinkMeta(String permalinkMeta) {
