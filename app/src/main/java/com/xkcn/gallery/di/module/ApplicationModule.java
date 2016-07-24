@@ -4,7 +4,6 @@ import android.content.Context;
 
 import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
-import com.xkcn.gallery.analytics.FirebaseAnalytics;
 import com.xkcn.gallery.analytics.GoogleAnalytics;
 import com.xkcn.gallery.data.DbHelper;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
@@ -89,7 +88,6 @@ public class ApplicationModule {
   @Singleton
   AnalyticsCollection provideAnalyticsCollection() {
     AnalyticsCollection collection = new AnalyticsCollection();
-    collection.addTracker(new FirebaseAnalytics(baseApp));
     collection.addTracker(new GoogleAnalytics(baseApp));
     return collection;
   }
