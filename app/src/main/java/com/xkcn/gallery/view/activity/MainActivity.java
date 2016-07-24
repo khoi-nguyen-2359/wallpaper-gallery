@@ -55,28 +55,28 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import butterknife.Bind;
+import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public abstract class MainActivity extends BaseActivity
     implements NavigationView.OnNavigationItemSelectedListener, MainView {
-  @Bind(R.id.main_coordinator_layout)
+  @BindView(R.id.main_coordinator_layout)
   CoordinatorLayout mainCoordinatorLayout;
-  @Bind(R.id.nav_view)
+  @BindView(R.id.nav_view)
   NavigationView viewNavigation;
-  @Bind(R.id.app_bar)
+  @BindView(R.id.app_bar)
   AppBarLayout appBarLayout;
-  @Bind(R.id.toolbar)
+  @BindView(R.id.toolbar)
   Toolbar toolbar;
-  @Bind(R.id.toolbar_container)
+  @BindView(R.id.toolbar_container)
   FrameLayout toolbarContainerLayout;
-  @Bind(R.id.photokit_widget)
+  @BindView(R.id.photokit_widget)
   PhotoViewerKitWidget photoKitWidget;
-  @Bind(R.id.photokit_photo_listing)
+  @BindView(R.id.photokit_photo_listing)
   PhotoListingView photoListingView;
-  @Bind(R.id.photokit_photo_gallery)
+  @BindView(R.id.photokit_photo_gallery)
   PhotoGalleryView photoGalleryView;
-  @Bind(R.id.photokit_photo_overlay)
+  @BindView(R.id.photokit_photo_overlay)
   PhotoOverlayView photoOverlayView;
 
   protected MainViewPresenter mainViewPresenter;

@@ -89,8 +89,10 @@ dependencies {
     compile(name: 'ui', ext: 'aar')
     compile(name: 'recyclerview', ext: 'aar')
     compile(name: 'log', ext: 'aar')
-    compile 'com.jakewharton:butterknife:7.0.1'
-    compile 'com.jakewharton:butterknife:7.0.1'
+
+    compile 'com.jakewharton:butterknife:8.2.1'
+    apt 'com.jakewharton:butterknife-compiler:8.2.1'
+
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'joda-time:joda-time:2.9'
     compile 'com.google.dagger:dagger:2.0'
