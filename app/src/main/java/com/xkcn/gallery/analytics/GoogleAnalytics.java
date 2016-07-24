@@ -34,7 +34,7 @@ public class GoogleAnalytics implements IAnalytics {
   private static final int DIMEN_SCREEN_TITLE = 5;
   private static final int DIMEN_PHOTO_LINK = 6;
 
-  private static final String VAL_SCREEN_TITLE_GALLERY = "Gallery Screen";
+  private static final String VAL_SCREEN_TITLE_GALLERY_PHOTO = "Gallery Photo Screen";
   private static final String VAL_SCREEN_TITLE_LISTING = "Listing Screen";
 
   private Tracker tracker;
@@ -46,6 +46,24 @@ public class GoogleAnalytics implements IAnalytics {
           .setCustomDimension(DIMEN_PHOTO_LINK, photoDetails.getDefaultDownloadUrl())
       ;
     }
+
+    return builder;
+  }
+
+  /**
+   * Because of this f**king <b>protected</b> {@link com.google.android.gms.analytics.HitBuilders.HitBuilder}.
+   * @param builder
+   * @param photoDetails
+   * @return
+   */
+  private static HitBuilders.ScreenViewBuilder buildPhotoDimensions(HitBuilders.ScreenViewBuilder builder, PhotoDetails photoDetails) {
+    if (builder != null && photoDetails != null) {
+      builder.setCustomDimension(DIMEN_PHOTO_ID, photoDetails.getIdentifierAsString())
+          .setCustomDimension(DIMEN_PHOTO_TITLE, photoDetails.getPermalinkMetaAsText())
+          .setCustomDimension(DIMEN_PHOTO_LINK, photoDetails.getDefaultDownloadUrl())
+      ;
+    }
+
     return builder;
   }
 
@@ -72,17 +90,17 @@ public class GoogleAnalytics implements IAnalytics {
   }
 
   @Override
-  public void trackGalleryPhotoView(PhotoDetails photoDetails) {
-    tracker.send(buildPhotoDimensions(new HitBuilders.EventBuilder(), photoDetails)
-        .setCategory(CAT_GALLERY)
-        .setAction(ACTION_VIEW_PHOTO)
-        .build()
-    );
+  public void trackGalleryPhotoScreenView(PhotoDetails photoDetails) {
+    trackScreenView(VAL_SCREEN_TITLE_GALLERY_PHOTO, buildPhotoDimensions(new HitBuilders.ScreenViewBuilder(), photoDetails));
+  }
+
+  private void trackScreenView(String screenName, HitBuilders.ScreenViewBuilder builder) {
+    tracker.setScreenName(screenName);
+    tracker.send(builder.build());
   }
 
   private void trackScreenView(String screenName) {
-    tracker.setScreenName(screenName);
-    tracker.send(new HitBuilders.ScreenViewBuilder().build());
+    trackScreenView(screenName, new HitBuilders.ScreenViewBuilder());
   }
 
   @Override
@@ -91,16 +109,11 @@ public class GoogleAnalytics implements IAnalytics {
   }
 
   @Override
-  public void trackGalleryScreenView() {
-    trackScreenView(VAL_SCREEN_TITLE_GALLERY);
-  }
-
-  @Override
   public void trackShareGalleryPhoto(PhotoDetails photoDetails) {
     tracker.send(buildPhotoDimensions(new HitBuilders.EventBuilder(), photoDetails)
         .setCategory(CAT_PHOTO_ACTION)
         .setAction(ACTION_SHARE)
-        .setCustomDimension(DIMEN_SCREEN_TITLE, VAL_SCREEN_TITLE_GALLERY)
+        .setCustomDimension(DIMEN_SCREEN_TITLE, VAL_SCREEN_TITLE_GALLERY_PHOTO)
         .build()
     );
   }
@@ -110,7 +123,7 @@ public class GoogleAnalytics implements IAnalytics {
     tracker.send(buildPhotoDimensions(new HitBuilders.EventBuilder(), photoDetails)
         .setCategory(CAT_PHOTO_ACTION)
         .setAction(ACTION_SET_WALLPAPER)
-        .setCustomDimension(DIMEN_SCREEN_TITLE, VAL_SCREEN_TITLE_GALLERY)
+        .setCustomDimension(DIMEN_SCREEN_TITLE, VAL_SCREEN_TITLE_GALLERY_PHOTO)
         .build()
     );
   }
@@ -120,7 +133,7 @@ public class GoogleAnalytics implements IAnalytics {
     tracker.send(buildPhotoDimensions(new HitBuilders.EventBuilder(), photoDetails)
         .setCategory(CAT_PHOTO_ACTION)
         .setAction(ACTION_DOWNLOAD)
-        .setCustomDimension(DIMEN_SCREEN_TITLE, VAL_SCREEN_TITLE_GALLERY)
+        .setCustomDimension(DIMEN_SCREEN_TITLE, VAL_SCREEN_TITLE_GALLERY_PHOTO)
         .build()
     );
   }

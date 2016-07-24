@@ -28,10 +28,10 @@ public class AnalyticsCollection implements IAnalytics {
   }
 
   @Override
-  public void trackGalleryPhotoView(PhotoDetails photoDetails) {
+  public void trackGalleryPhotoScreenView(PhotoDetails photoDetails) {
     for (IAnalytics t :
         trackers) {
-      t.trackGalleryPhotoView(photoDetails);
+      t.trackGalleryPhotoScreenView(photoDetails);
     }
   }
 
@@ -40,14 +40,6 @@ public class AnalyticsCollection implements IAnalytics {
     for (IAnalytics t :
         trackers) {
       t.trackListingScreenView();
-    }
-  }
-
-  @Override
-  public void trackGalleryScreenView() {
-    for (IAnalytics t :
-        trackers) {
-      t.trackGalleryScreenView();
     }
   }
 

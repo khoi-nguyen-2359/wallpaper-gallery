@@ -14,11 +14,9 @@ public interface IAnalytics {
    */
   void trackListingEndScroll(String categoryName, int lastPhotoIndex);
 
-  void trackGalleryPhotoView(PhotoDetails photoDetails);
+  void trackGalleryPhotoScreenView(PhotoDetails photoDetails);
 
   void trackListingScreenView();
-
-  void trackGalleryScreenView();
 
   void trackShareGalleryPhoto(PhotoDetails photoDetails);
   void trackSetWallpaperGalleryPhoto(PhotoDetails photoDetails);

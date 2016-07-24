@@ -441,13 +441,12 @@ public abstract class MainActivity extends BaseActivity
     @com.khoinguyen.apptemplate.eventbus.Subscribe
     public void handleOnPhotoListingItemClick(OnPhotoListingItemClick event) {
       appBarLayout.setExpanded(false, false);
-      analyticsCollection.trackGalleryScreenView();
     }
 
     @com.khoinguyen.apptemplate.eventbus.Subscribe
     public void handleOnGalleryPhotoPageSelect(OnPhotoGalleryPhotoSelect event) {
       PhotoDetails photoDetails = photoListingPresenter.findPhoto(event.getPhotoDisplayInfo());
-      analyticsCollection.trackGalleryPhotoView(photoDetails);
+      analyticsCollection.trackGalleryPhotoScreenView(photoDetails);
     }
 
     @com.khoinguyen.apptemplate.eventbus.Subscribe
