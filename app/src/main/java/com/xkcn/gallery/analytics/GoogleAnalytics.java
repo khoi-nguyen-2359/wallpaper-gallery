@@ -22,8 +22,8 @@ public class GoogleAnalytics implements IAnalytics {
   private static final String ACTION_SET_WALLPAPER = "Set Wallpaper";
   private static final String ACTION_DOWNLOAD = "Download";
   private static final String ACTION_SHARE = "Share";
-  private static final String ACTION_SCROLL = "Scroll";
-  private static final String ACTION_VIEW_PHOTO = "View Photo";
+  private static final String ACTION_VIEW = "View";
+  private static final String ACTION_LOAD = "Load";
 
   private static final String LABEL_END = "End";
 
@@ -36,6 +36,7 @@ public class GoogleAnalytics implements IAnalytics {
 
   private static final String VAL_SCREEN_TITLE_GALLERY_PHOTO = "Gallery Photo Screen";
   private static final String VAL_SCREEN_TITLE_LISTING = "Listing Screen";
+
 
   private Tracker tracker;
 
@@ -78,10 +79,10 @@ public class GoogleAnalytics implements IAnalytics {
   }
 
   @Override
-  public void trackListingEndScroll(String categoryName, int lastPhotoIndex) {
+  public void trackListingLastItem(String categoryName, int lastPhotoIndex) {
     tracker.send(new HitBuilders.EventBuilder()
         .setCategory(CAT_LISTING)
-        .setAction(ACTION_SCROLL)
+        .setAction(ACTION_LOAD)
         .setLabel(LABEL_END)
         .setCustomDimension(DIMEN_PHOTO_CAT, categoryName)
         .setCustomDimension(DIMEN_PHOTO_INDEX, String.valueOf(lastPhotoIndex))

@@ -12,7 +12,7 @@ public interface IAnalytics {
    * @param categoryName name of showing category to track
    * @param lastPhotoIndex the photo index at end of listing
    */
-  void trackListingEndScroll(String categoryName, int lastPhotoIndex);
+  void trackListingLastItem(String categoryName, int lastPhotoIndex);
 
   void trackGalleryPhotoScreenView(PhotoDetails photoDetails);
 

@@ -2,6 +2,7 @@ package com.xkcn.gallery.presenter;
 
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
+import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.model.PhotoCategory;
 import com.xkcn.gallery.data.model.PhotoDetails;
 import com.xkcn.gallery.data.model.DataPage;
@@ -36,6 +37,9 @@ public class PhotoListingViewPresenter {
 
   @Inject
   Scheduler rxIoScheduler;
+
+  @Inject
+  AnalyticsCollection analyticsCollection;
 
   private Observable<Integer> photoPerPageObservable;
 
@@ -79,8 +83,10 @@ public class PhotoListingViewPresenter {
     })
         .doOnNext(new Action1<DataPage<PhotoDetails>>() {
           @Override
-          public void call(DataPage<PhotoDetails> photoDetailsDataPage) {
-            allPages.append(photoDetailsDataPage);
+          public void call(DataPage<PhotoDetails> nextPageData) {
+            checkToTrackingListingLastItem(nextPageData);
+
+            allPages.append(nextPageData);
           }
         })    // call append in doOnNext because it takes much time to finish
         .subscribeOn(rxIoScheduler)
@@ -104,6 +110,16 @@ public class PhotoListingViewPresenter {
             L.get().d("next page %d %d", photoPage.getStart(), photoPage.getData().size());
           }
         });
+  }
+
+  private void checkToTrackingListingLastItem(DataPage<PhotoDetails> nextPageData) {
+    if (nextPageData.getStart() == 0 && allPages.getNextStart() != 0) {  // avoid first load
+      trackListingLastItem();
+    }
+  }
+
+  public void trackListingLastItem() {
+    analyticsCollection.trackListingLastItem(currentListingType.getName(), allPages.getNextStart() - 1);
   }
 
   public PhotoDetailsDataPage getAllPages() {

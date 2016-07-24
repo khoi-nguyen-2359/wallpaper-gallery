@@ -21,9 +21,9 @@ public class AnalyticsCollection implements IAnalytics {
   }
 
   @Override
-  public void trackListingEndScroll(String categoryName, int lastPhotoIndex) {
+  public void trackListingLastItem(String categoryName, int lastPhotoIndex) {
     for (IAnalytics t : trackers) {
-      t.trackListingEndScroll(categoryName, lastPhotoIndex);
+      t.trackListingLastItem(categoryName, lastPhotoIndex);
     }
   }
 

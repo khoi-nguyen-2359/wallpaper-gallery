@@ -233,11 +233,7 @@ public abstract class MainActivity extends BaseActivity
   protected void onDestroy() {
     super.onDestroy();
 
-    trackListingLength();
-  }
-
-  private void trackListingLength() {
-    analyticsCollection.trackListingEndScroll(photoListingPresenter.getCurrentListingType().getName(), photoListingPresenter.getAllPages().getNextStart() - 1);
+    photoListingPresenter.trackListingLastItem();
   }
 
   private void initViews() {
@@ -289,10 +285,8 @@ public abstract class MainActivity extends BaseActivity
     int id = item.getItemId();
 
     if (id == R.id.nav_hotest) {
-      trackListingLength();
       photoListingPresenter.loadPhotoPage(0, PhotoCategory.HOSTEST);
     } else if (id == R.id.nav_latest) {
-      trackListingLength();
       photoListingPresenter.loadPhotoPage(0, PhotoCategory.LATEST);
     }
 
