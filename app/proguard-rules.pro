@@ -15,3 +15,42 @@
 #-keepclassmembers class fqcn.of.javascript.interfaces.for.webview {
 #   public *;
 #}
+
+-dontobfuscate
+
+# HtmlCleaner
+-dontwarn org.apache.tools.ant.**
+-dontwarn org.jdom2.**
+
+# Joda time
+-dontwarn org.joda.convert.**
+
+# RxJava
+-keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
+    long producerIndex;
+    long consumerIndex;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueProducerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode producerNode;
+}
+-keepclassmembers class rx.internal.util.unsafe.BaseLinkedQueueConsumerNodeRef {
+    rx.internal.util.atomic.LinkedQueueNode consumerNode;
+}
+-dontwarn sun.misc.**
+
+# EventBus
+-keepattributes *Annotation*
+-keepclassmembers class ** {
+    @org.greenrobot.eventbus.Subscribe <methods>;
+}
+-keep enum org.greenrobot.eventbus.ThreadMode { *; }
+
+# Only required if you use AsyncExecutor
+-keepclassmembers class * extends org.greenrobot.eventbus.util.ThrowableFailureEvent {
+    <init>(java.lang.Throwable);
+}
+
+# LightEventBus
+-keepclassmembers class ** {
+    @com.khoinguyen.apptemplate.eventbus.Subscribe <methods>;
+}

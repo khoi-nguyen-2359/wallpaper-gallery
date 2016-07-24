@@ -41,6 +41,9 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro', 'proguard-fresco.pro'
+
             shrinkResources true
 
             buildConfigField "boolean", "LOGGABLE", "false"
@@ -50,8 +53,11 @@ android {
         }
 
         debug {
-            minifyEnabled false
-            shrinkResources false
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'),
+                    'proguard-rules.pro', 'proguard-fresco.pro'
+
+            shrinkResources true
 
             buildConfigField "boolean", "LOGGABLE", "true"
             buildConfigField "int", "GA_DISPATCH_PERIOD", "60"
@@ -95,12 +101,17 @@ dependencies {
 
     compile 'org.greenrobot:eventbus:3.0.0'
     compile 'joda-time:joda-time:2.9'
+
     compile 'com.google.dagger:dagger:2.0'
-    compile 'io.reactivex:rxandroid:1.2.1'
-    compile 'io.reactivex:rxjava:1.1.6'
-    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
-    compile "com.google.firebase:firebase-core:${firebaseVersion}"
     apt 'com.google.dagger:dagger-compiler:2.0'
+
+    compile 'io.reactivex:rxandroid:1.2.1'
+    compile 'io.reactivex:rxjava:1.1.8'
+
+    compile 'com.readystatesoftware.sqliteasset:sqliteassethelper:+'
+
+    compile "com.google.firebase:firebase-core:${firebaseVersion}"
+
     provided 'javax.annotation:jsr250-api:1.0'
 }
 
