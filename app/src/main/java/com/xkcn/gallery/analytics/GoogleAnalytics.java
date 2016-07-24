@@ -17,11 +17,13 @@ public class GoogleAnalytics implements IAnalytics {
 
   private static final String CAT_PHOTO_ACTION = "Photo Action";
   private static final String CAT_LISTING = "Listing";
+  private static final String CAT_GALLERY = "Gallery";
 
   private static final String ACTION_SET_WALLPAPER = "Set Wallpaper";
   private static final String ACTION_DOWNLOAD = "Download";
   private static final String ACTION_SHARE = "Share";
   private static final String ACTION_SCROLL = "Scroll";
+  private static final String ACTION_VIEW_PHOTO = "View Photo";
 
   private static final String LABEL_END = "End";
 
@@ -30,6 +32,7 @@ public class GoogleAnalytics implements IAnalytics {
   private static final int DIMEN_PHOTO_INDEX = 3;
   private static final int DIMEN_PHOTO_TITLE = 4;
   private static final int DIMEN_SCREEN_TITLE = 5;
+  private static final int DIMEN_PHOTO_LINK = 6;
 
   private static final String VAL_SCREEN_TITLE_GALLERY = "Gallery Screen";
   private static final String VAL_SCREEN_TITLE_LISTING = "Listing Screen";
@@ -39,7 +42,9 @@ public class GoogleAnalytics implements IAnalytics {
   private static HitBuilders.EventBuilder buildPhotoDimensions(HitBuilders.EventBuilder builder, PhotoDetails photoDetails) {
     if (builder != null && photoDetails != null) {
       builder.setCustomDimension(DIMEN_PHOTO_ID, photoDetails.getIdentifierAsString())
-          .setCustomDimension(DIMEN_PHOTO_TITLE, photoDetails.getPermalinkMetaAsText());
+          .setCustomDimension(DIMEN_PHOTO_TITLE, photoDetails.getPermalinkMetaAsText())
+          .setCustomDimension(DIMEN_PHOTO_LINK, photoDetails.getDefaultDownloadUrl())
+      ;
     }
     return builder;
   }
@@ -62,6 +67,15 @@ public class GoogleAnalytics implements IAnalytics {
         .setLabel(LABEL_END)
         .setCustomDimension(DIMEN_PHOTO_CAT, categoryName)
         .setCustomDimension(DIMEN_PHOTO_INDEX, String.valueOf(lastPhotoIndex))
+        .build()
+    );
+  }
+
+  @Override
+  public void trackGalleryPhotoView(PhotoDetails photoDetails) {
+    tracker.send(buildPhotoDimensions(new HitBuilders.EventBuilder(), photoDetails)
+        .setCategory(CAT_GALLERY)
+        .setAction(ACTION_VIEW_PHOTO)
         .build()
     );
   }
