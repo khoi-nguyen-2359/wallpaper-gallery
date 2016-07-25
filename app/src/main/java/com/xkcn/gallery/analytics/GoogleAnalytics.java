@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
+import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.BuildConfig;
 import com.xkcn.gallery.data.model.PhotoDetails;
 
@@ -17,12 +18,10 @@ public class GoogleAnalytics implements IAnalytics {
 
   private static final String CAT_PHOTO_ACTION = "Photo Action";
   private static final String CAT_LISTING = "Listing";
-  private static final String CAT_GALLERY = "Gallery";
 
   private static final String ACTION_SET_WALLPAPER = "Set Wallpaper";
   private static final String ACTION_DOWNLOAD = "Download";
   private static final String ACTION_SHARE = "Share";
-  private static final String ACTION_VIEW = "View";
   private static final String ACTION_LOAD = "Load";
 
   private static final String LABEL_END = "End";
@@ -85,9 +84,13 @@ public class GoogleAnalytics implements IAnalytics {
         .setAction(ACTION_LOAD)
         .setLabel(LABEL_END)
         .setCustomDimension(DIMEN_PHOTO_CAT, categoryName)
-        .setCustomDimension(DIMEN_PHOTO_INDEX, String.valueOf(lastPhotoIndex))
+        .setCustomDimension(DIMEN_PHOTO_INDEX, formatPhotoIndex(lastPhotoIndex))
         .build()
     );
+  }
+
+  private String formatPhotoIndex(int lastPhotoIndex) {
+    return String.format("%010d", lastPhotoIndex);
   }
 
   @Override
