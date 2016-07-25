@@ -16,16 +16,16 @@
 #   public *;
 #}
 
--dontobfuscate
+#-dontobfuscate
 
-# HtmlCleaner
+### HtmlCleaner
 -dontwarn org.apache.tools.ant.**
 -dontwarn org.jdom2.**
 
-# Joda time
+### Joda time
 -dontwarn org.joda.convert.**
 
-# RxJava
+### RxJava
 -keepclassmembers class rx.internal.util.unsafe.*ArrayQueue*Field* {
     long producerIndex;
     long consumerIndex;
@@ -38,7 +38,7 @@
 }
 -dontwarn sun.misc.**
 
-# EventBus
+### EventBus
 -keepattributes *Annotation*
 -keepclassmembers class ** {
     @org.greenrobot.eventbus.Subscribe <methods>;
@@ -50,7 +50,11 @@
     <init>(java.lang.Throwable);
 }
 
-# LightEventBus
+### LightEventBus
 -keepclassmembers class ** {
     @com.khoinguyen.apptemplate.eventbus.Subscribe <methods>;
 }
+
+### Crashlytics
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception

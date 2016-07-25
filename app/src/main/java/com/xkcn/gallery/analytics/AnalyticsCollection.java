@@ -1,5 +1,6 @@
 package com.xkcn.gallery.analytics;
 
+import com.crashlytics.android.Crashlytics;
 import com.xkcn.gallery.data.model.PhotoDetails;
 
 import java.util.ArrayList;
@@ -23,7 +24,11 @@ public class AnalyticsCollection implements IAnalytics {
   @Override
   public void trackListingLastItem(String categoryName, int lastPhotoIndex) {
     for (IAnalytics t : trackers) {
-      t.trackListingLastItem(categoryName, lastPhotoIndex);
+      try {
+        t.trackListingLastItem(categoryName, lastPhotoIndex);
+      } catch (Exception ex) {
+        Crashlytics.logException(ex);
+      }
     }
   }
 
@@ -31,7 +36,11 @@ public class AnalyticsCollection implements IAnalytics {
   public void trackGalleryPhotoScreenView(PhotoDetails photoDetails) {
     for (IAnalytics t :
         trackers) {
-      t.trackGalleryPhotoScreenView(photoDetails);
+      try {
+        t.trackGalleryPhotoScreenView(photoDetails);
+      } catch (Exception ex) {
+        Crashlytics.logException(ex);
+      }
     }
   }
 
@@ -39,7 +48,11 @@ public class AnalyticsCollection implements IAnalytics {
   public void trackListingScreenView() {
     for (IAnalytics t :
         trackers) {
-      t.trackListingScreenView();
+      try {
+        t.trackListingScreenView();
+      } catch (Exception ex) {
+        Crashlytics.logException(ex);
+      }
     }
   }
 
@@ -47,7 +60,11 @@ public class AnalyticsCollection implements IAnalytics {
   public void trackShareGalleryPhoto(PhotoDetails photoDetails) {
     for (IAnalytics t :
         trackers) {
-      t.trackShareGalleryPhoto(photoDetails);
+      try {
+        t.trackShareGalleryPhoto(photoDetails);
+      } catch (Exception ex) {
+        Crashlytics.logException(ex);
+      }
     }
   }
 
@@ -55,7 +72,11 @@ public class AnalyticsCollection implements IAnalytics {
   public void trackSetWallpaperGalleryPhoto(PhotoDetails photoDetails) {
     for (IAnalytics t :
         trackers) {
-      t.trackSetWallpaperGalleryPhoto(photoDetails);
+      try {
+        t.trackSetWallpaperGalleryPhoto(photoDetails);
+      } catch (Exception ex) {
+        Crashlytics.logException(ex);
+      }
     }
   }
 
@@ -63,7 +84,11 @@ public class AnalyticsCollection implements IAnalytics {
   public void trackDownloadGalleryPhoto(PhotoDetails photoDetails) {
     for (IAnalytics t :
         trackers) {
-      t.trackDownloadGalleryPhoto(photoDetails);
+      try {
+        t.trackDownloadGalleryPhoto(photoDetails);
+      } catch (Exception ex) {
+        Crashlytics.logException(ex);
+      }
     }
   }
 }
