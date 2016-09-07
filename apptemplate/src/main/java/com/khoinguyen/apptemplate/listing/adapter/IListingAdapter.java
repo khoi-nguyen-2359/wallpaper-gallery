@@ -9,19 +9,21 @@ import com.khoinguyen.apptemplate.listing.item.IViewHolder;
  * Created by khoinguyen on 4/29/16.
  */
 public interface IListingAdapter<VH extends IViewHolder> {
-  void notifyDataSetChanged();
-  void registerDataObserver(DataObserver observer);
-  void unregisterDataObserver(DataObserver observer);
+	void notifyDataSetChanged();
 
-  int getCount();
+	void registerDataObserver(DataObserver observer);
 
-  Object getData(int itemIndex);
+	void unregisterDataObserver(DataObserver observer);
 
-  View getView(ViewGroup parentView, int viewType);
+	int getCount();
 
-  int getViewType(int itemIndex);
+	Object getData(int itemIndex);
 
-  int getItemId(int itemIndex);
+	View getView(ViewGroup parentView, int viewType);
 
-  VH getViewHolder(View itemView, int viewType);
+	int getViewType(int itemIndex);
+
+	int getItemId(int itemIndex);
+
+	VH getViewHolder(View itemView, int viewType);
 }

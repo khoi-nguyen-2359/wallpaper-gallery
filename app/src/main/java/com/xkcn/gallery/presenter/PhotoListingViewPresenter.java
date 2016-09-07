@@ -60,6 +60,10 @@ public class PhotoListingViewPresenter {
     return (photoPerPageObservable == null ? photoPerPageObservable = preferencesUsecase.getListingPagerPerPage() : photoPerPageObservable).cache();
   }
 
+  private void loadPhotoPage(PhotoCategory category) {
+
+  }
+
   /**
    * @param startIndex  start item to load
    * @param category type of current listing

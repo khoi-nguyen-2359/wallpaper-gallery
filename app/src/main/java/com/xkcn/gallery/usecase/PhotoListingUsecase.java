@@ -30,11 +30,11 @@ public class PhotoListingUsecase {
     });
   }
 
-  public Observable<DataPage<PhotoDetails>> createHotestPhotoDetailsObservable(final int startIndex, final int perPage) {
+  public Observable<DataPage<PhotoDetails>> createHotestPhotoDetailsObservable(final int startIndex, final int count) {
     return Observable.create(new Observable.OnSubscribe<DataPage<PhotoDetails>>() {
       @Override
       public void call(Subscriber<? super DataPage<PhotoDetails>> subscriber) {
-        List<PhotoDetails> photos = photoDetailsRepository.getHotestPhotos(startIndex, perPage);
+        List<PhotoDetails> photos = photoDetailsRepository.getHotestPhotos(startIndex, count);
         DataPage<PhotoDetails> photoPage = new DataPage<>(photos, startIndex);
         subscriber.onNext(photoPage);
         subscriber.onCompleted();

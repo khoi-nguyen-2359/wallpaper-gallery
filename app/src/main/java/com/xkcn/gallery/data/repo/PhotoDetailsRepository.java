@@ -10,9 +10,9 @@ import java.util.List;
 public interface PhotoDetailsRepository {
   long getLargestPhotoId();
 
-  List<PhotoDetails> getLatestPhotos(int startIndex, int perPage);
+  List<PhotoDetails> getLatestPhotos(int startIndex, int count);
 
-  List<PhotoDetails> getHotestPhotos(int startIndex, int perPage);
+  List<PhotoDetails> getHotestPhotos(int startIndex, int count);
 
   int addPhotos(List<PhotoDetails> photos);
 

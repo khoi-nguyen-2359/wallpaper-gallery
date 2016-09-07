@@ -14,18 +14,18 @@ import java.util.Map;
  * This adapter saves one viewholder for each item view created. Used in case item views are recycled.
  */
 public abstract class RecycledListingAdapter<VH extends IViewHolder> extends PartitionedListingAdapter<VH> {
-  protected Map<View, VH> mapViewHolderByView = new HashMap<>();
-  private L log = L.get("RecycledListingAdapter");
+	protected Map<View, VH> mapViewHolderByView = new HashMap<>();
+	private L log = L.get("RecycledListingAdapter");
 
-  @Override
-  public VH getViewHolder(View itemView, int viewType) {
-    VH viewHolder = mapViewHolderByView.get(itemView);
-    if (viewHolder == null) {
-      viewHolder = super.getViewHolder(itemView, viewType);
-      log.d("createViewHolder viewType=%s", viewType);
-      mapViewHolderByView.put(itemView, viewHolder);
-    }
+	@Override
+	public VH getViewHolder(View itemView, int viewType) {
+		VH viewHolder = mapViewHolderByView.get(itemView);
+		if (viewHolder == null) {
+			viewHolder = super.getViewHolder(itemView, viewType);
+			log.d("createViewHolder viewType=%s", viewType);
+			mapViewHolderByView.put(itemView, viewHolder);
+		}
 
-    return viewHolder;
-  }
+		return viewHolder;
+	}
 }

@@ -3,39 +3,39 @@ apply plugin: 'com.android.library'
 def configs = rootProject.extensions.getByName("ext")
 
 repositories {
-    jcenter()
+  jcenter()
 
-    flatDir { dirs '../aars'}
+  flatDir { dirs '../aars' }
 }
 
 android {
-    compileSdkVersion configs.androidCompileSdk
-    buildToolsVersion configs.androidBuildToolVersion
+  compileSdkVersion configs.androidCompileSdk
+  buildToolsVersion configs.androidBuildToolVersion
 
-    defaultConfig {
-        minSdkVersion configs.androidMinSdk
-        targetSdkVersion configs.androidMaxSdk
-        versionCode 1
-        versionName "1.0"
-    }
+  defaultConfig {
+    minSdkVersion configs.androidMinSdk
+    targetSdkVersion configs.androidMaxSdk
+    versionCode 1
+    versionName "1.0"
+  }
 
-    dexOptions {
-        maxProcessCount 2
-        javaMaxHeapSize "2g"
-    }
+  dexOptions {
+    maxProcessCount 2
+    javaMaxHeapSize "2g"
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
+  buildTypes {
+    release {
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
+  }
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile "com.android.support:appcompat-v7:${configs.androidSupportLibVersion}"
-    compile "com.android.support:recyclerview-v7:${configs.androidSupportLibVersion}"
+  compile fileTree(dir: 'libs', include: ['*.jar'])
+  compile "com.android.support:appcompat-v7:${configs.androidSupportLibVersion}"
+  compile "com.android.support:recyclerview-v7:${configs.androidSupportLibVersion}"
 
-    compile(name:'log', ext:'aar')
+  compile(name: 'log', ext: 'aar')
 }

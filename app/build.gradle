@@ -53,11 +53,11 @@ android {
         }
 
         debug {
-            minifyEnabled true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'),
                     'proguard-rules.pro', 'proguard-fresco.pro'
 
-            shrinkResources true
+            shrinkResources false
 
             buildConfigField "boolean", "LOGGABLE", "true"
             buildConfigField "int", "GA_DISPATCH_PERIOD", "60"
