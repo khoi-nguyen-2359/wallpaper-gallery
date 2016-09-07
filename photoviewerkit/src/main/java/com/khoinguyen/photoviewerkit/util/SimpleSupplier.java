@@ -7,18 +7,18 @@ import com.facebook.common.internal.Supplier;
  */
 
 public class SimpleSupplier<T> implements Supplier<T> {
-  private T data;
+	private T data;
 
-  public SimpleSupplier(T data) {
-    set(data);
-  }
+	public SimpleSupplier(T data) {
+		set(data);
+	}
 
-  public void set(T data) {
-    this.data = data;
-  }
+	public void set(T data) {
+		this.data = data;
+	}
 
-  @Override
-  public T get() {
-    return data;
-  }
+	@Override
+	public T get() {
+		return data;
+	}
 }

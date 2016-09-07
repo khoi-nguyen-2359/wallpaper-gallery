@@ -11,14 +11,12 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.apptemplate.listing.adapter.DataObserver;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitComponent;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 
@@ -26,141 +24,139 @@ import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
  * Created by khoinguyen on 1/25/15.
  */
 public class PhotoActionView extends LinearLayout implements IPhotoViewerKitComponent<SharedData> {
-  public static final int TYPE_ICON = 0;
-  public static final int TYPE_ICON_TEXT = 1;
+	public static final int TYPE_ICON = 0;
+	public static final int TYPE_ICON_TEXT = 1;
 
-  private int type;
+	private int type;
 
-  private PhotoDisplayInfo photo;
-  private IEventBus eventBus;
-  private SharedData sharedData;
-  private IListingAdapter<IViewHolder<PhotoDisplayInfo>>  listingAdapter;
-  private PhotoActionEventListener eventListener;
+	private PhotoDisplayInfo photo;
+	private IEventBus eventBus;
+	private SharedData sharedData;
+	private IListingAdapter<IViewHolder<PhotoDisplayInfo>> listingAdapter;
+	private PhotoActionEventListener eventListener;
+	private OnClickListener onItemClicked = new OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			triggerOnItemSelect(v.getTag(R.id.photoaction_tag_id));
+		}
+	};
+	private DataObserver itemDataObserver = new DataObserver() {
+		@Override
+		public void onChanged() {
+			populateAdapterItems();
+		}
+	};
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public PhotoActionView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-    init(context, attrs);
-  }
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public PhotoActionView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		init(context, attrs);
+	}
 
-  public PhotoActionView(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    init(context, attrs);
-  }
+	public PhotoActionView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		init(context, attrs);
+	}
 
-  public PhotoActionView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init(context, attrs);
-  }
+	public PhotoActionView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init(context, attrs);
+	}
 
-  public PhotoActionView(Context context) {
-    super(context);
-    init(context, null);
-  }
+	public PhotoActionView(Context context) {
+		super(context);
+		init(context, null);
+	}
 
-  private void init(Context context, AttributeSet attrs) {
-    if (attrs == null) {
-      return;
-    }
+	private void init(Context context, AttributeSet attrs) {
+		if (attrs == null) {
+			return;
+		}
 
-    TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PhotoActionView);
-    type = a.getInt(R.styleable.PhotoActionView_type, 0);
-    a.recycle();
+		TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.PhotoActionView);
+		type = a.getInt(R.styleable.PhotoActionView_type, 0);
+		a.recycle();
 
-    setOrientation(HORIZONTAL);
-    setGravity(Gravity.CENTER_HORIZONTAL);
-    setShowDividers(SHOW_DIVIDER_MIDDLE);
-    Drawable divider = getResources().getDrawable(R.drawable.photoaction_item_divider);
-    setDividerDrawable(divider);
-  }
+		setOrientation(HORIZONTAL);
+		setGravity(Gravity.CENTER_HORIZONTAL);
+		setShowDividers(SHOW_DIVIDER_MIDDLE);
+		Drawable divider = getResources().getDrawable(R.drawable.photoaction_item_divider);
+		setDividerDrawable(divider);
+	}
 
-  public void bindPhoto(PhotoDisplayInfo photo) {
-    this.photo = photo;
-    populateAdapterItems();
-  }
+	public void bindPhoto(PhotoDisplayInfo photo) {
+		this.photo = photo;
+		populateAdapterItems();
+	}
 
-  @Override
-  public void attach(IPhotoViewerKitWidget<SharedData> widget) {
-    eventBus = widget.getEventBus();
-    sharedData = widget.getSharedData();
-  }
+	@Override
+	public void attach(IPhotoViewerKitWidget<SharedData> widget) {
+		eventBus = widget.getEventBus();
+		sharedData = widget.getSharedData();
+	}
 
-  public void setActionAdapter(IListingAdapter<IViewHolder<PhotoDisplayInfo>>  listingAdapter) {
-    if (this.listingAdapter != null) {
-      this.listingAdapter.unregisterDataObserver(itemDataObserver);
-    }
-    this.listingAdapter = listingAdapter;
-    if (this.listingAdapter != null) {
-      this.listingAdapter.registerDataObserver(itemDataObserver);
-    }
-  }
+	public void setActionAdapter(IListingAdapter<IViewHolder<PhotoDisplayInfo>> listingAdapter) {
+		if (this.listingAdapter != null) {
+			this.listingAdapter.unregisterDataObserver(itemDataObserver);
+		}
+		this.listingAdapter = listingAdapter;
+		if (this.listingAdapter != null) {
+			this.listingAdapter.registerDataObserver(itemDataObserver);
+		}
+	}
 
-  private DataObserver itemDataObserver = new DataObserver() {
-    @Override
-    public void onChanged() {
-      populateAdapterItems();
-    }
-  };
+	private void populateAdapterItems() {
+		if (listingAdapter == null) {
+			return;
+		}
 
-  private void populateAdapterItems() {
-    if (listingAdapter == null) {
-      return;
-    }
+		final int nItem = listingAdapter.getCount();
+		for (int i = 0; i < nItem; ++i) {
+			int viewType = listingAdapter.getViewType(i);
+			View currentChildView = getChildAt(i);
+			IViewHolder currentViewHolder = currentChildView == null ? null : (IViewHolder) currentChildView.getTag(R.id.photoaction_tag_viewholder);
+			View itemView = currentChildView;
+			if (currentViewHolder == null || currentViewHolder.getViewType() != viewType) {
+				itemView = addAdapterItemView(viewType);
+			}
 
-    final int nItem = listingAdapter.getCount();
-    for (int i = 0; i < nItem; ++i) {
-      int viewType = listingAdapter.getViewType(i);
-      View currentChildView = getChildAt(i);
-      IViewHolder currentViewHolder = currentChildView == null ? null : (IViewHolder) currentChildView.getTag(R.id.photoaction_tag_viewholder);
-      View itemView = currentChildView;
-      if (currentViewHolder == null || currentViewHolder.getViewType() != viewType) {
-        itemView = addAdapterItemView(viewType);
-      }
+			bindAdapterItemView(i, itemView);
+		}
+	}
 
-      bindAdapterItemView(i, itemView);
-    }
-  }
+	private void bindAdapterItemView(int i, View itemView) {
+		Object data = listingAdapter.getData(i);
+		IViewHolder viewHolder = (IViewHolder) itemView.getTag(R.id.photoaction_tag_viewholder);
+		if (data != null || photo != null) {
+			viewHolder.bind(data != null ? data : photo);
+		}
+		itemView.setTag(R.id.photoaction_tag_id, listingAdapter.getItemId(i));
+		// TODO: 6/29/16 what if the itemView has been setOnClickListener already?
+		itemView.setOnClickListener(onItemClicked);
+	}
 
-  private void bindAdapterItemView(int i, View itemView) {
-    Object data = listingAdapter.getData(i);
-    IViewHolder viewHolder = (IViewHolder) itemView.getTag(R.id.photoaction_tag_viewholder);
-    if (data != null || photo != null) {
-      viewHolder.bind(data != null ? data : photo);
-    }
-    itemView.setTag(R.id.photoaction_tag_id, listingAdapter.getItemId(i));
-    // TODO: 6/29/16 what if the itemView has been setOnClickListener already?
-    itemView.setOnClickListener(onItemClicked);
-  }
+	private void triggerOnItemSelect(Object actionId) {
+		if (eventListener == null || !(actionId instanceof Integer)) {
+			return;
+		}
 
-  private OnClickListener onItemClicked = new OnClickListener() {
-    @Override
-    public void onClick(View v) {
-      triggerOnItemSelect(v.getTag(R.id.photoaction_tag_id));
-    }
-  };
+		eventListener.onPhotoActionSelect((Integer) actionId, photo);
+	}
 
-  private void triggerOnItemSelect(Object actionId) {
-    if (eventListener == null || !(actionId instanceof Integer)) {
-      return;
-    }
+	private View addAdapterItemView(int viewType) {
+		View itemView = listingAdapter.getView(this, viewType);
+		IViewHolder viewHolder = listingAdapter.getViewHolder(itemView, viewType);
+		itemView.setTag(R.id.photoaction_tag_viewholder, viewHolder);
+		addView(itemView);
 
-    eventListener.onPhotoActionSelect((Integer) actionId, photo);
-  }
+		return itemView;
+	}
 
-  private View addAdapterItemView(int viewType) {
-    View itemView = listingAdapter.getView(this, viewType);
-    IViewHolder viewHolder = listingAdapter.getViewHolder(itemView, viewType);
-    itemView.setTag(R.id.photoaction_tag_viewholder, viewHolder);
-    addView(itemView);
+	public void setEventListener(PhotoActionEventListener eventListener) {
+		this.eventListener = eventListener;
+	}
 
-    return itemView;
-  }
-
-  public void setEventListener(PhotoActionEventListener eventListener) {
-    this.eventListener = eventListener;
-  }
-
-  public interface PhotoActionEventListener {
-    void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo);
-  }
+	public interface PhotoActionEventListener {
+		void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo);
+	}
 }

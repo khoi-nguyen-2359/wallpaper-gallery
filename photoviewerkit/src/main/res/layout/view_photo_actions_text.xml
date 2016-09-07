@@ -1,29 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <merge xmlns:android="http://schemas.android.com/apk/res/android">
-    <LinearLayout
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:layout_width="match_parent"
-        android:layout_height="?actionBarSize"
-        android:background="#3000">
 
-        <TextView
-            android:id="@+id/bt_set_wallpaper"
-            style="@style/PhotoActionText"
-            android:text="Set Wallpaper"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content" />
+	<LinearLayout
+		android:layout_width="match_parent"
+		android:layout_height="?actionBarSize"
+		android:background="#3000"
+		android:gravity="center"
+		android:orientation="horizontal">
 
-        <Space
-            android:layout_width="20dp"
-            android:layout_height="0dp" />
+		<TextView
+			android:id="@+id/bt_set_wallpaper"
+			style="@style/PhotoActionText"
+			android:layout_width="150dp"
+			android:layout_height="wrap_content"
+			android:text="Set Wallpaper"/>
 
-        <TextView
-            android:id="@+id/bt_share"
-            style="@style/PhotoActionText"
-            android:text="Share"
-            android:layout_width="150dp"
-            android:layout_height="wrap_content" />
+		<Space
+			android:layout_width="20dp"
+			android:layout_height="0dp"/>
 
-    </LinearLayout>
+		<TextView
+			android:id="@+id/bt_share"
+			style="@style/PhotoActionText"
+			android:layout_width="150dp"
+			android:layout_height="wrap_content"
+			android:text="Share"/>
+
+	</LinearLayout>
 </merge>

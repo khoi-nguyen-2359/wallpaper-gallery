@@ -17,14 +17,14 @@ import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
+import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
 import com.khoinguyen.apptemplate.listing.item.IViewHolder;
 import com.khoinguyen.apptemplate.listing.pageable.IPageableListingView;
+import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
 import com.khoinguyen.photoviewerkit.R;
-import com.khoinguyen.apptemplate.eventbus.LightEventBus;
 import com.khoinguyen.photoviewerkit.impl.data.ListingItemInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
-import com.khoinguyen.apptemplate.listing.pageable.PageableListingViewCollection;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnShrinkTransitionEnd;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoBackdropView;
@@ -33,295 +33,286 @@ import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoOverlayView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoTransitionView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
-import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/25/16.
  */
 public class PhotoViewerKitWidget extends RelativeLayout implements IPhotoViewerKitWidget<SharedData> {
 
-  private OverlayFadingGestureListener overlayFadingGestureListener;
+	public static final int TRANS_LISTING = 0;
+	public static final int TRANS_TO_GALLERY = 1;
+	public static final int TRANS_GALLERY = 2;
+	public static final int TRANS_TO_LISTING = 3;
+	protected IPhotoGalleryView<SharedData> photoGalleryView;
+	protected IPhotoListingView<SharedData, ? extends IViewHolder> photoListingView;
+	protected IPhotoTransitionView<SharedData> transitDraweeView;
+	protected IPhotoBackdropView<SharedData> transitBackdrop;
+	protected IPhotoOverlayView<SharedData> overlayView;
+	protected LightEventBus eventBus;
+	protected SharedData sharedData;
+	protected PageableListingViewCollection pageableListingViews = new PageableListingViewCollection();
+	private OverlayFadingGestureListener overlayFadingGestureListener;
+	private IPhotoViewerKitWidget.PagingListener pagingListener;
+	private RevealAnimationListener revealAnimationListener = new RevealAnimationListener();
+	private GestureDetectorCompat overlayFadingClickDetector;
+	private boolean overlayFadingEnabled;
+	private ValueAnimator.AnimatorUpdateListener shrinkAnimationUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+		@Override
+		public void onAnimationUpdate(ValueAnimator animation) {
+			transitBackdrop.updateAlphaOnShrinkAnimationUpdate(animation.getAnimatedFraction());
+		}
+	};
+	private AnimatorListenerAdapter shrinkAnimationListener = new AnimatorListenerAdapter() {
+		@Override
+		public void onAnimationStart(Animator animation) {
+			hideOverlay();
+			transitDraweeView.show();
+			sharedData.setCurrentTransitionState(TRANS_TO_LISTING);
+		}
 
-  @IntDef({TRANS_LISTING, TRANS_TO_GALLERY, TRANS_GALLERY, TRANS_TO_LISTING})
-  public @interface TransitionState {}
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			transitDraweeView.hide();
+			sharedData.setCurrentTransitionState(TRANS_LISTING);
+			sharedData.activePhoto(null);
+			photoListingView.toggleActiveItems();
 
-  public static final int TRANS_LISTING = 0;
-  public static final int TRANS_TO_GALLERY = 1;
-  public static final int TRANS_GALLERY = 2;
-  public static final int TRANS_TO_LISTING = 3;
+			eventBus.post(new OnShrinkTransitionEnd());
+		}
+	};
+	private ValueAnimator.AnimatorUpdateListener revealAnimUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
+		@Override
+		public void onAnimationUpdate(ValueAnimator animation) {
+			transitBackdrop.updateAlphaOnRevealAnimationUpdate(animation.getAnimatedFraction());
+		}
+	};
 
-  protected IPhotoGalleryView<SharedData> photoGalleryView;
-  protected IPhotoListingView<SharedData, ? extends IViewHolder> photoListingView;
-  protected IPhotoTransitionView<SharedData> transitDraweeView;
-  protected IPhotoBackdropView<SharedData> transitBackdrop;
-  protected IPhotoOverlayView<SharedData> overlayView;
+	public PhotoViewerKitWidget(Context context) {
+		super(context);
+		init();
+	}
 
-  protected LightEventBus eventBus;
-  protected SharedData sharedData;
+	public PhotoViewerKitWidget(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init();
+		readAttrs(attrs);
+	}
 
-  protected PageableListingViewCollection pageableListingViews = new PageableListingViewCollection();
-  private IPhotoViewerKitWidget.PagingListener pagingListener;
+	public PhotoViewerKitWidget(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+		init();
+		readAttrs(attrs);
+	}
 
-  private RevealAnimationListener revealAnimationListener = new RevealAnimationListener();
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public PhotoViewerKitWidget(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+		init();
+		readAttrs(attrs);
+	}
 
-  private GestureDetectorCompat overlayFadingClickDetector;
-  private boolean overlayFadingEnabled;
+	private void init() {
+		overlayFadingGestureListener = new OverlayFadingGestureListener();
+		overlayFadingClickDetector = new GestureDetectorCompat(getContext(), overlayFadingGestureListener);
+	}
 
-  public PhotoViewerKitWidget(Context context) {
-    super(context);
-    init();
-  }
+	@Override
+	protected void onFinishInflate() {
+		super.onFinishInflate();
+		initViews();
+	}
 
-  public PhotoViewerKitWidget(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init();
-    readAttrs(attrs);
-  }
+	@Override
+	protected void onAttachedToWindow() {
+		super.onAttachedToWindow();
 
-  public PhotoViewerKitWidget(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-    init();
-    readAttrs(attrs);
-  }
+		registerEvents();
+	}
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public PhotoViewerKitWidget(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-    init();
-    readAttrs(attrs);
-  }
+	@Override
+	protected void onDetachedFromWindow() {
+		super.onDetachedFromWindow();
 
-  private void init() {
-    overlayFadingGestureListener = new OverlayFadingGestureListener();
-    overlayFadingClickDetector = new GestureDetectorCompat(getContext(), overlayFadingGestureListener);
-  }
+		unregisterEvents();
+	}
 
-  @Override
-  protected void onFinishInflate() {
-    super.onFinishInflate();
-    initViews();
-  }
+	@Override
+	public boolean dispatchTouchEvent(MotionEvent ev) {
+		overlayFadingClickDetector.onTouchEvent(ev);
+		return super.dispatchTouchEvent(ev);
+	}
 
-  @Override
-  protected void onAttachedToWindow() {
-    super.onAttachedToWindow();
+	private void readAttrs(AttributeSet attrs) {
+		if (attrs == null) {
+			return;
+		}
+	}
 
-    registerEvents();
-  }
+	private void initViews() {
+		photoListingView = (IPhotoListingView<SharedData, ? extends IViewHolder>) findViewById(R.id.photokit_photo_listing);
+		photoGalleryView = (IPhotoGalleryView<SharedData>) findViewById(R.id.photokit_photo_gallery);
+		overlayView = (IPhotoOverlayView<SharedData>) findViewById(R.id.photokit_photo_overlay);
 
-  @Override
-  protected void onDetachedFromWindow() {
-    super.onDetachedFromWindow();
+		transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_photo_transition);
+		transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_photo_backdrop);
 
-    unregisterEvents();
-  }
+		photoListingView.attach(this);
+		photoGalleryView.attach(this);
+		transitDraweeView.attach(this);
 
-  @Override
-  public boolean dispatchTouchEvent(MotionEvent ev) {
-    overlayFadingClickDetector.onTouchEvent(ev);
-    return super.dispatchTouchEvent(ev);
-  }
+		buildPageableListingViews();
+	}
 
-  private void readAttrs(AttributeSet attrs) {
-    if (attrs == null) {
-      return;
-    }
-  }
+	private void buildPageableListingViews() {
+		pageableListingViews.clear();
+		pageableListingViews.add(photoListingView);
+		pageableListingViews.add(photoGalleryView);
+	}
 
-  private void initViews() {
-    photoListingView = (IPhotoListingView<SharedData, ? extends IViewHolder>) findViewById(R.id.photokit_photo_listing);
-    photoGalleryView = (IPhotoGalleryView<SharedData>) findViewById(R.id.photokit_photo_gallery);
-    overlayView = (IPhotoOverlayView<SharedData>) findViewById(R.id.photokit_photo_overlay);
+	public void registerEvents() {
+		eventBus.register(photoGalleryView);
+		eventBus.register(photoListingView);
+		eventBus.register(transitDraweeView);
+		eventBus.register(transitBackdrop);
+		eventBus.register(this);
+	}
 
-    transitDraweeView = (PhotoTransitionView) findViewById(R.id.photokit_photo_transition);
-    transitBackdrop = (PhotoBackdropView) findViewById(R.id.photokit_photo_backdrop);
+	public void unregisterEvents() {
+		eventBus.unregister(photoGalleryView);
+		eventBus.unregister(photoListingView);
+		eventBus.unregister(transitBackdrop);
+		eventBus.unregister(transitDraweeView);
+		eventBus.unregister(this);
+	}
 
-    photoListingView.attach(this);
-    photoGalleryView.attach(this);
-    transitDraweeView.attach(this);
+	public IEventBus getEventBus() {
+		return eventBus == null ? eventBus = new LightEventBus() : eventBus;
+	}
 
-    buildPageableListingViews();
-  }
+	public SharedData getSharedData() {
+		return sharedData == null ? sharedData = new SharedData() : sharedData;
+	}
 
-  private void buildPageableListingViews() {
-    pageableListingViews.clear();
-    pageableListingViews.add(photoListingView);
-    pageableListingViews.add(photoGalleryView);
-  }
+	@Override
+	public void enablePaging() {
+		pageableListingViews.enablePaging();
+	}
 
-  public void registerEvents() {
-    eventBus.register(photoGalleryView);
-    eventBus.register(photoListingView);
-    eventBus.register(transitDraweeView);
-    eventBus.register(transitBackdrop);
-    eventBus.register(this);
-  }
-
-  public void unregisterEvents() {
-    eventBus.unregister(photoGalleryView);
-    eventBus.unregister(photoListingView);
-    eventBus.unregister(transitBackdrop);
-    eventBus.unregister(transitDraweeView);
-    eventBus.unregister(this);
-  }
-
-  public IEventBus getEventBus() {
-    return eventBus == null ? eventBus = new LightEventBus() : eventBus;
-  }
-
-  public SharedData getSharedData() {
-    return sharedData == null ? sharedData = new SharedData() : sharedData;
-  }
-
-  @Override
-  public void enablePaging() {
-    pageableListingViews.enablePaging();
-  }
-
-  @Override
-  public boolean handleBackPress() {
-    if (sharedData.getCurrentTransitionState() == TRANS_GALLERY) {
+	@Override
+	public boolean handleBackPress() {
+		if (sharedData.getCurrentTransitionState() == TRANS_GALLERY) {
 //      photoListingView.toggleActiveItems();
-      returnToListing(getWidgetFullRect());
-      return true;
-    }
+			returnToListing(getWidgetFullRect());
+			return true;
+		}
 
-    return false;
-  }
+		return false;
+	}
 
-  private ValueAnimator.AnimatorUpdateListener shrinkAnimationUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-      transitBackdrop.updateAlphaOnShrinkAnimationUpdate(animation.getAnimatedFraction());
-    }
-  };
+	public void setPagingListener(PagingListener pagingListener) {
+		this.pagingListener = pagingListener;
+	}
 
-  private AnimatorListenerAdapter shrinkAnimationListener = new AnimatorListenerAdapter() {
-    @Override
-    public void onAnimationStart(Animator animation) {
-      hideOverlay();
-      transitDraweeView.show();
-      sharedData.setCurrentTransitionState(TRANS_TO_LISTING);
-    }
+	@Override
+	public void onPagingNext(IPageableListingView component) {
+		if (pagingListener != null) {
+			pagingListener.onPagingNext(this);
+		}
+	}
 
-    @Override
-    public void onAnimationEnd(Animator animation) {
-      transitDraweeView.hide();
-      sharedData.setCurrentTransitionState(TRANS_LISTING);
-      sharedData.activePhoto(null);
-      photoListingView.toggleActiveItems();
+	private void revealGallery(final ListingItemInfo itemInfo) {
+		if (itemInfo == null || !itemInfo.isPhotoValid()) {
+			return;
+		}
 
-      eventBus.post(new OnShrinkTransitionEnd());
-    }
-  };
+		transitDraweeView.show();
+		transitDraweeView.displayPhoto(itemInfo.getPhoto());
 
-  public void setPagingListener(PagingListener pagingListener) {
-    this.pagingListener = pagingListener;
-  }
+		revealAnimationListener.setPhotoId(itemInfo.getPhotoId());
+		transitDraweeView.startRevealAnimation(itemInfo.getItemRect(), getWidgetFullRect(), revealAnimationListener, revealAnimUpdateListener);
+	}
 
-  @Override
-  public void onPagingNext(IPageableListingView component) {
-    if (pagingListener != null) {
-      pagingListener.onPagingNext(this);
-    }
-  }
+	@Override
+	public void revealGallery(int itemIndex) {
+		photoListingView.activatePhotoItem(itemIndex);
+		ListingItemInfo currentActiveItem = sharedData.getCurrentActiveItem();
+		revealGallery(currentActiveItem);
+	}
 
-  private void revealGallery(final ListingItemInfo itemInfo) {
-    if (itemInfo == null || !itemInfo.isPhotoValid()) {
-      return;
-    }
-
-    transitDraweeView.show();
-    transitDraweeView.displayPhoto(itemInfo.getPhoto());
-
-    revealAnimationListener.setPhotoId(itemInfo.getPhotoId());
-    transitDraweeView.startRevealAnimation(itemInfo.getItemRect(), getWidgetFullRect(), revealAnimationListener, revealAnimUpdateListener);
-  }
-
-  @Override
-  public void revealGallery(int itemIndex) {
-    photoListingView.activatePhotoItem(itemIndex);
-    ListingItemInfo currentActiveItem = sharedData.getCurrentActiveItem();
-    revealGallery(currentActiveItem);
-  }
-
-  @Override
-  public void returnToListing(RectF fullRect) {
-    photoGalleryView.hide();
-    ListingItemInfo currActiveItem = sharedData.getCurrentActiveItem();
-    transitDraweeView.startShrinkAnimation(currActiveItem.getItemRect(), fullRect, shrinkAnimationListener, shrinkAnimationUpdateListener);
+	@Override
+	public void returnToListing(RectF fullRect) {
+		photoGalleryView.hide();
+		ListingItemInfo currActiveItem = sharedData.getCurrentActiveItem();
+		transitDraweeView.startShrinkAnimation(currActiveItem.getItemRect(), fullRect, shrinkAnimationListener, shrinkAnimationUpdateListener);
 //    photoListingView.toggleActiveItems();
-    photoGalleryView.zoomPrimaryItem(new Matrix());
-  }
+		photoGalleryView.zoomPrimaryItem(new Matrix());
+	}
 
-  private RectF getWidgetFullRect() {
-    Rect fullRect = new Rect();
-    getDrawingRect(fullRect);
-    return new RectF(fullRect);
-  }
+	private RectF getWidgetFullRect() {
+		Rect fullRect = new Rect();
+		getDrawingRect(fullRect);
+		return new RectF(fullRect);
+	}
 
-  private ValueAnimator.AnimatorUpdateListener revealAnimUpdateListener = new ValueAnimator.AnimatorUpdateListener() {
-    @Override
-    public void onAnimationUpdate(ValueAnimator animation) {
-      transitBackdrop.updateAlphaOnRevealAnimationUpdate(animation.getAnimatedFraction());
-    }
-  };
+	private void showOverlay() {
+		overlayView.show();
+		overlayFadingGestureListener.enabled = true;
+	}
 
-  private class RevealAnimationListener extends AnimatorListenerAdapter {
-    private String photoId;
+	private void hideOverlay() {
+		overlayView.hide();
+		overlayFadingGestureListener.enabled = false;
+	}
 
-    @Override
-    public void onAnimationStart(Animator animation) {
-      sharedData.setCurrentTransitionState(TRANS_TO_GALLERY);
-    }
+	@Subscribe
+	public void onPhotoGalleryPageSelect(OnPhotoGalleryPhotoSelect event) {
+		overlayView.bindPhoto(event.getPhotoDisplayInfo());
+	}
 
-    @Override
-    public void onAnimationEnd(Animator animation) {
-      sharedData.setCurrentTransitionState(TRANS_GALLERY);
-      photoGalleryView.setCurrentPhoto(photoId);
-      photoGalleryView.translate(0, 0);
-      photoGalleryView.show();
-      transitDraweeView.hide();
-      showOverlay();
-    }
+	@IntDef({TRANS_LISTING, TRANS_TO_GALLERY, TRANS_GALLERY, TRANS_TO_LISTING})
+	public @interface TransitionState {
+	}
 
-    public void setPhotoId(String photoId) {
-      this.photoId = photoId;
-    }
-  }
+	private class RevealAnimationListener extends AnimatorListenerAdapter {
+		private String photoId;
 
-  private void showOverlay() {
-    overlayView.show();
-    overlayFadingGestureListener.enabled = true;
-  }
+		@Override
+		public void onAnimationStart(Animator animation) {
+			sharedData.setCurrentTransitionState(TRANS_TO_GALLERY);
+		}
 
-  private void hideOverlay() {
-    overlayView.hide();
-    overlayFadingGestureListener.enabled = false;
-  }
+		@Override
+		public void onAnimationEnd(Animator animation) {
+			sharedData.setCurrentTransitionState(TRANS_GALLERY);
+			photoGalleryView.setCurrentPhoto(photoId);
+			photoGalleryView.translate(0, 0);
+			photoGalleryView.show();
+			transitDraweeView.hide();
+			showOverlay();
+		}
 
-  @Subscribe
-  public void onPhotoGalleryPageSelect(OnPhotoGalleryPhotoSelect event) {
-    overlayView.bindPhoto(event.getPhotoDisplayInfo());
-  }
+		public void setPhotoId(String photoId) {
+			this.photoId = photoId;
+		}
+	}
 
-  private class OverlayFadingGestureListener extends GestureDetector.SimpleOnGestureListener {
-    boolean enabled = false;
-    boolean hasLastDownEventEnabled = false;
+	private class OverlayFadingGestureListener extends GestureDetector.SimpleOnGestureListener {
+		boolean enabled = false;
+		boolean hasLastDownEventEnabled = false;
 
-    @Override
-    public boolean onDown(MotionEvent e) {
-      return hasLastDownEventEnabled = enabled;
-    }
+		@Override
+		public boolean onDown(MotionEvent e) {
+			return hasLastDownEventEnabled = enabled;
+		}
 
-    @Override
-    public boolean onSingleTapConfirmed(MotionEvent e) {
-      if (!hasLastDownEventEnabled) {   // prevent a single tap confirmed from a down event while reveal animation not yet finished.
-        return false;
-      }
+		@Override
+		public boolean onSingleTapConfirmed(MotionEvent e) {
+			if (!hasLastDownEventEnabled) {   // prevent a single tap confirmed from a down event while reveal animation not yet finished.
+				return false;
+			}
 
-      overlayView.toggleFading();
-      return true;
-    }
-  }
+			overlayView.toggleFading();
+			return true;
+		}
+	}
 }

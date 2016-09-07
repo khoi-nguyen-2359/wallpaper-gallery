@@ -18,51 +18,52 @@ import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
  * Created by khoinguyen on 4/25/16.
  */
 public class PhotoBackdropView extends View implements IPhotoBackdropView {
-  public static final float TRANSITION_OPAQUE_VALUE = 0.75f;
-  public PhotoBackdropView(Context context) {
-    super(context);
-  }
+	public static final float TRANSITION_OPAQUE_VALUE = 0.75f;
 
-  public PhotoBackdropView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-  }
+	public PhotoBackdropView(Context context) {
+		super(context);
+	}
 
-  public PhotoBackdropView(Context context, AttributeSet attrs, int defStyleAttr) {
-    super(context, attrs, defStyleAttr);
-  }
+	public PhotoBackdropView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+	}
 
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  public PhotoBackdropView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-    super(context, attrs, defStyleAttr, defStyleRes);
-  }
+	public PhotoBackdropView(Context context, AttributeSet attrs, int defStyleAttr) {
+		super(context, attrs, defStyleAttr);
+	}
 
-  @Override
-  protected void onDraw(Canvas canvas) {
-    canvas.drawColor(Color.BLACK);
-  }
+	@TargetApi(Build.VERSION_CODES.LOLLIPOP)
+	public PhotoBackdropView(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+		super(context, attrs, defStyleAttr, defStyleRes);
+	}
 
-  @Subscribe
-  public void handlePhotoRecenterAnimationUpdate(OnPhotoRecenterAnimationUpdate event) {
-    setAlpha(TRANSITION_OPAQUE_VALUE + event.getAnimatedFraction() * (1 - TRANSITION_OPAQUE_VALUE));
-  }
+	@Override
+	protected void onDraw(Canvas canvas) {
+		canvas.drawColor(Color.BLACK);
+	}
 
-  @Subscribe
-  public void onPhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
-    setAlpha(TRANSITION_OPAQUE_VALUE);
-  }
+	@Subscribe
+	public void handlePhotoRecenterAnimationUpdate(OnPhotoRecenterAnimationUpdate event) {
+		setAlpha(TRANSITION_OPAQUE_VALUE + event.getAnimatedFraction() * (1 - TRANSITION_OPAQUE_VALUE));
+	}
 
-  @Override
-  public void attach(IPhotoViewerKitWidget widget) {
+	@Subscribe
+	public void onPhotoGalleryDragStart(OnPhotoGalleryDragStart event) {
+		setAlpha(TRANSITION_OPAQUE_VALUE);
+	}
 
-  }
+	@Override
+	public void attach(IPhotoViewerKitWidget widget) {
 
-  @Override
-  public void updateAlphaOnShrinkAnimationUpdate(float animationProgress) {
-    setAlpha(TRANSITION_OPAQUE_VALUE * (1 - animationProgress));
-  }
+	}
 
-  @Override
-  public void updateAlphaOnRevealAnimationUpdate(float animationProgress) {
-    setAlpha(animationProgress);
-  }
+	@Override
+	public void updateAlphaOnShrinkAnimationUpdate(float animationProgress) {
+		setAlpha(TRANSITION_OPAQUE_VALUE * (1 - animationProgress));
+	}
+
+	@Override
+	public void updateAlphaOnRevealAnimationUpdate(float animationProgress) {
+		setAlpha(animationProgress);
+	}
 }

@@ -23,154 +23,185 @@ import android.view.MotionEvent;
  */
 public class TransformGestureDetector implements MultiPointerGestureDetector.Listener {
 
-  /** The listener for receiving notifications when gestures occur. */
-  public interface Listener {
-    /** A callback called right before the gesture is about to start. */
-    public void onGestureBegin(TransformGestureDetector detector);
+	private final MultiPointerGestureDetector mDetector;
+	private Listener mListener = null;
 
-    /** A callback called each time the gesture gets updated. */
-    public void onGestureUpdate(TransformGestureDetector detector);
+	public TransformGestureDetector(MultiPointerGestureDetector multiPointerGestureDetector) {
+		mDetector = multiPointerGestureDetector;
+		mDetector.setListener(this);
+	}
 
-    /** A callback called right after the gesture has finished. */
-    public void onGestureEnd(TransformGestureDetector detector);
-  }
+	/**
+	 * Factory method that creates a new instance of TransformGestureDetector
+	 */
+	public static TransformGestureDetector newInstance() {
+		return new TransformGestureDetector(MultiPointerGestureDetector.newInstance());
+	}
 
-  private final MultiPointerGestureDetector mDetector;
+	/**
+	 * Sets the listener.
+	 *
+	 * @param listener listener to set
+	 */
+	public void setListener(Listener listener) {
+		mListener = listener;
+	}
 
-  private Listener mListener = null;
+	/**
+	 * Resets the component to the initial state.
+	 */
+	public void reset() {
+		mDetector.reset();
+	}
 
-  public TransformGestureDetector(MultiPointerGestureDetector multiPointerGestureDetector) {
-    mDetector = multiPointerGestureDetector;
-    mDetector.setListener(this);
-  }
+	/**
+	 * Handles the given motion event.
+	 *
+	 * @param event event to handle
+	 * @return whether or not the event was handled
+	 */
+	public boolean onTouchEvent(final MotionEvent event) {
+		return mDetector.onTouchEvent(event);
+	}
 
-  /** Factory method that creates a new instance of TransformGestureDetector */
-  public static TransformGestureDetector newInstance() {
-    return new TransformGestureDetector(MultiPointerGestureDetector.newInstance());
-  }
+	@Override
+	public void onGestureBegin(MultiPointerGestureDetector detector) {
+		if (mListener != null) {
+			mListener.onGestureBegin(this);
+		}
+	}
 
-  /**
-   * Sets the listener.
-   * @param listener listener to set
-   */
-  public void setListener(Listener listener) {
-    mListener = listener;
-  }
+	@Override
+	public void onGestureUpdate(MultiPointerGestureDetector detector) {
+		if (mListener != null) {
+			mListener.onGestureUpdate(this);
+		}
+	}
 
-  /**
-   * Resets the component to the initial state.
-   */
-  public void reset() {
-    mDetector.reset();
-  }
+	@Override
+	public void onGestureEnd(MultiPointerGestureDetector detector) {
+		if (mListener != null) {
+			mListener.onGestureEnd(this);
+		}
+	}
 
-  /**
-   * Handles the given motion event.
-   * @param event event to handle
-   * @return whether or not the event was handled
-   */
-  public boolean onTouchEvent(final MotionEvent event) {
-    return mDetector.onTouchEvent(event);
-  }
+	private float calcAverage(float[] arr, int len) {
+		float sum = 0;
+		for (int i = 0; i < len; i++) {
+			sum += arr[i];
+		}
+		return (len > 0) ? sum / len : 0;
+	}
 
-  @Override
-  public void onGestureBegin(MultiPointerGestureDetector detector) {
-    if (mListener != null) {
-      mListener.onGestureBegin(this);
-    }
-  }
+	/**
+	 * Restarts the current gesture (if any).
+	 */
+	public void restartGesture() {
+		mDetector.restartGesture();
+	}
 
-  @Override
-  public void onGestureUpdate(MultiPointerGestureDetector detector) {
-    if (mListener != null) {
-      mListener.onGestureUpdate(this);
-    }
-  }
+	/**
+	 * Gets whether there is a gesture in progress
+	 */
+	public boolean isGestureInProgress() {
+		return mDetector.isGestureInProgress();
+	}
 
-  @Override
-  public void onGestureEnd(MultiPointerGestureDetector detector) {
-    if (mListener != null) {
-      mListener.onGestureEnd(this);
-    }
-  }
+	/**
+	 * Gets the number of pointers after the current gesture
+	 */
+	public int getNewPointerCount() {
+		return mDetector.getNewPointerCount();
+	}
 
-  private float calcAverage(float[] arr, int len) {
-    float sum = 0;
-    for (int i = 0; i < len; i++) {
-      sum += arr[i];
-    }
-    return (len > 0) ? sum / len : 0;
-  }
+	/**
+	 * Gets the number of pointers in the current gesture
+	 */
+	public int getPointerCount() {
+		return mDetector.getPointerCount();
+	}
 
-  /** Restarts the current gesture (if any).  */
-  public void restartGesture() {
-    mDetector.restartGesture();
-  }
+	/**
+	 * Gets the X coordinate of the pivot point
+	 */
+	public float getPivotX() {
+		return calcAverage(mDetector.getStartX(), mDetector.getPointerCount());
+	}
 
-  /** Gets whether there is a gesture in progress */
-  public boolean isGestureInProgress() {
-    return mDetector.isGestureInProgress();
-  }
+	/**
+	 * Gets the Y coordinate of the pivot point
+	 */
+	public float getPivotY() {
+		return calcAverage(mDetector.getStartY(), mDetector.getPointerCount());
+	}
 
-  /** Gets the number of pointers after the current gesture */
-  public int getNewPointerCount() {
-    return mDetector.getNewPointerCount();
-  }
+	/**
+	 * Gets the X component of the translation
+	 */
+	public float getTranslationX() {
+		return calcAverage(mDetector.getCurrentX(), mDetector.getPointerCount()) -
+			calcAverage(mDetector.getStartX(), mDetector.getPointerCount());
+	}
 
-  /** Gets the number of pointers in the current gesture */
-  public int getPointerCount() {
-    return mDetector.getPointerCount();
-  }
+	/**
+	 * Gets the Y component of the translation
+	 */
+	public float getTranslationY() {
+		return calcAverage(mDetector.getCurrentY(), mDetector.getPointerCount()) -
+			calcAverage(mDetector.getStartY(), mDetector.getPointerCount());
+	}
 
-  /** Gets the X coordinate of the pivot point */
-  public float getPivotX() {
-    return calcAverage(mDetector.getStartX(), mDetector.getPointerCount());
-  }
+	/**
+	 * Gets the scale
+	 */
+	public float getScale() {
+		if (mDetector.getPointerCount() < 2) {
+			return 1;
+		} else {
+			float startDeltaX = mDetector.getStartX()[1] - mDetector.getStartX()[0];
+			float startDeltaY = mDetector.getStartY()[1] - mDetector.getStartY()[0];
+			float currentDeltaX = mDetector.getCurrentX()[1] - mDetector.getCurrentX()[0];
+			float currentDeltaY = mDetector.getCurrentY()[1] - mDetector.getCurrentY()[0];
+			float startDist = (float) Math.hypot(startDeltaX, startDeltaY);
+			float currentDist = (float) Math.hypot(currentDeltaX, currentDeltaY);
+			return currentDist / startDist;
+		}
+	}
 
-  /** Gets the Y coordinate of the pivot point */
-  public float getPivotY() {
-    return calcAverage(mDetector.getStartY(), mDetector.getPointerCount());
-  }
+	/**
+	 * Gets the rotation in radians
+	 */
+	public float getRotation() {
+		if (mDetector.getPointerCount() < 2) {
+			return 0;
+		} else {
+			float startDeltaX = mDetector.getStartX()[1] - mDetector.getStartX()[0];
+			float startDeltaY = mDetector.getStartY()[1] - mDetector.getStartY()[0];
+			float currentDeltaX = mDetector.getCurrentX()[1] - mDetector.getCurrentX()[0];
+			float currentDeltaY = mDetector.getCurrentY()[1] - mDetector.getCurrentY()[0];
+			float startAngle = (float) Math.atan2(startDeltaY, startDeltaX);
+			float currentAngle = (float) Math.atan2(currentDeltaY, currentDeltaX);
+			return currentAngle - startAngle;
+		}
+	}
 
-  /** Gets the X component of the translation */
-  public float getTranslationX() {
-    return calcAverage(mDetector.getCurrentX(), mDetector.getPointerCount()) -
-        calcAverage(mDetector.getStartX(), mDetector.getPointerCount());
-  }
+	/**
+	 * The listener for receiving notifications when gestures occur.
+	 */
+	public interface Listener {
+		/**
+		 * A callback called right before the gesture is about to start.
+		 */
+		public void onGestureBegin(TransformGestureDetector detector);
 
-  /** Gets the Y component of the translation */
-  public float getTranslationY() {
-    return calcAverage(mDetector.getCurrentY(), mDetector.getPointerCount()) -
-        calcAverage(mDetector.getStartY(), mDetector.getPointerCount());
-  }
+		/**
+		 * A callback called each time the gesture gets updated.
+		 */
+		public void onGestureUpdate(TransformGestureDetector detector);
 
-  /** Gets the scale */
-  public float getScale() {
-    if (mDetector.getPointerCount() < 2) {
-      return 1;
-    } else {
-      float startDeltaX = mDetector.getStartX()[1] - mDetector.getStartX()[0];
-      float startDeltaY = mDetector.getStartY()[1] - mDetector.getStartY()[0];
-      float currentDeltaX = mDetector.getCurrentX()[1] - mDetector.getCurrentX()[0];
-      float currentDeltaY = mDetector.getCurrentY()[1] - mDetector.getCurrentY()[0];
-      float startDist = (float) Math.hypot(startDeltaX, startDeltaY);
-      float currentDist = (float) Math.hypot(currentDeltaX, currentDeltaY);
-      return currentDist / startDist;
-    }
-  }
-
-  /** Gets the rotation in radians */
-  public float getRotation() {
-    if (mDetector.getPointerCount() < 2) {
-      return 0;
-    } else {
-      float startDeltaX = mDetector.getStartX()[1] - mDetector.getStartX()[0];
-      float startDeltaY = mDetector.getStartY()[1] - mDetector.getStartY()[0];
-      float currentDeltaX = mDetector.getCurrentX()[1] - mDetector.getCurrentX()[0];
-      float currentDeltaY = mDetector.getCurrentY()[1] - mDetector.getCurrentY()[0];
-      float startAngle = (float) Math.atan2(startDeltaY, startDeltaX);
-      float currentAngle = (float) Math.atan2(currentDeltaY, currentDeltaX);
-      return currentAngle - startAngle;
-    }
-  }
+		/**
+		 * A callback called right after the gesture has finished.
+		 */
+		public void onGestureEnd(TransformGestureDetector detector);
+	}
 }

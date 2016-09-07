@@ -4,30 +4,30 @@ import android.graphics.RectF;
 import android.text.TextUtils;
 
 public class ListingItemInfo {
-  private RectF itemRect = new RectF();
-  private PhotoDisplayInfo photo;
+	private RectF itemRect = new RectF();
+	private PhotoDisplayInfo photo;
 
-  public PhotoDisplayInfo getPhoto() {
-    return photo;
-  }
+	public PhotoDisplayInfo getPhoto() {
+		return photo;
+	}
 
-  public String getPhotoId() {
-    return photo == null ? null : photo.getPhotoId();
-  }
+	public void setPhoto(PhotoDisplayInfo photoId) {
+		this.photo = photoId;
+	}
 
-  public RectF getItemRect() {
-    return itemRect;
-  }
+	public String getPhotoId() {
+		return photo == null ? null : photo.getPhotoId();
+	}
 
-  public void updateItemRect(RectF itemRect) {
-    this.itemRect.set(itemRect);
-  }
+	public RectF getItemRect() {
+		return itemRect;
+	}
 
-  public void setPhoto(PhotoDisplayInfo photoId) {
-      this.photo = photoId;
-    }
+	public void updateItemRect(RectF itemRect) {
+		this.itemRect.set(itemRect);
+	}
 
-  public boolean isPhotoValid() {
-    return photo != null && !TextUtils.isEmpty(photo.getPhotoId());
-  }
+	public boolean isPhotoValid() {
+		return photo != null && !TextUtils.isEmpty(photo.getPhotoId());
+	}
 }

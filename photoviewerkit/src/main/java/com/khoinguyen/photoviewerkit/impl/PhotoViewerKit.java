@@ -12,11 +12,11 @@ import okhttp3.OkHttpClient;
  * Created by khoinguyen on 5/3/16.
  */
 public final class PhotoViewerKit {
-  public static void init(Context context) {
-    OkHttpClient okHttpClient = new OkHttpClient();
-    ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
-        .newBuilder(context, okHttpClient)
-        .build();
-    Fresco.initialize(context, config);
-  }
+	public static void init(Context context) {
+		OkHttpClient okHttpClient = new OkHttpClient();
+		ImagePipelineConfig config = OkHttpImagePipelineConfigFactory
+			.newBuilder(context, okHttpClient)
+			.build();
+		Fresco.initialize(context, config);
+	}
 }

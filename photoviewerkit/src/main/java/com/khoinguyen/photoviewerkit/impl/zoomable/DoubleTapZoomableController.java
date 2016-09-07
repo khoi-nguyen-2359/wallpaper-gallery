@@ -16,43 +16,43 @@ import com.facebook.samples.zoomable.DefaultZoomableController;
  */
 
 public class DoubleTapZoomableController extends AnimatedZoomableController {
-  private static long DURATION_ZOOM = 200;
+	private static long DURATION_ZOOM = 200;
 
-  private final GestureDetector.OnGestureListener doubleTapListener = new GestureDetector.SimpleOnGestureListener() {
-    @Override
-    public boolean onDoubleTap(MotionEvent e) {
-      if (isIdentity()) {
-        RectF imageBounds = getImageBounds();
-        PointF imagePoint = new PointF(e.getX() / imageBounds.width(), e.getY() / imageBounds.height());
-        zoomToPoint(2.0f, imagePoint, new PointF(e.getX(), e.getY()), DefaultZoomableController.LIMIT_ALL, DURATION_ZOOM, null);
-      } else {
-        setTransform(new Matrix(), DURATION_ZOOM, null);
-      }
+	private final GestureDetector.OnGestureListener doubleTapListener = new GestureDetector.SimpleOnGestureListener() {
+		@Override
+		public boolean onDoubleTap(MotionEvent e) {
+			if (isIdentity()) {
+				RectF imageBounds = getImageBounds();
+				PointF imagePoint = new PointF(e.getX() / imageBounds.width(), e.getY() / imageBounds.height());
+				zoomToPoint(2.0f, imagePoint, new PointF(e.getX(), e.getY()), DefaultZoomableController.LIMIT_ALL, DURATION_ZOOM, null);
+			} else {
+				setTransform(new Matrix(), DURATION_ZOOM, null);
+			}
 
-      return true;
-    }
-  };
+			return true;
+		}
+	};
 
-  private GestureDetector doubleTapDetector;
+	private GestureDetector doubleTapDetector;
 
-  public DoubleTapZoomableController(Context context, TransformGestureDetector transformGestureDetector) {
-    super(transformGestureDetector);
+	public DoubleTapZoomableController(Context context, TransformGestureDetector transformGestureDetector) {
+		super(transformGestureDetector);
 
-    doubleTapDetector = new GestureDetector(context, doubleTapListener);
-  }
+		doubleTapDetector = new GestureDetector(context, doubleTapListener);
+	}
 
-  @Override
-  public boolean onTouchEvent(MotionEvent event) {
-    if (isEnabled()) {
-      if (doubleTapDetector.onTouchEvent(event)) {
-        return true;
-      }
-    }
+	public static DoubleTapZoomableController newInstance(Context context) {
+		return new DoubleTapZoomableController(context, TransformGestureDetector.newInstance());
+	}
 
-    return super.onTouchEvent(event);
-  }
+	@Override
+	public boolean onTouchEvent(MotionEvent event) {
+		if (isEnabled()) {
+			if (doubleTapDetector.onTouchEvent(event)) {
+				return true;
+			}
+		}
 
-  public static DoubleTapZoomableController newInstance(Context context) {
-    return new DoubleTapZoomableController(context, TransformGestureDetector.newInstance());
-  }
+		return super.onTouchEvent(event);
+	}
 }

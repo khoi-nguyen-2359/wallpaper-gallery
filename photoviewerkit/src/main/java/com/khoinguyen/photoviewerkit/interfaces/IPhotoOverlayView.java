@@ -10,14 +10,15 @@ import com.khoinguyen.photoviewerkit.impl.view.PhotoActionView;
  */
 
 public interface IPhotoOverlayView<D> extends IPhotoViewerKitComponent<D> {
-  void setPhotoActionAdapter(IListingAdapter<IViewHolder<PhotoDisplayInfo>> actionAdapter);
+	void setPhotoActionAdapter(IListingAdapter<IViewHolder<PhotoDisplayInfo>> actionAdapter);
 
-  void setPhotoActionEventListener(PhotoActionView.PhotoActionEventListener eventListener);
+	void setPhotoActionEventListener(PhotoActionView.PhotoActionEventListener eventListener);
 
-  void bindPhoto(PhotoDisplayInfo photoDisplayInfo);
+	void bindPhoto(PhotoDisplayInfo photoDisplayInfo);
 
-  void toggleFading();
+	void toggleFading();
 
-  void show();
-  void hide();
+	void show();
+
+	void hide();
 }

@@ -20,313 +20,309 @@ import com.facebook.samples.zoomable.DefaultZoomableController;
 import com.facebook.samples.zoomable.ZoomableController;
 import com.facebook.samples.zoomable.ZoomableDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
-import com.khoinguyen.apptemplate.listing.item.ListingItemType;
-import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
+import com.khoinguyen.apptemplate.listing.adapter.PagerListingAdapter;
+import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
+import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.photoviewerkit.R;
 import com.khoinguyen.photoviewerkit.impl.anim.ZoomToAnimation;
-import com.khoinguyen.photoviewerkit.util.AdapterPhotoFinder;
+import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.data.SharedData;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryDragStart;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoRecenterAnimationUpdate;
-import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
-import com.khoinguyen.apptemplate.listing.adapter.PagerListingAdapter;
-import com.khoinguyen.photoviewerkit.util.ViewDragHelper;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoGalleryView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
+import com.khoinguyen.photoviewerkit.util.AdapterPhotoFinder;
+import com.khoinguyen.photoviewerkit.util.ViewDragHelper;
 import com.khoinguyen.util.log.L;
 
 /**
  * Created by khoinguyen on 4/11/16.
  */
 public class PhotoGalleryView extends ViewPager implements IPhotoGalleryView<SharedData> {
-  private static final int PAGING_OFFSET = 3;
-  private static final int DEF_OFFSCREEN_PAGE = 1;
-  private static final long DURATION_DRAG_CANCEL = 200;
+	private static final int PAGING_OFFSET = 3;
+	private static final int DEF_OFFSCREEN_PAGE = 1;
+	private static final long DURATION_DRAG_CANCEL = 200;
 
-  protected L log = L.get("PhotoGalleryView");
+	protected L log = L.get("PhotoGalleryView");
 
-  protected AdapterPhotoFinder adapterPhotoFinder;
+	protected AdapterPhotoFinder adapterPhotoFinder;
 
-  protected IEventBus eventBus;
+	protected IEventBus eventBus;
 
-  protected PhotoGalleryPagerAdapter adapterPhotoGallery;
+	protected PhotoGalleryPagerAdapter adapterPhotoGallery;
 
-  protected IPhotoViewerKitWidget<SharedData> photoKitWidget;
+	protected IPhotoViewerKitWidget<SharedData> photoKitWidget;
 
-  protected SharedData sharedData;
+	protected SharedData sharedData;
+	protected ViewDragHelper viewDragHelper;
+	protected float endDragMinDistance;
+	private boolean pagingNextHasFired = false;
+	private ViewDragHelper.DragEventListener dragEventListener = new ViewDragHelper.DragEventListener() {
+		@Override
+		public void onDragStart() {
+			eventBus.post(new OnPhotoGalleryDragStart());
+		}
 
-  private boolean pagingNextHasFired = false;
+		@Override
+		public void onDragEnd(float totalDistanceX, float totalDistanceY) {
+			double dragDistance = Math.hypot(totalDistanceX, totalDistanceY);
+			if (dragDistance > endDragMinDistance) {
+				RectF fullRect = getCurrentRect();
+				photoKitWidget.returnToListing(fullRect);
+			} else {
+				new ZoomToAnimation()
+					.rects(getCurrentRect(), new RectF(0, 0, getWidth(), getHeight()))
+					.duration(DURATION_DRAG_CANCEL)
+					.target(PhotoGalleryView.this)
+					.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+						@Override
+						public void onAnimationUpdate(ValueAnimator animation) {
+							eventBus.post(new OnPhotoRecenterAnimationUpdate(animation.getAnimatedFraction()));
+						}
+					})
+					.run();
+			}
+		}
 
-  protected ViewDragHelper viewDragHelper;
-  protected float endDragMinDistance;
+		@Override
+		public void onDragUpdate(float translationX, float translationY) {
+			translate(getTranslationX() + translationX, getTranslationY() + translationY);
+		}
+	};
+	private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
+		@Override
+		public void onPageSelected(int position) {
+			super.onPageSelected(position);
 
-  public PhotoGalleryView(Context context) {
-    super(context);
-    init();
-  }
+			onPagerPageSelected(position);
+		}
+	};
 
-  public PhotoGalleryView(Context context, AttributeSet attrs) {
-    super(context, attrs);
-    init();
-  }
+	public PhotoGalleryView(Context context) {
+		super(context);
+		init();
+	}
 
-  private void init() {
-    setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
+	public PhotoGalleryView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init();
+	}
 
-    Resources resources = getResources();
-    endDragMinDistance = resources.getDimensionPixelSize(R.dimen.photo_gallery_end_drag_distance);
+	private void init() {
+		setOffscreenPageLimit(DEF_OFFSCREEN_PAGE);
 
-    viewDragHelper = new ViewDragHelper(getContext());
-    viewDragHelper.setDragEventListener(dragEventListener);
+		Resources resources = getResources();
+		endDragMinDistance = resources.getDimensionPixelSize(R.dimen.photo_gallery_end_drag_distance);
 
-    addOnPageChangeListener(internalOnPageChangeListener);
-    adapterPhotoGallery = new PhotoGalleryPagerAdapter();
-    setAdapter(adapterPhotoGallery);
+		viewDragHelper = new ViewDragHelper(getContext());
+		viewDragHelper.setDragEventListener(dragEventListener);
 
-    int pageMargin = resources.getDimensionPixelSize(R.dimen.photo_gallery_page_margin);
-    setPageMargin(pageMargin);
-  }
+		addOnPageChangeListener(internalOnPageChangeListener);
+		adapterPhotoGallery = new PhotoGalleryPagerAdapter();
+		setAdapter(adapterPhotoGallery);
 
-  @Override
-  public boolean onInterceptTouchEvent(MotionEvent ev) {
-    if (super.onInterceptTouchEvent(ev)) {
-      viewDragHelper.reset();
-      return true;
-    }
+		int pageMargin = resources.getDimensionPixelSize(R.dimen.photo_gallery_page_margin);
+		setPageMargin(pageMargin);
+	}
 
-    return viewDragHelper.onInterceptTouchEvent(ev);
-  }
+	@Override
+	public boolean onInterceptTouchEvent(MotionEvent ev) {
+		if (super.onInterceptTouchEvent(ev)) {
+			viewDragHelper.reset();
+			return true;
+		}
 
-  @Override
-  public boolean onTouchEvent(MotionEvent ev) {
-    return viewDragHelper.onTouchEvent(ev) || super.onTouchEvent(ev);
-  }
+		return viewDragHelper.onInterceptTouchEvent(ev);
+	}
 
-  private ViewDragHelper.DragEventListener dragEventListener = new ViewDragHelper.DragEventListener() {
-    @Override
-    public void onDragStart() {
-      eventBus.post(new OnPhotoGalleryDragStart());
-    }
+	@Override
+	public boolean onTouchEvent(MotionEvent ev) {
+		return viewDragHelper.onTouchEvent(ev) || super.onTouchEvent(ev);
+	}
 
-    @Override
-    public void onDragEnd(float totalDistanceX, float totalDistanceY) {
-      double dragDistance = Math.hypot(totalDistanceX, totalDistanceY);
-      if (dragDistance > endDragMinDistance) {
-        RectF fullRect = getCurrentRect();
-        photoKitWidget.returnToListing(fullRect);
-      } else {
-        new ZoomToAnimation()
-            .rects(getCurrentRect(), new RectF(0,0,getWidth(),getHeight()))
-            .duration(DURATION_DRAG_CANCEL)
-            .target(PhotoGalleryView.this)
-            .addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-              @Override
-              public void onAnimationUpdate(ValueAnimator animation) {
-                eventBus.post(new OnPhotoRecenterAnimationUpdate(animation.getAnimatedFraction()));
-              }
-            })
-            .run();
-      }
-    }
+	private RectF getCurrentRect() {
+		return new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight());
+	}
 
-    @Override
-    public void onDragUpdate(float translationX, float translationY) {
-      translate(getTranslationX() + translationX, getTranslationY() + translationY);
-    }
-  };
+	@Override
+	public void translate(float x, float y) {
+		setTranslationX(x);
+		setTranslationY(y);
+	}
 
-  private RectF getCurrentRect() {
-    return new RectF(getX(), getY(), getX() + getWidth(), getY() + getHeight());
-  }
+	public void setPhotoAdapter(IListingAdapter photoAdapter) {
+		adapterPhotoGallery.setListingViewAdapter(photoAdapter);
+		if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
+			adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
+		}
+	}
 
-  @Override
-  public void translate(float x, float y) {
-    setTranslationX(x);
-    setTranslationY(y);
-  }
+	@Override
+	public void attach(IPhotoViewerKitWidget<SharedData> widget) throws UnsupportedOperationException {
+		sharedData = widget.getSharedData();
+		eventBus = widget.getEventBus();
+		photoKitWidget = widget;
+	}
 
-  public void setPhotoAdapter(IListingAdapter photoAdapter) {
-    adapterPhotoGallery.setListingViewAdapter(photoAdapter);
-    if (adapterPhotoFinder == null || adapterPhotoFinder.getAdapter() != photoAdapter) {
-      adapterPhotoFinder = new AdapterPhotoFinder(photoAdapter);
-    }
-  }
+	private void onPagerPageSelected(int position) {
+		updateCurrentSelectedItemInfo(position);
+		checkPagingNext(position);
+	}
 
-  @Override
-  public void attach(IPhotoViewerKitWidget<SharedData> widget) throws UnsupportedOperationException {
-    sharedData = widget.getSharedData();
-    eventBus = widget.getEventBus();
-    photoKitWidget = widget;
-  }
+	private void checkPagingNext(int position) {
+		if (!pagingNextHasFired && position >= adapterPhotoGallery.getCount() - PAGING_OFFSET) {
+			photoKitWidget.onPagingNext(this);
+			pagingNextHasFired = true;
+		}
+	}
 
-  private ViewPager.SimpleOnPageChangeListener internalOnPageChangeListener = new SimpleOnPageChangeListener() {
-    @Override
-    public void onPageSelected(int position) {
-      super.onPageSelected(position);
+	private void updateCurrentSelectedItemInfo(int position) {
+		PhotoDisplayInfo photoDisplayInfo = adapterPhotoFinder.getPhoto(position);
+		if (photoDisplayInfo == null) {
+			return;
+		}
 
-      onPagerPageSelected(position);
-    }
-  };
+		sharedData.activePhoto(photoDisplayInfo);
 
-  private void onPagerPageSelected(int position) {
-    updateCurrentSelectedItemInfo(position);
-    checkPagingNext(position);
-  }
+		eventBus.post(new OnPhotoGalleryPhotoSelect(position, photoDisplayInfo));
+	}
 
-  private void checkPagingNext(int position) {
-    if (!pagingNextHasFired && position >= adapterPhotoGallery.getCount() - PAGING_OFFSET) {
-      photoKitWidget.onPagingNext(this);
-      pagingNextHasFired = true;
-    }
-  }
+	@Override
+	public void enablePaging() {
+		pagingNextHasFired = false;
+	}
 
-  private void updateCurrentSelectedItemInfo(int position) {
-    PhotoDisplayInfo photoDisplayInfo = adapterPhotoFinder.getPhoto(position);
-    if (photoDisplayInfo == null) {
-      return;
-    }
+	/**
+	 * EVENT HANDLERS
+	 */
 
-    sharedData.activePhoto(photoDisplayInfo);
+	@Override
+	public void setCurrentPhoto(String photoId) {
+		int itemIndex = adapterPhotoFinder.indexOf(photoId);
+		if (itemIndex == AdapterPhotoFinder.NO_POSITION) {
+			return;
+		}
 
-    eventBus.post(new OnPhotoGalleryPhotoSelect(position, photoDisplayInfo));
-  }
+		setCurrentItem(itemIndex, false);
+	}
 
-  @Override
-  public void enablePaging() {
-    pagingNextHasFired = false;
-  }
+	@Override
+	public void setCurrentItem(int item, boolean smoothScroll) {
+		if (item == getCurrentItem()) {
+			// This case the current item doesnt change, so onPageSelected wont fire
+			onPagerPageSelected(item);
+		}
 
-  public static class PhotoItemType extends ListingItemType<BaseViewHolder> {
-    private LayoutInflater layoutInflater;
+		super.setCurrentItem(item, smoothScroll);
+	}
 
-    public PhotoItemType(int viewType) {
-      super(viewType);
-    }
+	@Override
+	public void setCurrentPhoto(int itemIndex) {
+		PhotoDisplayInfo photo = adapterPhotoFinder.getPhoto(itemIndex);
+		if (photo == null) {
+			return;
+		}
 
-    @Override
-    public View createView(ViewGroup container) {
-      if (layoutInflater == null) {
-        layoutInflater = LayoutInflater.from(container.getContext());
-      }
+		setCurrentItem(itemIndex, false);
+	}
 
-      ZoomableDraweeView itemView = (ZoomableDraweeView) layoutInflater.inflate(R.layout.photokit_photo_gallery_pager_item, container, false);
-      itemView.getHierarchy().setFadeDuration(0);
-      itemView.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
+	@Override
+	public void show() {
+		setVisibility(VISIBLE);
+	}
 
-      return itemView;
-    }
+	@Override
+	public void zoomPrimaryItem(Matrix transformMatrix) {
+		ZoomableDraweeView primaryItemView = (ZoomableDraweeView) findViewWithTag(adapterPhotoGallery.primaryItemAdapterPosition);
+		if (primaryItemView == null) {
+			return;
+		}
 
-    @Override
-    public BaseViewHolder createViewHolder(View view) {
-      return new PhotoGalleryItemViewHolder((ZoomableDraweeView) view);
-    }
-  }
+		ZoomableController zoomableController = primaryItemView.getZoomableController();
+		if (zoomableController instanceof DefaultZoomableController) {
+			DefaultZoomableController animatedZoomableController = (DefaultZoomableController) zoomableController;
+			animatedZoomableController.setTransform(transformMatrix);
+		}
+	}
 
-  public static class PhotoGalleryItemViewHolder extends BaseViewHolder<PhotoDisplayInfo> {
-    protected ZoomableDraweeView draweeView;
+	@Override
+	public void hide() {
+		setVisibility(GONE);
+	}
 
-    private PhotoGalleryItemViewHolder(ZoomableDraweeView itemView) {
-      super(itemView);
-      this.draweeView = itemView;
-      draweeView.setIsLongpressEnabled(false);
-    }
+	public static class PhotoItemType extends ListingItemType<BaseViewHolder> {
+		private LayoutInflater layoutInflater;
 
-    @Override
-    public void bind(PhotoDisplayInfo data) {
-      DraweeController controller = Fresco.newDraweeControllerBuilder()
-          .setRetainImageOnFailure(true)
-          .setLowResImageRequest(ImageRequest.fromUri(data.getLowResUri()))
-          .setImageRequest(ImageRequest.fromUri(data.getHighResUri()))
-          .setOldController(draweeView.getController())
+		public PhotoItemType(int viewType) {
+			super(viewType);
+		}
+
+		@Override
+		public View createView(ViewGroup container) {
+			if (layoutInflater == null) {
+				layoutInflater = LayoutInflater.from(container.getContext());
+			}
+
+			ZoomableDraweeView itemView = (ZoomableDraweeView) layoutInflater.inflate(R.layout.photokit_photo_gallery_pager_item, container, false);
+			itemView.getHierarchy().setFadeDuration(0);
+			itemView.getHierarchy().setActualImageScaleType(ScalingUtils.ScaleType.FIT_CENTER);
+
+			return itemView;
+		}
+
+		@Override
+		public BaseViewHolder createViewHolder(View view) {
+			return new PhotoGalleryItemViewHolder((ZoomableDraweeView) view);
+		}
+	}
+
+	public static class PhotoGalleryItemViewHolder extends BaseViewHolder<PhotoDisplayInfo> {
+		protected ZoomableDraweeView draweeView;
+
+		private PhotoGalleryItemViewHolder(ZoomableDraweeView itemView) {
+			super(itemView);
+			this.draweeView = itemView;
+			draweeView.setIsLongpressEnabled(false);
+		}
+
+		@Override
+		public void bind(PhotoDisplayInfo data) {
+			DraweeController controller = Fresco.newDraweeControllerBuilder()
+				.setRetainImageOnFailure(true)
+				.setLowResImageRequest(ImageRequest.fromUri(data.getLowResUri()))
+				.setImageRequest(ImageRequest.fromUri(data.getHighResUri()))
+				.setOldController(draweeView.getController())
 //          .setCallerContext(this)
-          .build();
-      draweeView.setController(controller);
-    }
-  }
+				.build();
+			draweeView.setController(controller);
+		}
+	}
 
-  /**
-   * EVENT HANDLERS
-   */
+	/**
+	 * END - EVENT HANDLERS
+	 */
 
-  @Override
-  public void setCurrentPhoto(String photoId) {
-    int itemIndex = adapterPhotoFinder.indexOf(photoId);
-    if (itemIndex == AdapterPhotoFinder.NO_POSITION) {
-      return;
-    }
+	private static class PhotoGalleryPagerAdapter extends PagerListingAdapter {
+		int primaryItemAdapterPosition;
 
-    setCurrentItem(itemIndex, false);
-  }
+		@Override
+		public void setPrimaryItem(ViewGroup container, int position, Object object) {
+			super.setPrimaryItem(container, position, object);
 
-  @Override
-  public void setCurrentItem(int item, boolean smoothScroll) {
-    if (item == getCurrentItem()) {
-      // This case the current item doesnt change, so onPageSelected wont fire
-      onPagerPageSelected(item);
-    }
+			if (object instanceof View) {
+				View itemView = (View) object;
+				// // TODO: 7/12/16 what if this tag is used by other source
+				itemView.setTag(position);
+				primaryItemAdapterPosition = position;
+			}
+		}
 
-    super.setCurrentItem(item, smoothScroll);
-  }
-
-  @Override
-  public void setCurrentPhoto(int itemIndex) {
-    PhotoDisplayInfo photo = adapterPhotoFinder.getPhoto(itemIndex);
-    if (photo == null) {
-      return;
-    }
-
-    setCurrentItem(itemIndex, false);
-  }
-
-  @Override
-  public void show() {
-    setVisibility(VISIBLE);
-  }
-
-  @Override
-  public void zoomPrimaryItem(Matrix transformMatrix) {
-    ZoomableDraweeView primaryItemView = (ZoomableDraweeView) findViewWithTag(adapterPhotoGallery.primaryItemAdapterPosition);
-    if (primaryItemView == null) {
-      return;
-    }
-
-    ZoomableController zoomableController = primaryItemView.getZoomableController();
-    if (zoomableController instanceof DefaultZoomableController) {
-      DefaultZoomableController animatedZoomableController = (DefaultZoomableController) zoomableController;
-      animatedZoomableController.setTransform(transformMatrix);
-    }
-  }
-
-  @Override
-  public void hide() {
-    setVisibility(GONE);
-  }
-
-  /**
-   * END - EVENT HANDLERS
-   */
-
-  private static class PhotoGalleryPagerAdapter extends PagerListingAdapter {
-    int primaryItemAdapterPosition;
-
-    @Override
-    public void setPrimaryItem(ViewGroup container, int position, Object object) {
-      super.setPrimaryItem(container, position, object);
-
-      if (object instanceof View) {
-        View itemView = (View) object;
-        // // TODO: 7/12/16 what if this tag is used by other source
-        itemView.setTag(position);
-        primaryItemAdapterPosition = position;
-      }
-    }
-
-    @Override
-    public float getPageWidth(int position) {
-      return 1;
-    }
-  }
+		@Override
+		public float getPageWidth(int position) {
+			return 1;
+		}
+	}
 
 }
