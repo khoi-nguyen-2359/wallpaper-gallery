@@ -28,67 +28,67 @@ import rx.schedulers.Schedulers;
  */
 @Module
 public class ApplicationModule {
-  private final BaseApp baseApp;
-  private final DbHelper dbHelper;
+	private final BaseApp baseApp;
+	private final DbHelper dbHelper;
 
-  public ApplicationModule(BaseApp app) {
-    this.baseApp = app;
-    dbHelper = new DbHelper(app);
-  }
+	public ApplicationModule(BaseApp app) {
+		this.baseApp = app;
+		dbHelper = new DbHelper(app);
+	}
 
-  @Provides
-  @Singleton
-  PreferencesUsecase providePreferencesUsecase(PreferenceRepository preferenceRepository) {
-    return new PreferencesUsecase(preferenceRepository);
-  }
+	@Provides
+	@Singleton
+	PreferencesUsecase providePreferencesUsecase(PreferenceRepository preferenceRepository) {
+		return new PreferencesUsecase(preferenceRepository);
+	}
 
-  @Provides
-  @Singleton
-  PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
-    return new PhotoListingUsecase(photoDetailsRepository);
-  }
+	@Provides
+	@Singleton
+	PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
+		return new PhotoListingUsecase(photoDetailsRepository);
+	}
 
-  @Provides
-  @Singleton
-  Context provideContext() {
-    return this.baseApp;
-  }
+	@Provides
+	@Singleton
+	Context provideContext() {
+		return this.baseApp;
+	}
 
-  @Provides
-  @Singleton
-  PhotoDetailsRepository providePhotoDetailsDataStore() {
-    return new PhotoDetailsSqliteRepository(dbHelper);
-  }
+	@Provides
+	@Singleton
+	PhotoDetailsRepository providePhotoDetailsDataStore() {
+		return new PhotoDetailsSqliteRepository(dbHelper);
+	}
 
-  @Provides
-  @Singleton
-  PreferenceRepository providePreferenceDataStore() {
-    return new PreferenceRepositoryImpl(baseApp);
-  }
+	@Provides
+	@Singleton
+	PreferenceRepository providePreferenceDataStore() {
+		return new PreferenceRepositoryImpl(baseApp);
+	}
 
-  @Provides
-  @Singleton
-  PhotoFileManager providePhotoFileManager() {
-    return new PhotoFileManager(baseApp);
-  }
+	@Provides
+	@Singleton
+	PhotoFileManager providePhotoFileManager() {
+		return new PhotoFileManager(baseApp);
+	}
 
-  @Provides
-  @Singleton
-  PhotoTagRepository providePhotoTagRepository() {
-    return new PhotoTagSqliteRepository(dbHelper);
-  }
+	@Provides
+	@Singleton
+	PhotoTagRepository providePhotoTagRepository() {
+		return new PhotoTagSqliteRepository(dbHelper);
+	}
 
-  @Provides
-  @Singleton
-  Scheduler provideRxIoScheduler() {
-    return Schedulers.io();
-  }
+	@Provides
+	@Singleton
+	Scheduler provideRxIoScheduler() {
+		return Schedulers.io();
+	}
 
-  @Provides
-  @Singleton
-  AnalyticsCollection provideAnalyticsCollection() {
-    AnalyticsCollection collection = new AnalyticsCollection();
-    collection.addTracker(new GoogleAnalytics(baseApp));
-    return collection;
-  }
+	@Provides
+	@Singleton
+	AnalyticsCollection provideAnalyticsCollection() {
+		AnalyticsCollection collection = new AnalyticsCollection();
+		collection.addTracker(new GoogleAnalytics(baseApp));
+		return collection;
+	}
 }

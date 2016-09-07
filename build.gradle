@@ -1,19 +1,19 @@
 apply from: 'configs.gradle'
 
 buildscript {
-    repositories {
-        jcenter()
-    }
+  repositories {
+    jcenter()
+  }
 
-    dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.0-rc1'
-        classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
-        classpath 'com.google.gms:google-services:3.0.0'
-    }
+  dependencies {
+    classpath 'com.android.tools.build:gradle:2.2.0-rc1'
+    classpath 'com.neenbedankt.gradle.plugins:android-apt:1.8'
+    classpath 'com.google.gms:google-services:3.0.0'
+  }
 }
 
 allprojects {
-    repositories {
-        jcenter()
-    }
+  repositories {
+    jcenter()
+  }
 }

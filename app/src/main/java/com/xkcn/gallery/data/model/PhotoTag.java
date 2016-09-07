@@ -7,64 +7,63 @@ import android.os.Parcelable;
  * Created by khoinguyen on 3/2/15.
  */
 public class PhotoTag implements Parcelable {
-  String tag;
-  int mark;
-  int status;
+	public static final Parcelable.Creator<PhotoTag> CREATOR
+		= new Parcelable.Creator<PhotoTag>() {
+		public PhotoTag createFromParcel(Parcel in) {
+			return new PhotoTag(in);
+		}
 
-  public PhotoTag() {
+		public PhotoTag[] newArray(int size) {
+			return new PhotoTag[size];
+		}
+	};
+	String tag;
+	int mark;
+	int status;
 
-  }
+	public PhotoTag() {
 
-  public String getTag() {
-    return tag;
-  }
+	}
 
-  public void setTag(String tag) {
-    this.tag = tag;
-  }
+	private PhotoTag(Parcel in) {
+		tag = in.readString();
+		mark = in.readInt();
+		status = in.readInt();
+	}
 
-  public int getMark() {
-    return mark;
-  }
+	public String getTag() {
+		return tag;
+	}
 
-  public void setMark(int mark) {
-    this.mark = mark;
-  }
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
 
-  public int getStatus() {
-    return status;
-  }
+	public int getMark() {
+		return mark;
+	}
 
-  public void setStatus(int status) {
-    this.status = status;
-  }
+	public void setMark(int mark) {
+		this.mark = mark;
+	}
 
-  @Override
-  public int describeContents() {
-    return 0;
-  }
+	public int getStatus() {
+		return status;
+	}
 
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-    dest.writeString(tag);
-    dest.writeInt(mark);
-    dest.writeInt(status);
-  }
+	public void setStatus(int status) {
+		this.status = status;
+	}
 
-  public static final Parcelable.Creator<PhotoTag> CREATOR
-      = new Parcelable.Creator<PhotoTag>() {
-    public PhotoTag createFromParcel(Parcel in) {
-      return new PhotoTag(in);
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    public PhotoTag[] newArray(int size) {
-      return new PhotoTag[size];
-    }
-  };
-
-  private PhotoTag(Parcel in) {
-    tag = in.readString();
-    mark = in.readInt();
-    status = in.readInt();
-  }
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(tag);
+		dest.writeInt(mark);
+		dest.writeInt(status);
+	}
 }

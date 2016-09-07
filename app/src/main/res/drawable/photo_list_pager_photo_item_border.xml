@@ -1,41 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:width="@dimen/photo_list_pager_photo_border_width" android:gravity="right">
-        <shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle" >
-            <gradient
-                android:startColor="#0fff"
-                android:endColor="#ffff"
-                android:type="linear"
-                />
-        </shape>
-    </item>
-    <item android:width="@dimen/photo_list_pager_photo_border_width" android:gravity="left">
-        <shape android:shape="rectangle" >
-            <gradient
-                android:startColor="#ffff"
-                android:endColor="#0fff"
-                android:type="linear"
-                />
-        </shape>
-    </item>
-    <item android:height="@dimen/photo_list_pager_photo_border_width" android:gravity="top">
-        <shape android:shape="rectangle" >
-            <gradient
-                android:angle="270"
-                android:startColor="#ffff"
-                android:endColor="#0fff"
-                android:type="linear"
-                />
-        </shape>
-    </item>
-    <item android:height="@dimen/photo_list_pager_photo_border_width" android:gravity="bottom">
-        <shape android:shape="rectangle" >
-            <gradient
-                android:angle="90"
-                android:startColor="#ffff"
-                android:endColor="#0fff"
-                android:type="linear"
-                />
-        </shape>
-    </item>
+	<item
+		android:width="@dimen/photo_list_pager_photo_border_width"
+		android:gravity="right">
+		<shape xmlns:android="http://schemas.android.com/apk/res/android"
+					 android:shape="rectangle">
+			<gradient
+				android:endColor="#ffff"
+				android:startColor="#0fff"
+				android:type="linear"
+				/>
+		</shape>
+	</item>
+	<item
+		android:width="@dimen/photo_list_pager_photo_border_width"
+		android:gravity="left">
+		<shape android:shape="rectangle">
+			<gradient
+				android:endColor="#0fff"
+				android:startColor="#ffff"
+				android:type="linear"
+				/>
+		</shape>
+	</item>
+	<item
+		android:height="@dimen/photo_list_pager_photo_border_width"
+		android:gravity="top">
+		<shape android:shape="rectangle">
+			<gradient
+				android:angle="270"
+				android:endColor="#0fff"
+				android:startColor="#ffff"
+				android:type="linear"
+				/>
+		</shape>
+	</item>
+	<item
+		android:height="@dimen/photo_list_pager_photo_border_width"
+		android:gravity="bottom">
+		<shape android:shape="rectangle">
+			<gradient
+				android:angle="90"
+				android:endColor="#0fff"
+				android:startColor="#ffff"
+				android:type="linear"
+				/>
+		</shape>
+	</item>
 </layer-list>

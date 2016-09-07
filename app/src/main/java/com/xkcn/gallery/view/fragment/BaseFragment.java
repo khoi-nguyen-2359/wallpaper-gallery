@@ -17,22 +17,22 @@ import javax.inject.Inject;
  * Created by khoinguyen on 2/1/16.
  */
 public abstract class BaseFragment extends Fragment {
-  @Inject
-  PhotoDetailsRepository photoDetailsRepository;
-  @Inject
-  PreferenceRepository preferenceRepository;
-  @Inject
-  PhotoTagRepository photoTagRepository;
-  @Inject
-  PhotoFileManager photoFileManager;
+	@Inject
+	PhotoDetailsRepository photoDetailsRepository;
+	@Inject
+	PreferenceRepository preferenceRepository;
+	@Inject
+	PhotoTagRepository photoTagRepository;
+	@Inject
+	PhotoFileManager photoFileManager;
 
-  @Override
-  public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    getApplicationComponent().inject(this);
-  }
+	@Override
+	public void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		getApplicationComponent().inject(this);
+	}
 
-  protected ApplicationComponent getApplicationComponent() {
-    return ((BaseApp) getActivity().getApplication()).getApplicationComponent();
-  }
+	protected ApplicationComponent getApplicationComponent() {
+		return ((BaseApp) getActivity().getApplication()).getApplicationComponent();
+	}
 }

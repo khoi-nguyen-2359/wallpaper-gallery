@@ -1,46 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_coordinator_layout"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".view.activity.MainActivityImpl"
-    >
+																								 xmlns:app="http://schemas.android.com/apk/res-auto"
+																								 xmlns:tools="http://schemas.android.com/tools"
+																								 android:id="@+id/main_coordinator_layout"
+																								 android:layout_width="match_parent"
+																								 android:layout_height="match_parent"
+																								 tools:context=".view.activity.MainActivityImpl"
+	>
 
-    <android.support.design.widget.AppBarLayout
-        android:id="@+id/app_bar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay"
-        >
-        
-        <FrameLayout
-            android:id="@+id/toolbar_container"
-            app:layout_scrollFlags="scroll|enterAlways"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?attr/colorPrimary"
-            >
+	<android.support.design.widget.AppBarLayout
+		android:id="@+id/app_bar"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:theme="@style/AppTheme.AppBarOverlay"
+		>
 
-            <android.support.v7.widget.Toolbar
-                android:id="@+id/toolbar"
-                android:layout_width="match_parent"
-                android:layout_height="?attr/actionBarSize"
-                app:popupTheme="@style/AppTheme.PopupOverlay"
-                />
+		<FrameLayout
+			android:id="@+id/toolbar_container"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:background="?attr/colorPrimary"
+			app:layout_scrollFlags="scroll|enterAlways"
+			>
 
-        </FrameLayout>
-    </android.support.design.widget.AppBarLayout>
+			<android.support.v7.widget.Toolbar
+				android:id="@+id/toolbar"
+				android:layout_width="match_parent"
+				android:layout_height="?attr/actionBarSize"
+				app:popupTheme="@style/AppTheme.PopupOverlay"
+				/>
 
-    <com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        android:id="@+id/photokit_widget"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+		</FrameLayout>
+	</android.support.design.widget.AppBarLayout>
 
-        <include layout="@layout/photokit_main_view" />
+	<com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget
+		android:id="@+id/photokit_widget"
+		android:layout_width="match_parent"
+		android:layout_height="match_parent"
+		app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-    </com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget>
+		<include layout="@layout/photokit_main_view"/>
+
+	</com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget>
 
 </android.support.design.widget.CoordinatorLayout>

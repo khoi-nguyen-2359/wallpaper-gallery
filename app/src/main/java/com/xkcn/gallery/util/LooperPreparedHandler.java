@@ -9,28 +9,28 @@ import java.util.concurrent.Semaphore;
 
 public class LooperPreparedHandler extends Handler {
 
-    public LooperPreparedHandler(String name) {
-        this(name, Process.THREAD_PRIORITY_BACKGROUND);
-    }
+	public LooperPreparedHandler(String name) {
+		this(name, Process.THREAD_PRIORITY_BACKGROUND);
+	}
 
-    protected LooperPreparedHandler(String handlerName, int handlerPriority) {
-        super(startHandlerThread(handlerName, handlerPriority));
-    }
+	protected LooperPreparedHandler(String handlerName, int handlerPriority) {
+		super(startHandlerThread(handlerName, handlerPriority));
+	}
 
-    private static Looper startHandlerThread(String name, int priority) {
-        final Semaphore semaphore = new Semaphore(0);
-        HandlerThread handlerThread = new HandlerThread(name, priority) {
-            protected void onLooperPrepared() {
-                semaphore.release();
-            }
-        };
-        handlerThread.start();
-        semaphore.acquireUninterruptibly();
-        return handlerThread.getLooper();
-    }
+	private static Looper startHandlerThread(String name, int priority) {
+		final Semaphore semaphore = new Semaphore(0);
+		HandlerThread handlerThread = new HandlerThread(name, priority) {
+			protected void onLooperPrepared() {
+				semaphore.release();
+			}
+		};
+		handlerThread.start();
+		semaphore.acquireUninterruptibly();
+		return handlerThread.getLooper();
+	}
 
-    public void quit() {
-        getLooper().quit();
-    }
+	public void quit() {
+		getLooper().quit();
+	}
 
 }

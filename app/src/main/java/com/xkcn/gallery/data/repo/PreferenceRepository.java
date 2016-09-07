@@ -4,25 +4,25 @@ package com.xkcn.gallery.data.repo;
  * Created by khoinguyen on 11/1/15.
  */
 public interface PreferenceRepository {
-  void setLastPhotoCrawlTime(long lastUpdate);
+	long getLastPhotoCrawlTime();
 
-  void setLastCrawledPhotoId(long lastPhotoId);
+	void setLastPhotoCrawlTime(long lastUpdate);
 
-  long getLastPhotoCrawlTime();
+	long getLastCrawledPhotoId();
 
-  long getLastCrawledPhotoId();
+	void setLastCrawledPhotoId(long lastPhotoId);
 
-  boolean hasPhotoCrawled();
+	boolean hasPhotoCrawled();
 
-  boolean hasOpenedLeftDrawer();
+	boolean hasOpenedLeftDrawer();
 
-  void setLeftDrawerOpened(boolean b);
+	void setLeftDrawerOpened(boolean b);
 
-  int getListPagerPhotoPerPage();
+	int getListPagerPhotoPerPage();
 
-  long getUpdatePeriod();
+	long getUpdatePeriod();
 
-  void setLastWatchedPhotoListPage(int position);
+	int getLastWatchedPhotoListPage();
 
-  int getLastWatchedPhotoListPage();
+	void setLastWatchedPhotoListPage(int position);
 }

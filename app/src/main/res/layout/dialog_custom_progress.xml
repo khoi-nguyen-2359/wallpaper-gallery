@@ -1,28 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="200dp"
-    android:layout_height="wrap_content"
-    android:paddingStart="30dp"
-    android:paddingTop="15dp"
-    android:paddingEnd="30dp"
-    android:paddingBottom="15dp"
-    android:layout_gravity="center"
-    android:background="#fff"
-    >
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
+	android:layout_width="200dp"
+	android:layout_height="wrap_content"
+	android:layout_gravity="center"
+	android:background="#fff"
+	android:paddingBottom="15dp"
+	android:paddingEnd="30dp"
+	android:paddingStart="30dp"
+	android:paddingTop="15dp"
+	>
 
-    <TextView
-        tools:text="blah blah"
-        android:id="@+id/tv_message"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+	<TextView
+		android:id="@+id/tv_message"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		tools:text="blah blah"/>
 
-    <ProgressBar
-        android:layout_below="@+id/tv_message"
-        android:id="@+id/progress"
-        style="?android:attr/progressBarStyleHorizontal"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+	<ProgressBar
+		android:id="@+id/progress"
+		style="?android:attr/progressBarStyleHorizontal"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/tv_message"/>
 </RelativeLayout>

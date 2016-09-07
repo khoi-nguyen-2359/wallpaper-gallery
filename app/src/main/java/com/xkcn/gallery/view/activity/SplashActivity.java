@@ -11,13 +11,13 @@ import com.xkcn.gallery.view.interfaces.SplashView;
  * Created by khoinguyen on 12/14/15.
  */
 public class SplashActivity extends BaseActivity implements SplashView {
-  private SplashViewPresenter presenter;
+	private SplashViewPresenter presenter;
 
-  @Override
-  protected void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+	@Override
+	protected void onCreate(@Nullable Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    startActivity(new Intent(this, MainActivityImpl.class));
-    finish();
-  }
+		startActivity(new Intent(this, MainActivityImpl.class));
+		finish();
+	}
 }

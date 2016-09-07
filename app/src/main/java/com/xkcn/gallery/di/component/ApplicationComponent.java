@@ -1,12 +1,12 @@
 package com.xkcn.gallery.di.component;
 
 import com.xkcn.gallery.data.model.PhotoDetailsDataPage;
-import com.xkcn.gallery.view.activity.BaseActivity;
 import com.xkcn.gallery.di.module.ApplicationModule;
-import com.xkcn.gallery.view.fragment.BaseFragment;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
+import com.xkcn.gallery.view.activity.BaseActivity;
+import com.xkcn.gallery.view.fragment.BaseFragment;
 
 import javax.inject.Singleton;
 
@@ -18,15 +18,15 @@ import dagger.Component;
 @Singleton
 @Component(modules = ApplicationModule.class)
 public interface ApplicationComponent {
-  void inject(BaseActivity activity);
+	void inject(BaseActivity activity);
 
-  void inject(BaseFragment baseFragment);
+	void inject(BaseFragment baseFragment);
 
-  void inject(UpdateService updateService);
+	void inject(UpdateService updateService);
 
-  void inject(MainViewPresenter mainViewPresenter);
+	void inject(MainViewPresenter mainViewPresenter);
 
-  void inject(PhotoListingViewPresenter photoListingViewPresenter);
+	void inject(PhotoListingViewPresenter photoListingViewPresenter);
 
-  void inject(PhotoDetailsDataPage allPages);
+	void inject(PhotoDetailsDataPage allPages);
 }

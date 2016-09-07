@@ -7,18 +7,21 @@ import com.xkcn.gallery.data.model.PhotoDetails;
  */
 
 public interface IAnalytics {
-  /**
-   * Track how long did user scroll to view photos.
-   * @param categoryName name of showing category to track
-   * @param lastPhotoIndex the photo index at end of listing
-   */
-  void trackListingLastItem(String categoryName, int lastPhotoIndex);
+	/**
+	 * Track how long did user scroll to view photos.
+	 *
+	 * @param categoryName   name of showing category to track
+	 * @param lastPhotoIndex the photo index at end of listing
+	 */
+	void trackListingLastItem(String categoryName, int lastPhotoIndex);
 
-  void trackGalleryPhotoScreenView(PhotoDetails photoDetails);
+	void trackGalleryPhotoScreenView(PhotoDetails photoDetails);
 
-  void trackListingScreenView();
+	void trackListingScreenView();
 
-  void trackShareGalleryPhoto(PhotoDetails photoDetails);
-  void trackSetWallpaperGalleryPhoto(PhotoDetails photoDetails);
-  void trackDownloadGalleryPhoto(PhotoDetails photoDetails);
+	void trackShareGalleryPhoto(PhotoDetails photoDetails);
+
+	void trackSetWallpaperGalleryPhoto(PhotoDetails photoDetails);
+
+	void trackDownloadGalleryPhoto(PhotoDetails photoDetails);
 }

@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">Wallpaper Gallery</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-    <string name="send_to">Gửi đến</string>
-    <string name="send_to_trailing_text">Ảnh đẹp tuyển chọn:\n%1$s</string>
-    <string name="photo_actions_set_wp_chooser">Set as:</string>
-    <string name="msg_wait_a_moment">Chờ trong giây lát ...</string>
-    <string name="photo_action_download_failed_retry">Không thể tải ảnh, vui lòng thử lại sau ...</string>
-    <string name="photo_action_download_processing">Đang tải ảnh phân giải cao ...</string>
-    <string name="sidebar_cat_latest">Ảnh mới</string>
-    <string name="sidebar_cat_hotest">Ảnh hot</string>
+	<string name="app_name">Wallpaper Gallery</string>
+	<string name="hello_world">Hello world!</string>
+	<string name="action_settings">Settings</string>
+	<string name="send_to">Gửi đến</string>
+	<string name="send_to_trailing_text">Ảnh đẹp tuyển chọn:\n%1$s</string>
+	<string name="photo_actions_set_wp_chooser">Set as:</string>
+	<string name="msg_wait_a_moment">Chờ trong giây lát ...</string>
+	<string name="photo_action_download_failed_retry">Không thể tải ảnh, vui lòng thử lại sau ...</string>
+	<string name="photo_action_download_processing">Đang tải ảnh phân giải cao ...</string>
+	<string name="sidebar_cat_latest">Ảnh mới</string>
+	<string name="sidebar_cat_hotest">Ảnh hot</string>
 
-    <string name="font_noto_r">NotoSans-Regular.ttf</string>
-    <string name="font_noto_b">NotoSans-Bold.ttf</string>
-    <string name="font_noto_bi">NotoSans-BoldItalic.ttf</string>
-    <string name="font_noto_i">NotoSans-Italic.ttf</string>
+	<string name="font_noto_r">NotoSans-Regular.ttf</string>
+	<string name="font_noto_b">NotoSans-Bold.ttf</string>
+	<string name="font_noto_bi">NotoSans-BoldItalic.ttf</string>
+	<string name="font_noto_i">NotoSans-Italic.ttf</string>
 
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nav_item_debug">Debug Options</string>
-    <string name="debug_force_crawling">Force Crawling</string>
-    <string name="debug_refresh_photo_list">Refresh photo listing pager</string>
-    <string name="debug_clear_fresco_cache">Clear Fresco cache</string>
-    <string name="photo_action_set_wallpaper">Set Wallpaper</string>
-    <string name="photo_action_share">Share</string>
-    <string name="photo_action_download">Download</string>
-    <string name="debug_clear_photo_files">Delete all downloaded photos</string>
-    <string name="download_notification_title">Download photo %1$s</string>
-    <string name="download_notification_downloading_message">Please wait a few secs</string>
+	<string name="navigation_drawer_open">Open navigation drawer</string>
+	<string name="navigation_drawer_close">Close navigation drawer</string>
+	<string name="nav_item_debug">Debug Options</string>
+	<string name="debug_force_crawling">Force Crawling</string>
+	<string name="debug_refresh_photo_list">Refresh photo listing pager</string>
+	<string name="debug_clear_fresco_cache">Clear Fresco cache</string>
+	<string name="photo_action_set_wallpaper">Set Wallpaper</string>
+	<string name="photo_action_share">Share</string>
+	<string name="photo_action_download">Download</string>
+	<string name="debug_clear_photo_files">Delete all downloaded photos</string>
+	<string name="download_notification_title">Download photo %1$s</string>
+	<string name="download_notification_downloading_message">Please wait a few secs</string>
     <string name="download_notification_completed">Completed. Please touch to open in external
         viewer.
     </string>
-    <string name="download_notification_error">Error: %1$s</string>
-    <string name="photo_action_downloaded_already">Downloaded</string>
-    <string name="text_cancel">Cancel</string>
-    <string name="photo_gallery_downloading_message">Downloading photo ...</string>
-    <string name="general_alert_please_retry">Please retry ...</string>
+	<string name="download_notification_error">Error: %1$s</string>
+	<string name="photo_action_downloaded_already">Downloaded</string>
+	<string name="text_cancel">Cancel</string>
+	<string name="photo_gallery_downloading_message">Downloading photo ...</string>
+	<string name="general_alert_please_retry">Please retry ...</string>
 
 </resources>

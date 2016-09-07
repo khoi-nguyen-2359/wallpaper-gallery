@@ -8,17 +8,17 @@ import java.util.List;
  * Created by khoinguyen on 11/1/15.
  */
 public interface PhotoDetailsRepository {
-  long getLargestPhotoId();
+	long getLargestPhotoId();
 
-  List<PhotoDetails> getLatestPhotos(int startIndex, int count);
+	List<PhotoDetails> getLatestPhotos(int startIndex, int count);
 
-  List<PhotoDetails> getHotestPhotos(int startIndex, int count);
+	List<PhotoDetails> getHotestPhotos(int startIndex, int count);
 
-  int addPhotos(List<PhotoDetails> photos);
+	int addPhotos(List<PhotoDetails> photos);
 
-  PhotoDetails getPhotoDetails(long photoId);
+	PhotoDetails getPhotoDetails(long photoId);
 
-  int updatePhotosStatus(int status);
+	int updatePhotosStatus(int status);
 
-  int getPageCount(int perPage);
+	int getPageCount(int perPage);
 }

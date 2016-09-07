@@ -29,83 +29,83 @@ import com.xkcn.gallery.R;
 
 public class PhotoDownloadProgressDialog extends Dialog {
 
-  private ProgressBar mProgress;
+	private ProgressBar mProgress;
 
-  private int mMax = 100;
-  private int mProgressVal;
-  private boolean mIndeterminate = false;
+	private int mMax = 100;
+	private int mProgressVal;
+	private boolean mIndeterminate = false;
 
-  private boolean mHasStarted;
-  private TextView tvMessage;
-  private String message;
+	private boolean mHasStarted;
+	private TextView tvMessage;
+	private String message;
 
-  public PhotoDownloadProgressDialog(Context context) {
-    super(context);
-  }
+	public PhotoDownloadProgressDialog(Context context) {
+		super(context);
+	}
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    setContentView(R.layout.dialog_custom_progress);
-    mProgress = (ProgressBar) findViewById(R.id.progress);
-    tvMessage = (TextView) findViewById(R.id.tv_message);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		setContentView(R.layout.dialog_custom_progress);
+		mProgress = (ProgressBar) findViewById(R.id.progress);
+		tvMessage = (TextView) findViewById(R.id.tv_message);
 
-    if (mMax > 0) {
-      setMax(mMax);
-    }
-    if (mProgressVal > 0) {
-      setProgress(mProgressVal);
-    }
+		if (mMax > 0) {
+			setMax(mMax);
+		}
+		if (mProgressVal > 0) {
+			setProgress(mProgressVal);
+		}
 
-    if (message != null) {
-      tvMessage.setText(message);
-    } else {
-      tvMessage.setVisibility(View.GONE);
-    }
+		if (message != null) {
+			tvMessage.setText(message);
+		} else {
+			tvMessage.setVisibility(View.GONE);
+		}
 
-    setIndeterminate(mIndeterminate);
-    super.onCreate(savedInstanceState);
-  }
+		setIndeterminate(mIndeterminate);
+		super.onCreate(savedInstanceState);
+	}
 
-  @Override
-  public void onStart() {
-    super.onStart();
-    mHasStarted = true;
-  }
+	@Override
+	public void onStart() {
+		super.onStart();
+		mHasStarted = true;
+	}
 
-  @Override
-  protected void onStop() {
-    super.onStop();
-    mHasStarted = false;
-  }
+	@Override
+	protected void onStop() {
+		super.onStop();
+		mHasStarted = false;
+	}
 
-  public void setProgress(int value) {
-    if (mHasStarted) {
-      ObjectAnimator progressAnim = ObjectAnimator.ofInt(mProgress, "progress", value);
-      progressAnim.setInterpolator(new AccelerateDecelerateInterpolator());
-      progressAnim.setDuration(200);
-      progressAnim.start();
-    } else {
-      mProgressVal = value;
-    }
-  }
+	public void setProgress(int value) {
+		if (mHasStarted) {
+			ObjectAnimator progressAnim = ObjectAnimator.ofInt(mProgress, "progress", value);
+			progressAnim.setInterpolator(new AccelerateDecelerateInterpolator());
+			progressAnim.setDuration(200);
+			progressAnim.start();
+		} else {
+			mProgressVal = value;
+		}
+	}
 
-  public void setMax(int max) {
-    if (mProgress != null) {
-      mProgress.setMax(max);
-    } else {
-      mMax = max;
-    }
-  }
+	public void setMax(int max) {
+		if (mProgress != null) {
+			mProgress.setMax(max);
+		} else {
+			mMax = max;
+		}
+	}
 
-  public void setIndeterminate(boolean indeterminate) {
-    if (mProgress != null) {
-      mProgress.setIndeterminate(indeterminate);
-    } else {
-      mIndeterminate = indeterminate;
-    }
-  }
+	public void setIndeterminate(boolean indeterminate) {
+		if (mProgress != null) {
+			mProgress.setIndeterminate(indeterminate);
+		} else {
+			mIndeterminate = indeterminate;
+		}
+	}
 
-  public void setMessage(String message) {
-    this.message = message;
-  }
+	public void setMessage(String message) {
+		this.message = message;
+	}
 }

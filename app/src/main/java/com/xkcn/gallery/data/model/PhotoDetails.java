@@ -10,216 +10,215 @@ import android.text.TextUtils;
  * Created by khoinguyen on 12/22/14.
  */
 public class PhotoDetails implements Parcelable {
-  String photo100;
-  String photo250;
-  String photo500;
-  String photoHigh;
-  long identifier;
-  String permalink;
-  String permalinkMeta;
-  String notesUrl;
-  int heightHighRes;
-  int widthHighRes;
-  String title;
-  String tags;
-  int notes;
-  int status;
+	public static final Parcelable.Creator<PhotoDetails> CREATOR
+		= new Parcelable.Creator<PhotoDetails>() {
+		public PhotoDetails createFromParcel(Parcel in) {
+			return new PhotoDetails(in);
+		}
 
-  public PhotoDetails() {
-  }
+		public PhotoDetails[] newArray(int size) {
+			return new PhotoDetails[size];
+		}
+	};
+	String photo100;
+	String photo250;
+	String photo500;
+	String photoHigh;
+	long identifier;
+	String permalink;
+	String permalinkMeta;
+	String notesUrl;
+	int heightHighRes;
+	int widthHighRes;
+	String title;
+	String tags;
+	int notes;
+	int status;
 
-  public String getDefaultDownloadUrl() {
-    return photoHigh;
-  }
+	public PhotoDetails() {
+	}
 
-  public String getPhoto100() {
-    return photo100;
-  }
+	private PhotoDetails(Parcel in) {
+		photo100 = in.readString();
+		photo250 = in.readString();
+		photo500 = in.readString();
+		photoHigh = in.readString();
+		identifier = in.readLong();
+		permalink = in.readString();
+		permalinkMeta = in.readString();
+		notesUrl = in.readString();
+		heightHighRes = in.readInt();
+		widthHighRes = in.readInt();
+		title = in.readString();
+		tags = in.readString();
+		notes = in.readInt();
+		status = in.readInt();
+	}
 
-  public void setPhoto100(String photo100) {
-    this.photo100 = photo100;
-  }
+	public String getDefaultDownloadUrl() {
+		return photoHigh;
+	}
 
-  public String getPhoto250() {
-    return photo250;
-  }
+	public String getPhoto100() {
+		return photo100;
+	}
 
-  public void setPhoto250(String photo250) {
-    this.photo250 = photo250;
-  }
+	public void setPhoto100(String photo100) {
+		this.photo100 = photo100;
+	}
 
-  public String getPhoto500() {
-    return photo500;
-  }
+	public String getPhoto250() {
+		return photo250;
+	}
 
-  public void setPhoto500(String photo500) {
-    this.photo500 = photo500;
-  }
+	public void setPhoto250(String photo250) {
+		this.photo250 = photo250;
+	}
 
-  public String getPhotoHigh() {
-    return photoHigh;
-  }
+	public String getPhoto500() {
+		return photo500;
+	}
 
-  public void setPhotoHigh(String photoHigh) {
-    this.photoHigh = photoHigh;
-  }
+	public void setPhoto500(String photo500) {
+		this.photo500 = photo500;
+	}
 
-  public long getIdentifier() {
-    return identifier;
-  }
+	public String getPhotoHigh() {
+		return photoHigh;
+	}
 
-  public String getIdentifierAsString() {
-    return String.valueOf(identifier);
-  }
+	public void setPhotoHigh(String photoHigh) {
+		this.photoHigh = photoHigh;
+	}
 
-  public void setIdentifier(long identifier) {
-    this.identifier = identifier;
-  }
+	public long getIdentifier() {
+		return identifier;
+	}
 
-  public String getPermalink() {
-    return permalink;
-  }
+	public void setIdentifier(long identifier) {
+		this.identifier = identifier;
+	}
 
-  public void setPermalink(String permalink) {
-    this.permalink = permalink;
-  }
+	public String getIdentifierAsString() {
+		return String.valueOf(identifier);
+	}
 
-  public String getNotesUrl() {
-    return notesUrl;
-  }
+	public String getPermalink() {
+		return permalink;
+	}
 
-  public void setNotesUrl(String notesUrl) {
-    this.notesUrl = notesUrl;
-  }
+	public void setPermalink(String permalink) {
+		this.permalink = permalink;
+	}
 
-  public int getHeightHighRes() {
-    return heightHighRes;
-  }
+	public String getNotesUrl() {
+		return notesUrl;
+	}
 
-  public void setHeightHighRes(int heightHighRes) {
-    this.heightHighRes = heightHighRes;
-  }
+	public void setNotesUrl(String notesUrl) {
+		this.notesUrl = notesUrl;
+	}
 
-  public int getWidthHighRes() {
-    return widthHighRes;
-  }
+	public int getHeightHighRes() {
+		return heightHighRes;
+	}
 
-  public void setWidthHighRes(int widthHighRes) {
-    this.widthHighRes = widthHighRes;
-  }
+	public void setHeightHighRes(int heightHighRes) {
+		this.heightHighRes = heightHighRes;
+	}
 
-  public String getTitle() {
-    return title;
-  }
+	public int getWidthHighRes() {
+		return widthHighRes;
+	}
 
-  public void setTitle(String title) {
-    this.title = title;
-  }
+	public void setWidthHighRes(int widthHighRes) {
+		this.widthHighRes = widthHighRes;
+	}
 
-  public String getTags() {
-    return tags;
-  }
+	public String getTitle() {
+		return title;
+	}
 
-  public void setTags(String tags) {
-    this.tags = tags;
-  }
+	public void setTitle(String title) {
+		this.title = title;
+	}
 
-  public String getPermalinkMeta() {
-    return permalinkMeta;
-  }
+	public String getTags() {
+		return tags;
+	}
 
-  public String getPermalinkMetaAsText() {
-    if (TextUtils.isEmpty(permalinkMeta)) {
-      return "";
-    }
+	public void setTags(String tags) {
+		this.tags = tags;
+	}
 
-    return Html.fromHtml(permalinkMeta).toString();
-  }
+	public String getPermalinkMeta() {
+		return permalinkMeta;
+	}
 
-  public void setPermalinkMeta(String permalinkMeta) {
-    this.permalinkMeta = permalinkMeta;
-  }
+	public void setPermalinkMeta(String permalinkMeta) {
+		this.permalinkMeta = permalinkMeta;
+	}
 
-  @Override
-  public int describeContents() {
-    return 0;
-  }
+	public String getPermalinkMetaAsText() {
+		if (TextUtils.isEmpty(permalinkMeta)) {
+			return "";
+		}
 
-  @Override
-  public void writeToParcel(Parcel dest, int flags) {
-    dest.writeString(photo100);
-    dest.writeString(photo250);
-    dest.writeString(photo500);
-    dest.writeString(photoHigh);
-    dest.writeLong(identifier);
-    dest.writeString(permalink);
-    dest.writeString(permalinkMeta);
-    dest.writeString(notesUrl);
-    dest.writeInt(heightHighRes);
-    dest.writeInt(widthHighRes);
-    dest.writeString(title);
-    dest.writeString(tags);
-    dest.writeInt(notes);
-    dest.writeInt(status);
-  }
+		return Html.fromHtml(permalinkMeta).toString();
+	}
 
-  public static final Parcelable.Creator<PhotoDetails> CREATOR
-      = new Parcelable.Creator<PhotoDetails>() {
-    public PhotoDetails createFromParcel(Parcel in) {
-      return new PhotoDetails(in);
-    }
+	@Override
+	public int describeContents() {
+		return 0;
+	}
 
-    public PhotoDetails[] newArray(int size) {
-      return new PhotoDetails[size];
-    }
-  };
+	@Override
+	public void writeToParcel(Parcel dest, int flags) {
+		dest.writeString(photo100);
+		dest.writeString(photo250);
+		dest.writeString(photo500);
+		dest.writeString(photoHigh);
+		dest.writeLong(identifier);
+		dest.writeString(permalink);
+		dest.writeString(permalinkMeta);
+		dest.writeString(notesUrl);
+		dest.writeInt(heightHighRes);
+		dest.writeInt(widthHighRes);
+		dest.writeString(title);
+		dest.writeString(tags);
+		dest.writeInt(notes);
+		dest.writeInt(status);
+	}
 
-  private PhotoDetails(Parcel in) {
-    photo100 = in.readString();
-    photo250 = in.readString();
-    photo500 = in.readString();
-    photoHigh = in.readString();
-    identifier = in.readLong();
-    permalink = in.readString();
-    permalinkMeta = in.readString();
-    notesUrl = in.readString();
-    heightHighRes = in.readInt();
-    widthHighRes = in.readInt();
-    title = in.readString();
-    tags = in.readString();
-    notes = in.readInt();
-    status = in.readInt();
-  }
+	public int getNotes() {
+		return notes;
+	}
 
-  public int getNotes() {
-    return notes;
-  }
+	public void setNotes(int notes) {
+		this.notes = notes;
+	}
 
-  public void setNotes(int notes) {
-    this.notes = notes;
-  }
+	public int getStatus() {
+		return status;
+	}
 
-  public void setStatus(int status) {
-    this.status = status;
-  }
+	public void setStatus(int status) {
+		this.status = status;
+	}
 
-  public int getStatus() {
-    return status;
-  }
+	public String getLowResUrl() {
+		return getPhoto250();
+	}
 
-  public String getLowResUrl() {
-    return getPhoto250();
-  }
+	public String getHighResUrl() {
+		return getPhotoHigh();
+	}
 
-  public String getHighResUrl() {
-    return getPhotoHigh();
-  }
+	public Uri getLowResUri() {
+		return Uri.parse(getLowResUrl());
+	}
 
-  public Uri getLowResUri() {
-    return Uri.parse(getLowResUrl());
-  }
-
-  public Uri getHighResUri() {
-    return Uri.parse(getHighResUrl());
-  }
+	public Uri getHighResUri() {
+		return Uri.parse(getHighResUrl());
+	}
 }

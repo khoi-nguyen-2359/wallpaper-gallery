@@ -3,9 +3,9 @@ package com.xkcn.gallery.presenter;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
+import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.data.model.PhotoCategory;
 import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.model.DataPage;
 import com.xkcn.gallery.data.model.PhotoDetailsDataPage;
 import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
@@ -27,130 +27,125 @@ import rx.functions.Func1;
  * Created by khoinguyen on 12/18/15.
  */
 public class PhotoListingViewPresenter {
-  private MainView view;
+	@Inject
+	PhotoListingUsecase photoListingUsecase;
+	@Inject
+	PreferencesUsecase preferencesUsecase;
+	@Inject
+	Scheduler rxIoScheduler;
+	@Inject
+	AnalyticsCollection analyticsCollection;
+	private MainView view;
+	private Observable<Integer> photoPerPageObservable;
 
-  @Inject
-  PhotoListingUsecase photoListingUsecase;
+	private PhotoCategory currentListingType;
 
-  @Inject
-  PreferencesUsecase preferencesUsecase;
+	private PhotoDetailsDataPage allPages = new PhotoDetailsDataPage();
 
-  @Inject
-  Scheduler rxIoScheduler;
+	public PhotoListingViewPresenter(ApplicationComponent component) {
+		component.inject(this);
+		component.inject(allPages);
+	}
 
-  @Inject
-  AnalyticsCollection analyticsCollection;
+	public void setView(MainView view) {
+		this.view = view;
+	}
 
-  private Observable<Integer> photoPerPageObservable;
+	private Observable<Integer> getPhotoPerPageObservable() {
+		return (photoPerPageObservable == null ? photoPerPageObservable = preferencesUsecase.getListingPagerPerPage() : photoPerPageObservable).cache();
+	}
 
-  private PhotoCategory currentListingType;
+	private void loadPhotoPage(PhotoCategory category) {
 
-  private PhotoDetailsDataPage allPages = new PhotoDetailsDataPage();
+	}
 
-  public PhotoListingViewPresenter(ApplicationComponent component) {
-    component.inject(this);
-    component.inject(allPages);
-  }
+	/**
+	 * @param startIndex start item to load
+	 * @param category   type of current listing
+	 */
+	public void loadPhotoPage(final int startIndex, final PhotoCategory category) {
+		currentListingType = category;
+		getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<DataPage<PhotoDetails>>>() {
+			@Override
+			public Observable<DataPage<PhotoDetails>> call(Integer perPage) {
+				Observable<DataPage<PhotoDetails>> photoQueryObservable = null;
+				if (category.getId() == PhotoCategory.HOSTEST.getId()) {
+					photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(startIndex, perPage);
+				} else if (category.getId() == PhotoCategory.LATEST.getId()) {
+					photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(startIndex, perPage);
+				} else {
+					photoQueryObservable = Observable.empty();
+				}
 
-  public void setView(MainView view) {
-    this.view = view;
-  }
+				return photoQueryObservable;
+			}
+		})
+			.doOnNext(new Action1<DataPage<PhotoDetails>>() {
+				@Override
+				public void call(DataPage<PhotoDetails> nextPageData) {
+					checkToTrackingListingLastItem(nextPageData);
 
-  private Observable<Integer> getPhotoPerPageObservable() {
-    return (photoPerPageObservable == null ? photoPerPageObservable = preferencesUsecase.getListingPagerPerPage() : photoPerPageObservable).cache();
-  }
+					allPages.append(nextPageData);
+				}
+			})    // call append in doOnNext because it takes much time to finish
+			.subscribeOn(rxIoScheduler)
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Observer<DataPage<PhotoDetails>>() {
+				@Override
+				public void onCompleted() {
+					view.onPagingLoaded();
+					if (!allPages.hasEnded()) {
+						view.enablePaging();
+					}
+				}
 
-  private void loadPhotoPage(PhotoCategory category) {
+				@Override
+				public void onError(Throwable e) {
 
-  }
+				}
 
-  /**
-   * @param startIndex  start item to load
-   * @param category type of current listing
-   */
-  public void loadPhotoPage(final int startIndex, final PhotoCategory category) {
-    currentListingType = category;
-    getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<DataPage<PhotoDetails>>>() {
-      @Override
-      public Observable<DataPage<PhotoDetails>> call(Integer perPage) {
-        Observable<DataPage<PhotoDetails>> photoQueryObservable = null;
-        if (category.getId() == PhotoCategory.HOSTEST.getId()) {
-          photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(startIndex, perPage);
-        } else if (category.getId() == PhotoCategory.LATEST.getId()) {
-          photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(startIndex, perPage);
-        } else {
-          photoQueryObservable = Observable.empty();
-        }
+				@Override
+				public void onNext(DataPage<PhotoDetails> photoPage) {
+					L.get().d("next page %d %d", photoPage.getStart(), photoPage.getData().size());
+				}
+			});
+	}
 
-        return photoQueryObservable;
-      }
-    })
-        .doOnNext(new Action1<DataPage<PhotoDetails>>() {
-          @Override
-          public void call(DataPage<PhotoDetails> nextPageData) {
-            checkToTrackingListingLastItem(nextPageData);
+	private void checkToTrackingListingLastItem(DataPage<PhotoDetails> nextPageData) {
+		if (nextPageData.getStart() == 0 && allPages.getNextStart() != 0) {  // avoid first load
+			trackListingLastItem();
+		}
+	}
 
-            allPages.append(nextPageData);
-          }
-        })    // call append in doOnNext because it takes much time to finish
-        .subscribeOn(rxIoScheduler)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Observer<DataPage<PhotoDetails>>() {
-          @Override
-          public void onCompleted() {
-            view.onPagingLoaded();
-            if (!allPages.hasEnded()) {
-              view.enablePaging();
-            }
-          }
+	public void trackListingLastItem() {
+		analyticsCollection.trackListingLastItem(currentListingType.getName(), allPages.getNextStart() - 1);
+	}
 
-          @Override
-          public void onError(Throwable e) {
+	public PhotoDetailsDataPage getAllPages() {
+		return allPages;
+	}
 
-          }
+	public void loadNextPhotoPage() {
+		loadPhotoPage(allPages.getNextStart(), currentListingType);
+	}
 
-          @Override
-          public void onNext(DataPage<PhotoDetails> photoPage) {
-            L.get().d("next page %d %d", photoPage.getStart(), photoPage.getData().size());
-          }
-        });
-  }
+	public PhotoDetails findPhoto(PhotoDisplayInfo photoDisplayInfo) {
+		if (photoDisplayInfo == null) {
+			return null;
+		}
 
-  private void checkToTrackingListingLastItem(DataPage<PhotoDetails> nextPageData) {
-    if (nextPageData.getStart() == 0 && allPages.getNextStart() != 0) {  // avoid first load
-      trackListingLastItem();
-    }
-  }
+		String photoId = photoDisplayInfo.getPhotoId();
+		List<PhotoDetails> allPhotos = allPages.getData();
+		for (PhotoDetails photo : allPhotos) {
+			if (photo.getIdentifierAsString().equals(photoId)) {
+				return photo;
+			}
+		}
 
-  public void trackListingLastItem() {
-    analyticsCollection.trackListingLastItem(currentListingType.getName(), allPages.getNextStart() - 1);
-  }
+		return null;
+	}
 
-  public PhotoDetailsDataPage getAllPages() {
-    return allPages;
-  }
-
-  public void loadNextPhotoPage() {
-    loadPhotoPage(allPages.getNextStart(), currentListingType);
-  }
-
-  public PhotoDetails findPhoto(PhotoDisplayInfo photoDisplayInfo) {
-    if (photoDisplayInfo == null) {
-      return null;
-    }
-
-    String photoId = photoDisplayInfo.getPhotoId();
-    List<PhotoDetails> allPhotos = allPages.getData();
-    for (PhotoDetails photo : allPhotos) {
-      if (photo.getIdentifierAsString().equals(photoId)) {
-        return photo;
-      }
-    }
-
-    return null;
-  }
-
-  public PhotoCategory getCurrentListingType() {
-    return currentListingType;
-  }
+	public PhotoCategory getCurrentListingType() {
+		return currentListingType;
+	}
 }

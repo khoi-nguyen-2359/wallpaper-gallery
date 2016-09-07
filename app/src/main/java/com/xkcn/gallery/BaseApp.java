@@ -14,23 +14,23 @@ import io.fabric.sdk.android.Fabric;
  * Created by khoinguyen on 12/25/14.
  */
 public class BaseApp extends Application {
-  private ApplicationComponent applicationComponent;
+	private ApplicationComponent applicationComponent;
 
-  @Override
-  public void onCreate() {
-    super.onCreate();
-    Fabric.with(this, new Crashlytics());
-    initInjector();
-    PhotoViewerKit.init(this);
-  }
+	@Override
+	public void onCreate() {
+		super.onCreate();
+		Fabric.with(this, new Crashlytics());
+		initInjector();
+		PhotoViewerKit.init(this);
+	}
 
-  private void initInjector() {
-    applicationComponent = DaggerApplicationComponent.builder()
-        .applicationModule(new ApplicationModule(this))
-        .build();
-  }
+	private void initInjector() {
+		applicationComponent = DaggerApplicationComponent.builder()
+			.applicationModule(new ApplicationModule(this))
+			.build();
+	}
 
-  public ApplicationComponent getApplicationComponent() {
-    return applicationComponent;
-  }
+	public ApplicationComponent getApplicationComponent() {
+		return applicationComponent;
+	}
 }

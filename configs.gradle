@@ -1,12 +1,12 @@
 ext {
-    androidCompileSdk = 23
-    androidMinSdk = 16
-    androidMaxSdk = 23
-    androidBuildToolVersion = "24.0.0"
-    androidSupportLibVersion = "24.0.0"
-    applicationId = "com.xkcn.gallery"
-    gmsVersion = "9.2.1"
-    frescoVersion = "0.11.0"
-    knUtilsVersion = "0.1.1"
-    firebaseVersion = "9.2.1"
+  androidCompileSdk = 23
+  androidMinSdk = 16
+  androidMaxSdk = 23
+  androidBuildToolVersion = "24.0.0"
+  androidSupportLibVersion = "24.0.0"
+  applicationId = "com.xkcn.gallery"
+  gmsVersion = "9.2.1"
+  frescoVersion = "0.11.0"
+  knUtilsVersion = "0.1.1"
+  firebaseVersion = "9.2.1"
 }

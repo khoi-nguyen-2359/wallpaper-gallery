@@ -10,21 +10,21 @@ import java.util.Map;
  */
 
 public class PhotoDownloadNotificationsInfo {
-  private Map<String, Integer> mapDownloadUrlNotificationIds = new HashMap<>();
-  private int currentMaxId = 0;
+	private Map<String, Integer> mapDownloadUrlNotificationIds = new HashMap<>();
+	private int currentMaxId = 0;
 
-  public int getId(PhotoDetails photoDetails) {
-    String downloadUrl = photoDetails.getDefaultDownloadUrl();
-    Integer nextId = mapDownloadUrlNotificationIds.get(downloadUrl);
-    if (nextId == null) {
-      nextId = generateUniqueId();
-      mapDownloadUrlNotificationIds.put(downloadUrl, nextId);
-    }
+	public int getId(PhotoDetails photoDetails) {
+		String downloadUrl = photoDetails.getDefaultDownloadUrl();
+		Integer nextId = mapDownloadUrlNotificationIds.get(downloadUrl);
+		if (nextId == null) {
+			nextId = generateUniqueId();
+			mapDownloadUrlNotificationIds.put(downloadUrl, nextId);
+		}
 
-    return nextId;
-  }
+		return nextId;
+	}
 
-  private Integer generateUniqueId() {
-    return ++currentMaxId;
-  }
+	private Integer generateUniqueId() {
+		return ++currentMaxId;
+	}
 }

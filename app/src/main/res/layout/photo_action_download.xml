@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <TextView
-    android:id="@+id/tv_download"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/PhotoActionText"
-    android:text="@string/photo_action_download"
-    android:layout_height="wrap_content" />
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	android:id="@+id/tv_download"
+	style="@style/PhotoActionText"
+	android:layout_height="wrap_content"
+	android:text="@string/photo_action_download"/>

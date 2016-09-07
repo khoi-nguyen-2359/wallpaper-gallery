@@ -2,25 +2,23 @@ package com.xkcn.gallery.view.interfaces;
 
 import com.xkcn.gallery.data.model.PhotoDetails;
 
-import java.io.File;
-
 /**
  * Created by khoinguyen on 12/13/15.
  */
 public interface MainView extends ScreenView {
-  void startActionUpdate();
+	void startActionUpdate();
 
-  void onPagingLoaded();
+	void onPagingLoaded();
 
-  void showWallpaperChooser(PhotoDetails photoDetails);
+	void showWallpaperChooser(PhotoDetails photoDetails);
 
-  void enablePaging();
+	void enablePaging();
 
-  void updateDownloadProgress(PhotoDetails photoDetails, Float progress);
+	void updateDownloadProgress(PhotoDetails photoDetails, Float progress);
 
-  void showDownloadComplete(PhotoDetails photoDetails);
+	void showDownloadComplete(PhotoDetails photoDetails);
 
-  void showDownloadError(PhotoDetails photoDetails, String message);
+	void showDownloadError(PhotoDetails photoDetails, String message);
 
-  void showSharingChooser(PhotoDetails photoDetails);
+	void showSharingChooser(PhotoDetails photoDetails);
 }

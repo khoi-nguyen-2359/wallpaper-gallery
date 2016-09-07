@@ -10,135 +10,127 @@ import com.xkcn.gallery.view.interfaces.MainView;
 
 import javax.inject.Inject;
 
-import rx.Observable;
-import rx.Observer;
 import rx.Scheduler;
 import rx.Subscriber;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
-import rx.observables.ConnectableObservable;
 
 /**
  * Created by khoinguyen on 12/14/15.
  */
 public class MainViewPresenter {
-  private MainView view;
+	@Inject
+	PhotoFileManager photoFileManager;
+	@Inject
+	PreferenceRepository prefDataStore;
+	@Inject
+	Scheduler rxIoScheduler;
+	@Inject
+	AnalyticsCollection analyticsCollection;
+	private MainView view;
+	/**
+	 * MainView has one task that is requisite and block the UI
+	 */
+	private Subscription blockingTask;
 
-  @Inject
-  PhotoFileManager photoFileManager;
+	public MainViewPresenter(MainView view) {
+		this.view = view;
+	}
 
-  @Inject
-  PreferenceRepository prefDataStore;
+	public void loadWallpaperSetting(final PhotoDetails photoDetails) {
+		view.showProgressLoading(R.string.photo_gallery_downloading_message);
 
-  @Inject
-  Scheduler rxIoScheduler;
+		blockingTask = photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Subscriber<Float>() {
+				@Override
+				public void onCompleted() {
+					view.hideLoading();
+					view.showWallpaperChooser(photoDetails);
+				}
 
-  @Inject
-  AnalyticsCollection analyticsCollection;
+				@Override
+				public void onError(Throwable e) {
+					view.hideLoading();
+					view.showToast(e.getMessage());
+				}
 
-  /**
-   * MainView has one task that is requisite and block the UI
-   */
-  private Subscription blockingTask;
+				@Override
+				public void onNext(Float progress) {
+					L.get().d("load wallpaper onNext %f", progress);
+					view.updateProgressLoading((int) (progress * 100));
+				}
+			});
+	}
 
-  public MainViewPresenter(MainView view) {
-    this.view = view;
-  }
+	public void checkToCrawlPhoto() {
+		if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - prefDataStore.getUpdatePeriod()) {
+			view.startActionUpdate();
+		}
+	}
 
-  public void loadWallpaperSetting(final PhotoDetails photoDetails) {
-    view.showProgressLoading(R.string.photo_gallery_downloading_message);
+	public void downloadPhoto(final PhotoDetails photoDetails) {
+		if (photoDetails == null) {
+			return;
+		}
 
-    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Float>() {
-          @Override
-          public void onCompleted() {
-            view.hideLoading();
-            view.showWallpaperChooser(photoDetails);
-          }
+		photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Subscriber<Float>() {
+				@Override
+				public void onCompleted() {
+					view.showDownloadComplete(photoDetails);
+				}
 
-          @Override
-          public void onError(Throwable e) {
-            view.hideLoading();
-            view.showToast(e.getMessage());
-          }
+				@Override
+				public void onError(Throwable e) {
+					view.showDownloadError(photoDetails, e.getMessage());
+				}
 
-          @Override
-          public void onNext(Float progress) {
-            L.get().d("load wallpaper onNext %f", progress);
-            view.updateProgressLoading((int) (progress * 100));
-          }
-        });
-  }
+				@Override
+				public void onNext(Float progress) {
+					L.get().d("download onNext %f", progress);
+					view.updateDownloadProgress(photoDetails, progress);
+				}
+			});
+	}
 
-  public void checkToCrawlPhoto() {
-    if (prefDataStore.getLastPhotoCrawlTime() < System.currentTimeMillis() - prefDataStore.getUpdatePeriod()) {
-      view.startActionUpdate();
-    }
-  }
+	public void sharePhoto(final PhotoDetails photoDetails) {
+		if (photoDetails == null) {
+			return;
+		}
 
-  public void downloadPhoto(final PhotoDetails photoDetails) {
-    if (photoDetails == null) {
-      return;
-    }
+		view.showProgressLoading(R.string.photo_gallery_downloading_message);
+		blockingTask = photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
+			.observeOn(AndroidSchedulers.mainThread())
+			.subscribe(new Subscriber<Float>() {
+				@Override
+				public void onCompleted() {
+					view.hideLoading();
+					view.showSharingChooser(photoDetails);
+				}
 
-    photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Float>() {
-          @Override
-          public void onCompleted() {
-            view.showDownloadComplete(photoDetails);
-          }
+				@Override
+				public void onError(Throwable e) {
+					view.hideLoading();
+					view.showToast(e.getMessage());
+				}
 
-          @Override
-          public void onError(Throwable e) {
-            view.showDownloadError(photoDetails, e.getMessage());
-          }
+				@Override
+				public void onNext(Float progress) {
+					L.get().d("share onNext %f", progress);
+					view.updateProgressLoading((int) (progress * 100));
+				}
+			});
+	}
 
-          @Override
-          public void onNext(Float progress) {
-            L.get().d("download onNext %f", progress);
-            view.updateDownloadProgress(photoDetails, progress);
-          }
-        });
-  }
+	public void cancelBlockingTask() {
+		if (blockingTask != null) {
+			L.get().d("cancel blocking task");
+			blockingTask.unsubscribe();
+			blockingTask = null;
+		}
 
-  public void sharePhoto(final PhotoDetails photoDetails) {
-    if (photoDetails == null) {
-      return;
-    }
-
-    view.showProgressLoading(R.string.photo_gallery_downloading_message);
-    blockingTask = photoFileManager.getPhotoFileObservable(photoDetails, rxIoScheduler)
-        .observeOn(AndroidSchedulers.mainThread())
-        .subscribe(new Subscriber<Float>() {
-          @Override
-          public void onCompleted() {
-            view.hideLoading();
-            view.showSharingChooser(photoDetails);
-          }
-
-          @Override
-          public void onError(Throwable e) {
-            view.hideLoading();
-            view.showToast(e.getMessage());
-          }
-
-          @Override
-          public void onNext(Float progress) {
-            L.get().d("share onNext %f", progress);
-            view.updateProgressLoading((int) (progress * 100));
-          }
-        });
-  }
-
-  public void cancelBlockingTask() {
-    if (blockingTask != null) {
-      L.get().d("cancel blocking task");
-      blockingTask.unsubscribe();
-      blockingTask = null;
-    }
-
-    view.hideLoading();
-  }
+		view.hideLoading();
+	}
 }

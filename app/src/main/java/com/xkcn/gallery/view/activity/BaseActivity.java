@@ -4,7 +4,6 @@ import android.app.NotificationManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
-import com.google.firebase.analytics.FirebaseAnalytics;
 import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
@@ -21,39 +20,39 @@ import javax.inject.Inject;
  * Created by khoinguyen on 2/1/16.
  */
 public abstract class BaseActivity extends AppCompatActivity {
-  @Inject
-  PhotoDetailsRepository photoDetailsRepository;
-  @Inject
-  PreferenceRepository preferenceRepository;
-  @Inject
-  PhotoTagRepository photoTagRepository;
-  @Inject
-  PhotoFileManager photoFileManager;
-  @Inject
-  PhotoListingUsecase photoListingUsecase;
-  @Inject
-  PreferencesUsecase preferencesUsecase;
-  @Inject
-  AnalyticsCollection analyticsCollection;
+	@Inject
+	PhotoDetailsRepository photoDetailsRepository;
+	@Inject
+	PreferenceRepository preferenceRepository;
+	@Inject
+	PhotoTagRepository photoTagRepository;
+	@Inject
+	PhotoFileManager photoFileManager;
+	@Inject
+	PhotoListingUsecase photoListingUsecase;
+	@Inject
+	PreferencesUsecase preferencesUsecase;
+	@Inject
+	AnalyticsCollection analyticsCollection;
 
-  private NotificationManager notificationManager;
+	private NotificationManager notificationManager;
 
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+	@Override
+	protected void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
 
-    getApplicationComponent().inject(this);
-  }
+		getApplicationComponent().inject(this);
+	}
 
-  protected ApplicationComponent getApplicationComponent() {
-    return ((BaseApp) getApplication()).getApplicationComponent();
-  }
+	protected ApplicationComponent getApplicationComponent() {
+		return ((BaseApp) getApplication()).getApplicationComponent();
+	}
 
-  public NotificationManager getNotificationManager() {
-    if (notificationManager == null) {
-      notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-    }
+	public NotificationManager getNotificationManager() {
+		if (notificationManager == null) {
+			notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+		}
 
-    return notificationManager;
-  }
+		return notificationManager;
+	}
 }
