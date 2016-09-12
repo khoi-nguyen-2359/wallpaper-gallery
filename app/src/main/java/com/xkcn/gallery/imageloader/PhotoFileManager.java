@@ -15,7 +15,7 @@ import com.facebook.imagepipeline.request.ImageRequest;
 import com.facebook.imagepipeline.request.ImageRequestBuilder;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
 import com.xkcn.gallery.util.AndroidUtils;
 
 import java.io.BufferedOutputStream;

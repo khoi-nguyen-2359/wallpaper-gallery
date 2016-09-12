@@ -8,6 +8,8 @@ import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.di.component.DaggerApplicationComponent;
 import com.xkcn.gallery.di.module.ApplicationModule;
 
+import net.danlew.android.joda.JodaTimeAndroid;
+
 import io.fabric.sdk.android.Fabric;
 
 /**
@@ -22,6 +24,7 @@ public class BaseApp extends Application {
 		Fabric.with(this, new Crashlytics());
 		initInjector();
 		PhotoViewerKit.init(this);
+		JodaTimeAndroid.init(this);
 	}
 
 	private void initInjector() {

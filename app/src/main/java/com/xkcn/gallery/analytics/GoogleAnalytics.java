@@ -5,7 +5,7 @@ import android.content.Context;
 import com.google.android.gms.analytics.HitBuilders;
 import com.google.android.gms.analytics.Tracker;
 import com.xkcn.gallery.BuildConfig;
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
 
 /**
  * Created by khoinguyen on 7/21/16.

@@ -1,8 +1,8 @@
 package com.xkcn.gallery.usecase;
 
-import com.xkcn.gallery.data.model.DataPage;
-import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
+import com.xkcn.gallery.model.DataPage;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
+import com.xkcn.gallery.data.local.repo.PhotoDetailsRepository;
 
 import java.util.List;
 
@@ -25,6 +25,18 @@ public class PhotoListingUsecase {
 			public void call(Subscriber<? super Integer> subscriber) {
 				int pageCount = photoDetailsRepository.getPageCount(perPage);
 				subscriber.onNext(pageCount);
+				subscriber.onCompleted();
+			}
+		});
+	}
+
+	public Observable<DataPage<PhotoDetails>> getPhotoPageByCommand(final String cmd, final int start, final int count) {
+		return Observable.create(new Observable.OnSubscribe<DataPage<PhotoDetails>>() {
+			@Override
+			public void call(Subscriber<? super DataPage<PhotoDetails>> subscriber) {
+				List<PhotoDetails> photos = photoDetailsRepository.getPhotoDetails(cmd, start, count);
+				DataPage<PhotoDetails> photoPage = new DataPage<>(photos, start);
+				subscriber.onNext(photoPage);
 				subscriber.onCompleted();
 			}
 		});

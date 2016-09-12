@@ -1,6 +1,6 @@
 package com.xkcn.gallery.usecase;
 
-import com.xkcn.gallery.data.repo.PreferenceRepository;
+import com.xkcn.gallery.manager.LocalConfigManager;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -9,9 +9,9 @@ import rx.Subscriber;
  * Created by khoinguyen on 4/17/16.
  */
 public class PreferencesUsecase {
-	private PreferenceRepository prefRepo;
+	private LocalConfigManager prefRepo;
 
-	public PreferencesUsecase(PreferenceRepository prefRepo) {
+	public PreferencesUsecase(LocalConfigManager prefRepo) {
 		this.prefRepo = prefRepo;
 	}
 

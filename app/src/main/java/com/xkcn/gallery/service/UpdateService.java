@@ -12,12 +12,12 @@ import android.webkit.WebViewClient;
 
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.model.ModelConstants;
-import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.model.PhotoTag;
-import com.xkcn.gallery.data.repo.PhotoDetailsRepository;
-import com.xkcn.gallery.data.repo.PhotoTagRepository;
-import com.xkcn.gallery.data.repo.PreferenceRepository;
+import com.xkcn.gallery.data.local.model.ModelConstants;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
+import com.xkcn.gallery.data.local.model.PhotoTag;
+import com.xkcn.gallery.data.local.repo.PhotoDetailsRepository;
+import com.xkcn.gallery.data.local.repo.PhotoTagRepository;
+import com.xkcn.gallery.manager.LocalConfigManager;
 import com.xkcn.gallery.event.CrawlNextPageEvent;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 
@@ -40,7 +40,7 @@ public class UpdateService extends Service {
 
 	public static final String ACTION_UPDATE = "com.xkcn.crawler.action.UPDATE";
 	@Inject
-	PreferenceRepository prefDataStore;
+	LocalConfigManager prefDataStore;
 	@Inject
 	PhotoDetailsRepository photoDetailsRepository;
 	@Inject

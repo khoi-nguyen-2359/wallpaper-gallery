@@ -1,6 +1,6 @@
 package com.xkcn.gallery.analytics;
 
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
 
 /**
  * Created by khoinguyen on 7/20/16.

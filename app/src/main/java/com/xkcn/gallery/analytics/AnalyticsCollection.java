@@ -1,7 +1,7 @@
 package com.xkcn.gallery.analytics;
 
 import com.crashlytics.android.Crashlytics;
-import com.xkcn.gallery.data.model.PhotoDetails;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
 
 import java.util.ArrayList;
 import java.util.List;

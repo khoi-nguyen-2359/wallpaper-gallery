@@ -3,14 +3,14 @@ package com.xkcn.gallery.presenter;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
-import com.xkcn.gallery.data.model.DataPage;
-import com.xkcn.gallery.data.model.PhotoCategory;
-import com.xkcn.gallery.data.model.PhotoDetails;
-import com.xkcn.gallery.data.model.PhotoDetailsDataPage;
+import com.xkcn.gallery.model.DataPage;
+import com.xkcn.gallery.data.local.model.PhotoCategory;
+import com.xkcn.gallery.data.local.model.PhotoDetails;
+import com.xkcn.gallery.model.PhotoDetailsDataPage;
 import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
-import com.xkcn.gallery.view.interfaces.MainView;
+import com.xkcn.gallery.view.interfaces.PhotoCollectionView;
 
 import java.util.List;
 
@@ -35,7 +35,7 @@ public class PhotoListingViewPresenter {
 	Scheduler rxIoScheduler;
 	@Inject
 	AnalyticsCollection analyticsCollection;
-	private MainView view;
+	private PhotoCollectionView view;
 	private Observable<Integer> photoPerPageObservable;
 
 	private PhotoCategory currentListingType;
@@ -47,7 +47,7 @@ public class PhotoListingViewPresenter {
 		component.inject(allPages);
 	}
 
-	public void setView(MainView view) {
+	public void setView(PhotoCollectionView view) {
 		this.view = view;
 	}
 
@@ -63,15 +63,15 @@ public class PhotoListingViewPresenter {
 	 * @param startIndex start item to load
 	 * @param category   type of current listing
 	 */
-	public void loadPhotoPage(final int startIndex, final PhotoCategory category) {
+	public void loadPhotoPage(final int startIndex, PhotoCategory category) {
 		currentListingType = category;
 		getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<DataPage<PhotoDetails>>>() {
 			@Override
 			public Observable<DataPage<PhotoDetails>> call(Integer perPage) {
 				Observable<DataPage<PhotoDetails>> photoQueryObservable = null;
-				if (category.getId() == PhotoCategory.HOSTEST.getId()) {
+				if (currentListingType.getId() == PhotoCategory.HOSTEST.getId()) {
 					photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(startIndex, perPage);
-				} else if (category.getId() == PhotoCategory.LATEST.getId()) {
+				} else if (currentListingType.getId() == PhotoCategory.LATEST.getId()) {
 					photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(startIndex, perPage);
 				} else {
 					photoQueryObservable = Observable.empty();
