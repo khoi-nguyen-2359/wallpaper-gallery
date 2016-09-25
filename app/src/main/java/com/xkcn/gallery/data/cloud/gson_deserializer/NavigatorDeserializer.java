@@ -1,11 +1,12 @@
-package com.xkcn.gallery.data.remote.gson_deserializer;
+package com.xkcn.gallery.data.cloud.gson_deserializer;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
-import com.xkcn.gallery.data.remote.DataContracts;
+import com.xkcn.gallery.data.cloud.DataContracts;
+import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.view.navigator.CollectionNavigator;
 import com.xkcn.gallery.view.navigator.Navigator;
 
@@ -25,16 +26,23 @@ public class NavigatorDeserializer implements JsonDeserializer<Navigator> {
 		}
 
 		JsonObject jsonObject = json.getAsJsonObject();
-		String navigatorType = jsonObject.getAsJsonPrimitive("type").getAsString();
-		navigator = parseCollectionNavigator(navigatorType, jsonObject);
+		String navigatorType = jsonObject.getAsJsonPrimitive(DataContracts.NAVIGATOR_TYPE).getAsString();
+		navigator = parseCollectionNavigator(navigatorType, jsonObject, context);
 
 		return navigator;
 	}
 
-	private Navigator parseCollectionNavigator(String navigatorType, JsonObject jsonObject) {
+	private Navigator parseCollectionNavigator(String navigatorType, JsonObject jsonObject, JsonDeserializationContext context) {
 		if (DataContracts.NAVIGATOR_TYPE_COLLECTION.equalsIgnoreCase(navigatorType)) {
-			String data = jsonObject.getAsJsonPrimitive("data").getAsString();
-			return new CollectionNavigator(data);
+			CollectionNavigator navigator = new CollectionNavigator();
+
+			JsonObject photoColJsonObj = jsonObject.getAsJsonObject(DataContracts.NAVIGATOR_PHOTO_COLLECTION);
+			if (!photoColJsonObj.isJsonNull()) {
+				PhotoCollection photoCollection = context.deserialize(photoColJsonObj, PhotoCollection.class);
+				navigator.setPhotoCollection(photoCollection);
+			}
+
+			return navigator;
 		}
 
 		return null;

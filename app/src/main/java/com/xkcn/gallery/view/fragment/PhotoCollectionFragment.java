@@ -33,10 +33,11 @@ import com.khoinguyen.photoviewerkit.util.BottomLoadingIndicatorAdapter;
 import com.khoinguyen.ui.UiUtils;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
+import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
 import com.xkcn.gallery.model.PhotoDownloadNotificationsInfo;
 import com.xkcn.gallery.presenter.PhotoCollectionPresenter;
-import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
+import com.xkcn.gallery.presenter.PhotoCollectionViewPresenter;
 import com.xkcn.gallery.view.dialog.PhotoDownloadProgressDialog;
 import com.xkcn.gallery.view.interfaces.PhotoCollectionView;
 
@@ -55,12 +56,12 @@ import butterknife.Unbinder;
  */
 
 public class PhotoCollectionFragment extends BaseFragment implements PhotoCollectionView {
-	private static final String ARG_COMMAND = "ARG_COMMAND";
+	private static final String ARG_PHOTO_COLLECTION = "ARG_PHOTO_COLLECTION";
 
-	public static PhotoCollectionFragment instantiate(String command) {
+	public static PhotoCollectionFragment instantiate(PhotoCollection photoCollection) {
 		PhotoCollectionFragment f = new PhotoCollectionFragment();
 		Bundle args = new Bundle();
-		args.putString(ARG_COMMAND, command);
+		args.putSerializable(ARG_PHOTO_COLLECTION, photoCollection);
 		f.setArguments(args);
 
 		return f;
@@ -87,7 +88,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	private NotificationCompat.Builder downloadNotificationBuilder;
 	protected PhotoDownloadNotificationsInfo downloadNotificationsInfo = new PhotoDownloadNotificationsInfo();
 
-	private PhotoListingViewPresenter photoListingPresenter;
+	private PhotoCollectionViewPresenter photoListingPresenter;
 	private PhotoCollectionPresenter photoCollectionPresenter;
 
 	private IEventBus photoViewerKitEventBus;
@@ -97,11 +98,23 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	private PhotoGalleryAdapter photoGalleryAdapter;
 	private PhotoActionAdapter photoActionAdapter;
 
+	private PhotoCollection photoCollection;
+
 	@Override
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		readArgs();
 		setupDi();
 		setupData();
+	}
+
+	private void readArgs() {
+		Bundle args = getArguments();
+		if (args == null) {
+			return;
+		}
+
+		photoCollection = (PhotoCollection) args.getSerializable(ARG_PHOTO_COLLECTION);
 	}
 
 	@Nullable
@@ -111,6 +124,13 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		unbinder = ButterKnife.bind(this, rootView);
 		setupViews();
 		return rootView;
+	}
+
+	@Override
+	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+		super.onViewCreated(view, savedInstanceState);
+
+		photoListingPresenter.loadPhotoPage(0, photoCollection.getQuery());
 	}
 
 	@Override
@@ -150,8 +170,9 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		photoCollectionPresenter = new PhotoCollectionPresenter(photoFileManager, localConfigManager, schedulerBackground, remoteConfigManager);
 		photoCollectionPresenter.setView(this);
 
-		photoListingPresenter = new PhotoListingViewPresenter(getApplicationComponent());
+		photoListingPresenter = new PhotoCollectionViewPresenter(photoCollection);
 		photoListingPresenter.setView(this);
+		getApplicationComponent().inject(photoListingPresenter);
 	}
 
 	private void setupViews() {

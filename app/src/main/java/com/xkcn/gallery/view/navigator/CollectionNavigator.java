@@ -5,6 +5,7 @@ import android.support.v4.app.FragmentManager;
 
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
+import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.view.fragment.PhotoCollectionFragment;
 
 /**
@@ -12,11 +13,7 @@ import com.xkcn.gallery.view.fragment.PhotoCollectionFragment;
  */
 
 public class CollectionNavigator implements Navigator {
-	private String data;
-
-	public CollectionNavigator(String data) {
-		this.data = data;
-	}
+	private PhotoCollection photoCollection;
 
 	@Override
 	public void navigate(FragmentActivity activity) {
@@ -25,15 +22,15 @@ public class CollectionNavigator implements Navigator {
 		FragmentManager fragMan = activity.getSupportFragmentManager();
 		fragMan
 			.beginTransaction()
-			.replace(R.id.fragment_container, PhotoCollectionFragment.instantiate(data))
+			.replace(R.id.fragment_container, PhotoCollectionFragment.instantiate(photoCollection))
 			.commit();
 	}
 
-	public String getData() {
-		return data;
+	public PhotoCollection getPhotoCollection() {
+		return photoCollection;
 	}
 
-	public void setData(String data) {
-		this.data = data;
+	public void setPhotoCollection(PhotoCollection photoCollection) {
+		this.photoCollection = photoCollection;
 	}
 }

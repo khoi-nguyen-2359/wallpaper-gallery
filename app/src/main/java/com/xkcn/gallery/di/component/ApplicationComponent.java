@@ -4,7 +4,7 @@ import com.xkcn.gallery.di.module.ApplicationModule;
 import com.xkcn.gallery.di.module.SystemServiceModule;
 import com.xkcn.gallery.model.PhotoDetailsDataPage;
 import com.xkcn.gallery.presenter.PhotoCollectionPresenter;
-import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
+import com.xkcn.gallery.presenter.PhotoCollectionViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.view.activity.BaseActivity;
 import com.xkcn.gallery.view.activity.SplashActivity;
@@ -31,7 +31,7 @@ public interface ApplicationComponent {
 
 	void inject(PhotoCollectionPresenter photoCollectionPresenter);
 
-	void inject(PhotoListingViewPresenter photoListingViewPresenter);
+	void inject(PhotoCollectionViewPresenter photoCollectionViewPresenter);
 
 	void inject(PhotoDetailsDataPage allPages);
 

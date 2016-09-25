@@ -22,10 +22,10 @@ public class AnalyticsCollection implements IAnalytics {
 	}
 
 	@Override
-	public void trackListingLastItem(String categoryName, int lastPhotoIndex) {
+	public void trackListingLastItem(String collectionName, int lastPhotoIndex) {
 		for (IAnalytics t : trackers) {
 			try {
-				t.trackListingLastItem(categoryName, lastPhotoIndex);
+				t.trackListingLastItem(collectionName, lastPhotoIndex);
 			} catch (Exception ex) {
 				Crashlytics.logException(ex);
 			}

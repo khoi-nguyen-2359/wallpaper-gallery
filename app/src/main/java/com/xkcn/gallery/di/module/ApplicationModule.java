@@ -15,7 +15,7 @@ import com.xkcn.gallery.data.local.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.local.repo.PhotoDetailsSqliteRepository;
 import com.xkcn.gallery.data.local.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.local.repo.PhotoTagSqliteRepository;
-import com.xkcn.gallery.data.remote.gson_deserializer.NavigatorDeserializer;
+import com.xkcn.gallery.data.cloud.gson_deserializer.NavigatorDeserializer;
 import com.xkcn.gallery.manager.LocalConfigManager;
 import com.xkcn.gallery.manager.RemoteConfigManager;
 import com.xkcn.gallery.manager.impl.LocalConfigManagerImpl;

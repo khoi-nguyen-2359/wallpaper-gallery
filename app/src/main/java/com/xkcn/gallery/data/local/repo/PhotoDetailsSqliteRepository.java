@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.khoinguyen.util.log.L;
-import com.xkcn.gallery.data.local.model.ModelConstants;
+import com.xkcn.gallery.data.local.ModelConstants;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
 
 import java.util.ArrayList;

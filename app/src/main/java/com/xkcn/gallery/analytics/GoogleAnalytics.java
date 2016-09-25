@@ -25,7 +25,7 @@ public class GoogleAnalytics implements IAnalytics {
 
 	private static final String LABEL_END = "End";
 
-	private static final int DIMEN_PHOTO_CAT = 1;
+	private static final int DIMEN_PHOTO_COLLECTION = 1;
 	private static final int DIMEN_PHOTO_ID = 2;
 	private static final int DIMEN_PHOTO_INDEX = 3;
 	private static final int DIMEN_PHOTO_TITLE = 4;
@@ -78,12 +78,12 @@ public class GoogleAnalytics implements IAnalytics {
 	}
 
 	@Override
-	public void trackListingLastItem(String categoryName, int lastPhotoIndex) {
+	public void trackListingLastItem(String collectionName, int lastPhotoIndex) {
 		tracker.send(new HitBuilders.EventBuilder()
 			.setCategory(CAT_LISTING)
 			.setAction(ACTION_LOAD)
 			.setLabel(LABEL_END)
-			.setCustomDimension(DIMEN_PHOTO_CAT, categoryName)
+			.setCustomDimension(DIMEN_PHOTO_COLLECTION, collectionName)
 			.setCustomDimension(DIMEN_PHOTO_INDEX, formatPhotoIndex(lastPhotoIndex))
 			.build()
 		);

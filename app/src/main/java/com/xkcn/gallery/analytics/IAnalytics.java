@@ -10,10 +10,10 @@ public interface IAnalytics {
 	/**
 	 * Track how long did user scroll to view photos.
 	 *
-	 * @param categoryName   name of showing category to track
+	 * @param collectionName   name of showing category to track
 	 * @param lastPhotoIndex the photo index at end of listing
 	 */
-	void trackListingLastItem(String categoryName, int lastPhotoIndex);
+	void trackListingLastItem(String collectionName, int lastPhotoIndex);
 
 	void trackGalleryPhotoScreenView(PhotoDetails photoDetails);
 

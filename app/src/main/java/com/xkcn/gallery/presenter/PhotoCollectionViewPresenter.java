@@ -3,11 +3,10 @@ package com.xkcn.gallery.presenter;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
-import com.xkcn.gallery.model.DataPage;
-import com.xkcn.gallery.data.local.model.PhotoCategory;
+import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
+import com.xkcn.gallery.model.DataPage;
 import com.xkcn.gallery.model.PhotoDetailsDataPage;
-import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.view.interfaces.PhotoCollectionView;
@@ -26,7 +25,7 @@ import rx.functions.Func1;
 /**
  * Created by khoinguyen on 12/18/15.
  */
-public class PhotoListingViewPresenter {
+public class PhotoCollectionViewPresenter {
 	@Inject
 	PhotoListingUsecase photoListingUsecase;
 	@Inject
@@ -35,16 +34,15 @@ public class PhotoListingViewPresenter {
 	Scheduler rxIoScheduler;
 	@Inject
 	AnalyticsCollection analyticsCollection;
+
 	private PhotoCollectionView view;
 	private Observable<Integer> photoPerPageObservable;
 
-	private PhotoCategory currentListingType;
-
 	private PhotoDetailsDataPage allPages = new PhotoDetailsDataPage();
+	private PhotoCollection photoCollection;
 
-	public PhotoListingViewPresenter(ApplicationComponent component) {
-		component.inject(this);
-		component.inject(allPages);
+	public PhotoCollectionViewPresenter(PhotoCollection photoCollection) {
+		this.photoCollection = photoCollection;
 	}
 
 	public void setView(PhotoCollectionView view) {
@@ -55,39 +53,26 @@ public class PhotoListingViewPresenter {
 		return (photoPerPageObservable == null ? photoPerPageObservable = preferencesUsecase.getListingPagerPerPage() : photoPerPageObservable).cache();
 	}
 
-	private void loadPhotoPage(PhotoCategory category) {
-
-	}
-
-	/**
-	 * @param startIndex start item to load
-	 * @param category   type of current listing
-	 */
-	public void loadPhotoPage(final int startIndex, PhotoCategory category) {
-		currentListingType = category;
+	public void loadPhotoPage(final int startIndex, final String command) {
 		getPhotoPerPageObservable().flatMap(new Func1<Integer, Observable<DataPage<PhotoDetails>>>() {
 			@Override
 			public Observable<DataPage<PhotoDetails>> call(Integer perPage) {
-				Observable<DataPage<PhotoDetails>> photoQueryObservable = null;
-				if (currentListingType.getId() == PhotoCategory.HOSTEST.getId()) {
-					photoQueryObservable = photoListingUsecase.createHotestPhotoDetailsObservable(startIndex, perPage);
-				} else if (currentListingType.getId() == PhotoCategory.LATEST.getId()) {
-					photoQueryObservable = photoListingUsecase.createLatestPhotoDetailsObservable(startIndex, perPage);
-				} else {
-					photoQueryObservable = Observable.empty();
-				}
-
-				return photoQueryObservable;
+				return photoListingUsecase.getPhotoPageByCommand(command, startIndex, perPage);
 			}
 		})
 			.doOnNext(new Action1<DataPage<PhotoDetails>>() {
 				@Override
 				public void call(DataPage<PhotoDetails> nextPageData) {
 					checkToTrackingListingLastItem(nextPageData);
-
-					allPages.append(nextPageData);
 				}
 			})    // call append in doOnNext because it takes much time to finish
+			.map(new Func1<DataPage<PhotoDetails>, DataPage<PhotoDetails>>() {
+				@Override
+				public DataPage<PhotoDetails> call(DataPage<PhotoDetails> photoDetailsDataPage) {
+					allPages.append(photoDetailsDataPage);;
+					return allPages;
+				}
+			})
 			.subscribeOn(rxIoScheduler)
 			.observeOn(AndroidSchedulers.mainThread())
 			.subscribe(new Observer<DataPage<PhotoDetails>>() {
@@ -118,7 +103,7 @@ public class PhotoListingViewPresenter {
 	}
 
 	public void trackListingLastItem() {
-		analyticsCollection.trackListingLastItem(currentListingType.getName(), allPages.getNextStart() - 1);
+		analyticsCollection.trackListingLastItem(photoCollection.getName(), allPages.getNextStart() - 1);
 	}
 
 	public PhotoDetailsDataPage getAllPages() {
@@ -126,7 +111,7 @@ public class PhotoListingViewPresenter {
 	}
 
 	public void loadNextPhotoPage() {
-		loadPhotoPage(allPages.getNextStart(), currentListingType);
+		loadPhotoPage(allPages.getNextStart(), photoCollection.getQuery());
 	}
 
 	public PhotoDetails findPhoto(PhotoDisplayInfo photoDisplayInfo) {
@@ -143,9 +128,5 @@ public class PhotoListingViewPresenter {
 		}
 
 		return null;
-	}
-
-	public PhotoCategory getCurrentListingType() {
-		return currentListingType;
 	}
 }

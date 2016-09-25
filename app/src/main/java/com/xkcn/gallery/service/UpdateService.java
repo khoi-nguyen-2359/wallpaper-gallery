@@ -12,7 +12,7 @@ import android.webkit.WebViewClient;
 
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.BaseApp;
-import com.xkcn.gallery.data.local.model.ModelConstants;
+import com.xkcn.gallery.data.local.ModelConstants;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
 import com.xkcn.gallery.data.local.model.PhotoTag;
 import com.xkcn.gallery.data.local.repo.PhotoDetailsRepository;

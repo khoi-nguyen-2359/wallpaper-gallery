@@ -1,4 +1,4 @@
-package com.xkcn.gallery.data.local.model;
+package com.xkcn.gallery.data.local;
 
 /**
  * Created by khoinguyen on 3/20/16.
