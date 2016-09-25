@@ -1,6 +1,6 @@
 package com.xkcn.gallery.view.navigator;
 
-import com.xkcn.gallery.view.activity.BaseActivity;
+import android.support.v4.app.FragmentActivity;
 
 import java.io.Serializable;
 
@@ -8,5 +8,5 @@ import java.io.Serializable;
  * Created by khoinguyen on 9/11/16.
  */
 public interface Navigator extends Serializable {
-	void navigate(BaseActivity mainActivity);
+	void navigate(FragmentActivity mainActivity);
 }

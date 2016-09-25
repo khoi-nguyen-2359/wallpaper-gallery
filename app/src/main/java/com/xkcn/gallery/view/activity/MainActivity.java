@@ -54,7 +54,6 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 		super.onStart();
 		mainViewPresenter.checkToCrawlPhoto();
 		EventBus.getDefault().register(this);
-
 	}
 
 	@Override

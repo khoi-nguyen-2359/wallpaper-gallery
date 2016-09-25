@@ -34,14 +34,11 @@ import com.khoinguyen.ui.UiUtils;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
-import com.xkcn.gallery.di.module.SystemServiceModule;
 import com.xkcn.gallery.model.PhotoDownloadNotificationsInfo;
 import com.xkcn.gallery.presenter.PhotoCollectionPresenter;
 import com.xkcn.gallery.presenter.PhotoListingViewPresenter;
 import com.xkcn.gallery.view.dialog.PhotoDownloadProgressDialog;
 import com.xkcn.gallery.view.interfaces.PhotoCollectionView;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -120,7 +117,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	public void onStart() {
 		super.onStart();
 
-		EventBus.getDefault().register(this);
+//		EventBus.getDefault().register(this);
 		photoViewerKitEventBus.register(photoKitEventListener);
 	}
 
@@ -128,7 +125,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	public void onStop() {
 		super.onStop();
 
-		EventBus.getDefault().unregister(this);
+//		EventBus.getDefault().unregister(this);
 		photoViewerKitEventBus.unregister(photoKitEventListener);
 	}
 
@@ -146,7 +143,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	}
 
 	private void setupDi() {
-		getApplicationComponent().systemServiceComponent(new SystemServiceModule(getContext())).inject(this);
+		getApplicationComponent().inject(this);
 	}
 
 	private void setupData() {
@@ -155,14 +152,6 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 
 		photoListingPresenter = new PhotoListingViewPresenter(getApplicationComponent());
 		photoListingPresenter.setView(this);
-
-		photoListingAdapter = new PhotoListingAdapter();
-		photoListingAdapter.registerListingItemType(photoListingView.new PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
-
-		photoGalleryAdapter = new PhotoGalleryAdapter();
-		photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
-
-		photoActionAdapter = new PhotoActionAdapter();
 	}
 
 	private void setupViews() {
@@ -171,6 +160,14 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		photoViewerKitEventBus = photoKitWidget.getEventBus();
 
 		photoKitWidget.setPagingListener(listingPagingListener);
+
+		photoListingAdapter = new PhotoListingAdapter();
+		photoListingAdapter.registerListingItemType(photoListingView.new PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
+
+		photoGalleryAdapter = new PhotoGalleryAdapter();
+		photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
+
+		photoActionAdapter = new PhotoActionAdapter();
 
 		photoListingView.setPhotoAdapter(photoListingAdapter);
 		photoGalleryView.setPhotoAdapter(photoGalleryAdapter);

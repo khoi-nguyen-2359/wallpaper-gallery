@@ -26,14 +26,15 @@ public class NavigatorDeserializer implements JsonDeserializer<Navigator> {
 
 		JsonObject jsonObject = json.getAsJsonObject();
 		String navigatorType = jsonObject.getAsJsonPrimitive("type").getAsString();
-		navigator = parseCollectionNavigator(navigatorType);
+		navigator = parseCollectionNavigator(navigatorType, jsonObject);
 
 		return navigator;
 	}
 
-	private Navigator parseCollectionNavigator(String navigatorType) {
+	private Navigator parseCollectionNavigator(String navigatorType, JsonObject jsonObject) {
 		if (DataContracts.NAVIGATOR_TYPE_COLLECTION.equalsIgnoreCase(navigatorType)) {
-			return new CollectionNavigator();
+			String data = jsonObject.getAsJsonPrimitive("data").getAsString();
+			return new CollectionNavigator(data);
 		}
 
 		return null;

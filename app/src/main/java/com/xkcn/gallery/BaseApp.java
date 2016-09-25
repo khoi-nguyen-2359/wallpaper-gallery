@@ -7,6 +7,7 @@ import com.khoinguyen.photoviewerkit.impl.PhotoViewerKit;
 import com.xkcn.gallery.di.component.ApplicationComponent;
 import com.xkcn.gallery.di.component.DaggerApplicationComponent;
 import com.xkcn.gallery.di.module.ApplicationModule;
+import com.xkcn.gallery.di.module.SystemServiceModule;
 
 import net.danlew.android.joda.JodaTimeAndroid;
 
@@ -30,6 +31,7 @@ public class BaseApp extends Application {
 	private void initInjector() {
 		applicationComponent = DaggerApplicationComponent.builder()
 			.applicationModule(new ApplicationModule(this))
+			.systemServiceModule(new SystemServiceModule(this))
 			.build();
 	}
 
