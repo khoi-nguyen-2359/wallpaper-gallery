@@ -10,5 +10,5 @@ public class DataContracts {
 	public static final String NAVIGATION_ITEM_FIELD_TITLE = "title";
 	public static final String NAVIGATION_ITEM_FIELD_DATA = "data";
 
-	public static final String NAVIGATION_ITEM_TYPE_COLLECTION = "collection";
+	public static final String NAVIGATOR_TYPE_COLLECTION = "collection";
 }

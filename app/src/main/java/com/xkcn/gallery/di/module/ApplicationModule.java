@@ -3,8 +3,11 @@ package com.xkcn.gallery.di.module;
 import android.content.Context;
 
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
+import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.xkcn.gallery.BaseApp;
+import com.xkcn.gallery.BuildConfig;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.analytics.GoogleAnalytics;
 import com.xkcn.gallery.data.local.DbHelper;
@@ -12,6 +15,7 @@ import com.xkcn.gallery.data.local.repo.PhotoDetailsRepository;
 import com.xkcn.gallery.data.local.repo.PhotoDetailsSqliteRepository;
 import com.xkcn.gallery.data.local.repo.PhotoTagRepository;
 import com.xkcn.gallery.data.local.repo.PhotoTagSqliteRepository;
+import com.xkcn.gallery.data.remote.gson_deserializer.NavigatorDeserializer;
 import com.xkcn.gallery.manager.LocalConfigManager;
 import com.xkcn.gallery.manager.RemoteConfigManager;
 import com.xkcn.gallery.manager.impl.LocalConfigManagerImpl;
@@ -19,6 +23,7 @@ import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.manager.impl.RemoteConfigManagerImpl;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
+import com.xkcn.gallery.view.navigator.Navigator;
 
 import java.util.regex.Pattern;
 
@@ -37,6 +42,7 @@ import rx.schedulers.Schedulers;
 public class ApplicationModule {
 	private static final String PATTERN_SQLITE_LIMIT_CLAUSE = "PATTERN_SQLITE_LIMIT_CLAUSE";
 	public static final String SCHEDULER_BACKGROUND = "SCHEDULER_BACKGROUND";
+	private static final String GSON_REMOTE_CONFIG = "GSON_REMOTE_CONFIG";
 
 	private final BaseApp baseApp;
 
@@ -122,7 +128,19 @@ public class ApplicationModule {
 
 	@Provides
 	@Singleton
-	public RemoteConfigManager provideRemoteConfigManager() {
-		return new RemoteConfigManagerImpl(baseApp.getResources(), FirebaseRemoteConfig.getInstance(), new Gson());
+	@Named(GSON_REMOTE_CONFIG)
+	Gson providesRemoteConfigGson() {
+		return new GsonBuilder().registerTypeAdapter(Navigator.class, new NavigatorDeserializer()).create();
+	}
+
+	@Provides
+	@Singleton
+	public RemoteConfigManager provideRemoteConfigManager(@Named(GSON_REMOTE_CONFIG) Gson gson) {
+		FirebaseRemoteConfig remoteConfig = FirebaseRemoteConfig.getInstance();
+		FirebaseRemoteConfigSettings settings = new FirebaseRemoteConfigSettings.Builder()
+			.setDeveloperModeEnabled(BuildConfig.DEBUG)
+			.build();
+		remoteConfig.setConfigSettings(settings);
+		return new RemoteConfigManagerImpl(baseApp.getResources(), remoteConfig, gson);
 	}
 }

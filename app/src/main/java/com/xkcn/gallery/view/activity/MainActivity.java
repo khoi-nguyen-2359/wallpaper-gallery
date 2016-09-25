@@ -16,7 +16,6 @@ import com.xkcn.gallery.model.NavigationItem;
 import com.xkcn.gallery.presenter.MainViewPresenter;
 import com.xkcn.gallery.service.UpdateService;
 import com.xkcn.gallery.view.interfaces.MainView;
-import com.xkcn.gallery.view.navigator.ItemNavigator;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -102,8 +101,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 			return;
 		}
 
-		ItemNavigator navigator = navItem.navigator();
-		navigator.navigate(this);
+		navItem.getNavigator().navigate(this);
 	}
 
 	private void initNavigationItems() {
@@ -114,7 +112,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 		if (navItems != null) {
 			for (NavigationItem item : navItems) {
 				MenuItem menuItem = navMenu.add(Menu.NONE, item.getId(), Menu.NONE, item.getTitle());
-				Intent intent = new Intent(this, MainActivity.class);
+				Intent intent = new Intent(this, MainActivityImpl.class);
 				intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
 				intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				intent.putExtra(EXTRAS_NAV_ITEM, item);
@@ -129,10 +127,9 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 
 	@Override
 	public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-		DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-		drawer.closeDrawer(GravityCompat.START);
+		drawerLayout.closeDrawer(GravityCompat.START);
 
-		return true;
+		return false;
 	}
 
 	protected void initMainViews() {

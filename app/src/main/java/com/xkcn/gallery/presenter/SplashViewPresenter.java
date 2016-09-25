@@ -1,14 +1,10 @@
 package com.xkcn.gallery.presenter;
 
-import android.support.annotation.NonNull;
-
-import com.google.android.gms.tasks.Continuation;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
-import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.manager.RemoteConfigManager;
 import com.xkcn.gallery.view.interfaces.SplashView;
+
+import rx.Subscriber;
+import rx.functions.Action0;
 
 /**
  * Created by khoinguyen on 12/14/15.
@@ -16,10 +12,6 @@ import com.xkcn.gallery.view.interfaces.SplashView;
 public class SplashViewPresenter {
 	private SplashView view;
 	private RemoteConfigManager remoteConfigManager;
-	private Task<Void> fetchRemoteConfigsTask;
-	private OnCompleteListener<Void> onFetchRemoteConfigComplete;
-
-	private boolean areInitTasksCompleted;
 
 	public SplashViewPresenter(SplashView view, RemoteConfigManager remoteConfigManager) {
 		this.view = view;
@@ -31,43 +23,28 @@ public class SplashViewPresenter {
 	}
 
 	public void runInitTasks() {
-		Task taskFetchRemoteConfigs = getFetchRemoteConfigsTask();
-		taskFetchRemoteConfigs
-			.continueWith(getTaskInitContinuation());
-	}
-
-	private Continuation getTaskInitContinuation() {
-		return new Continuation() {
+		remoteConfigManager.fetchRemoteConfig()
+			.doOnTerminate(new Action0() {
+				@Override
+				public void call() {
+					view.finishSplash();
+				}
+			})
+			.subscribe(new Subscriber<Boolean>() {
 			@Override
-			public Object then(@NonNull Task task) throws Exception {
-				L.get().d("init tasks completed");
-				areInitTasksCompleted = true;
-				checkToFinishSplashView();
-				// dont care return value
-				return null;
+			public void onCompleted() {
+
 			}
-		};
-	}
 
-	private void checkToFinishSplashView() {
-		if (areInitTasksCompleted) {
-			view.finishSplash();
-		}
-	}
-
-	private Task getFetchRemoteConfigsTask() {
-		final FirebaseRemoteConfig firebaseConfigs = FirebaseRemoteConfig.getInstance();
-		fetchRemoteConfigsTask = firebaseConfigs.fetch();
-		onFetchRemoteConfigComplete = new OnCompleteListener<Void>() {
 			@Override
-			public void onComplete(@NonNull Task<Void> task) {
-				L.get().d("onComplete");
-				firebaseConfigs.activateFetched();
+			public void onError(Throwable e) {
+
 			}
-		};
 
-		fetchRemoteConfigsTask.addOnCompleteListener(onFetchRemoteConfigComplete);
+			@Override
+			public void onNext(Boolean aBoolean) {
 
-		return fetchRemoteConfigsTask;
+			}
+		});
 	}
 }

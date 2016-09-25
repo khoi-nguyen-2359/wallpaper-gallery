@@ -3,7 +3,7 @@ package com.xkcn.gallery.di.component;
 import com.xkcn.gallery.di.module.ApplicationModule;
 import com.xkcn.gallery.di.module.SystemServiceModule;
 import com.xkcn.gallery.view.activity.MainActivity;
-import com.xkcn.gallery.view.navigator.ItemNavigator;
+import com.xkcn.gallery.view.navigator.Navigator;
 
 import dagger.Subcomponent;
 
@@ -11,5 +11,5 @@ import dagger.Subcomponent;
 public interface MainActivityComponent {
 	void inject(MainActivity mainActivity);
 
-	<T extends ItemNavigator> void inject(T navigator);
+	<T extends Navigator> void inject(T navigator);
 }
