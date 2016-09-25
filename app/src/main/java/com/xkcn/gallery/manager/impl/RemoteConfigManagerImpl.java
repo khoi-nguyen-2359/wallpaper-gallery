@@ -10,6 +10,7 @@ import com.xkcn.gallery.manager.RemoteConfigManager;
 import com.xkcn.gallery.model.NavigationItem;
 
 import java.lang.reflect.Type;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,35 +41,15 @@ public class RemoteConfigManagerImpl implements RemoteConfigManager {
 
 	@Override
 	public List<NavigationItem> getNavigationMenuItems() {
-		String jsonItemArray = firebaseConfig.getString(KEY_NAV_MENU_ITEMS);
-		Type type = new TypeToken<List<NavigationItem>>() {
-		}.getType();
-		return gson.fromJson(jsonItemArray, type);
-//		JsonArray menuItemArray = gson.fromJson(jsonItemArray, JsonArray.class);
-//		if (menuItemArray != null && !menuItemArray.isJsonNull() && menuItemArray.isJsonArray()) {
-//			for (JsonElement element : menuItemArray) {
-//				if (element == null || element.isJsonNull() || !element.isJsonObject()) {
-//					continue;
-//				}
-//
-//				JsonObject elementObj = element.getAsJsonObject();
-//				String type = elementObj.getAsJsonPrimitive(DataContracts.NAVIGATION_ITEM_FIELD_TYPE).getAsString();
-//				NavigationItem navItem = null;
-//				if (DataContracts.NAVIGATION_ITEM_TYPE_COLLECTION.equalsIgnoreCase(type)) {
-//					navItem = new CollectionNavigationItem();
-//					navItems.add(navItem);
-//
-//					navItem.setId(elementObj.getAsJsonPrimitive(DataContracts.NAVIGATION_ITEM_FIELD_ID).getAsInt());
-//					navItem.setTitle(elementObj.getAsJsonPrimitive(DataContracts.NAVIGATION_ITEM_FIELD_TITLE).getAsString());
-//					navItem.setData(elementObj.getAsJsonPrimitive(DataContracts.NAVIGATION_ITEM_FIELD_DATA).getAsString());
-//				}
-//
-//				if (navItem != null) {
-//					navItem.setType(type);
-//				}
-//			}
-//		}
+		try {
+			String jsonItemArray = firebaseConfig.getString(KEY_NAV_MENU_ITEMS);
+			Type type = new TypeToken<List<NavigationItem>>() {
+			}.getType();
+			return gson.fromJson(jsonItemArray, type);
+		} catch (Exception ex) {
+			ex.printStackTrace();
+		}
 
-//		return navItems;
+		return new ArrayList<>();
 	}
 }

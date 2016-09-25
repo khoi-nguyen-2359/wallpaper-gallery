@@ -11,7 +11,7 @@ import java.lang.reflect.TypeVariable;
 /**
  * Created by khoinguyen on 9/9/16.
  */
-public abstract class NavigationItem implements Serializable {
+public class NavigationItem implements Serializable {
 	private int id;
 	private String type;
 	private String title;
