@@ -1,45 +1,58 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-																								 xmlns:app="http://schemas.android.com/apk/res-auto"
-																								 xmlns:tools="http://schemas.android.com/tools"
-																								 android:id="@+id/main_coordinator_layout"
-																								 android:layout_width="match_parent"
-																								 android:layout_height="match_parent"
+<layout
+	xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:app="http://schemas.android.com/apk/res-auto"
 	>
 
-	<android.support.design.widget.AppBarLayout
-		android:id="@+id/app_bar"
-		android:layout_width="match_parent"
-		android:layout_height="wrap_content"
-		android:theme="@style/AppTheme.AppBarOverlay"
-		>
+	<data>
 
-		<FrameLayout
-			android:id="@+id/toolbar_container"
-			android:layout_width="match_parent"
-			android:layout_height="wrap_content"
-			android:background="?attr/colorPrimary"
-			app:layout_scrollFlags="scroll|enterAlways"
-			>
+		<variable
+			name="photoCollection"
+			type="com.xkcn.gallery.presenter.PhotoCollectionViewModel"/>
+	</data>
 
-			<android.support.v7.widget.Toolbar
-				android:id="@+id/toolbar"
-				android:layout_width="match_parent"
-				android:layout_height="?attr/actionBarSize"
-				app:popupTheme="@style/AppTheme.PopupOverlay"
-				/>
-
-		</FrameLayout>
-	</android.support.design.widget.AppBarLayout>
-
-	<com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget
-		android:id="@+id/photokit_widget"
+	<android.support.design.widget.CoordinatorLayout
+		android:id="@+id/main_coordinator_layout"
 		android:layout_width="match_parent"
 		android:layout_height="match_parent"
-		app:layout_behavior="@string/appbar_scrolling_view_behavior">
+		>
 
-		<include layout="@layout/photokit_main_view"/>
+		<android.support.design.widget.AppBarLayout
+			android:id="@+id/app_bar"
+			android:layout_width="match_parent"
+			android:layout_height="wrap_content"
+			android:theme="@style/AppTheme.AppBarOverlay"
+			>
 
-	</com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget>
+			<FrameLayout
+				android:id="@+id/toolbar_container"
+				android:layout_width="match_parent"
+				android:layout_height="wrap_content"
+				android:background="?attr/colorPrimary"
+				app:layout_scrollFlags="scroll|enterAlways"
+				>
 
-</android.support.design.widget.CoordinatorLayout>
+				<android.support.v7.widget.Toolbar
+					android:id="@+id/toolbar"
+					android:layout_width="match_parent"
+					android:layout_height="?attr/actionBarSize"
+					app:popupTheme="@style/AppTheme.PopupOverlay"
+					/>
+
+			</FrameLayout>
+		</android.support.design.widget.AppBarLayout>
+
+		<com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget
+			android:id="@+id/photokit_widget"
+			android:layout_width="match_parent"
+			android:layout_height="match_parent"
+			app:layout_behavior="@string/appbar_scrolling_view_behavior"
+			>
+
+			<include layout="@layout/photokit_main_view"/>
+
+		</com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget>
+
+	</android.support.design.widget.CoordinatorLayout>
+
+</layout>

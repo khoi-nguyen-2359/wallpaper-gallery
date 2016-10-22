@@ -182,7 +182,7 @@ public class PhotoDetailsSqliteRepository implements PhotoDetailsRepository {
 	@Override
 	public List<PhotoDetails> getPhotoDetails(String cmd, int start, int count) {
 		SQLiteDatabase db = dbHelper.getReadableDatabase();
-		appendLimitClause(limitClauseDetector, cmd, start, count);
+		cmd = appendLimitClause(limitClauseDetector, cmd, start, count);
 		Cursor c = db.rawQuery(cmd, null);
 		List<PhotoDetails> photoList = new ArrayList<>();
 		if (c != null) {

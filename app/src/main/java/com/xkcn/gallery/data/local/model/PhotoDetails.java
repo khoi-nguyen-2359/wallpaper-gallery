@@ -6,6 +6,9 @@ import android.os.Parcelable;
 import android.text.Html;
 import android.text.TextUtils;
 
+import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
+import com.xkcn.gallery.imageloader.PhotoFileManager;
+
 /**
  * Created by khoinguyen on 12/22/14.
  */
@@ -220,5 +223,16 @@ public class PhotoDetails implements Parcelable {
 
 	public Uri getHighResUri() {
 		return Uri.parse(getHighResUrl());
+	}
+
+	public PhotoDisplayInfo createDisplayInfo(PhotoFileManager photoFileManager) {
+		PhotoDisplayInfo displayInfo = new PhotoDisplayInfo();
+		displayInfo.setPhotoId(getIdentifierAsString());
+		displayInfo.setDescription(getPermalinkMeta());
+		displayInfo.setLowResUrl(getLowResUrl());
+		displayInfo.setHighResUrl(getHighResUrl());
+		displayInfo.setLocalFile(photoFileManager.getPhotoFile(this));
+
+		return displayInfo;
 	}
 }

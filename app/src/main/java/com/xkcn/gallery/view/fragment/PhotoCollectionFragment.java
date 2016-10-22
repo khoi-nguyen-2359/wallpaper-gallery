@@ -2,13 +2,17 @@ package com.xkcn.gallery.view.fragment;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Resources;
+import android.databinding.DataBindingUtil;
+import android.databinding.Observable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.NotificationCompat;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +23,8 @@ import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.listing.adapter.PartitionedListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.BaseViewHolder;
 import com.khoinguyen.apptemplate.listing.item.ListingItem;
+import com.khoinguyen.apptemplate.listing.item.ListingItemType;
+import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoGalleryPhotoSelect;
 import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
@@ -29,17 +35,18 @@ import com.khoinguyen.photoviewerkit.impl.view.PhotoListingView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoOverlayView;
 import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
-import com.khoinguyen.photoviewerkit.util.BottomLoadingIndicatorAdapter;
-import com.khoinguyen.ui.UiUtils;
+import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.adapter.PhotoActionAdapter;
+import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
+import com.xkcn.gallery.databinding.FragmentPhotoCollectionBinding;
+import com.xkcn.gallery.model.DataPage;
 import com.xkcn.gallery.model.PhotoDownloadNotificationsInfo;
-import com.xkcn.gallery.presenter.PhotoCollectionPresenter;
-import com.xkcn.gallery.presenter.PhotoCollectionViewPresenter;
+import com.xkcn.gallery.presenter.PhotoCollectionViewModel;
+import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.dialog.PhotoDownloadProgressDialog;
-import com.xkcn.gallery.view.interfaces.PhotoCollectionView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -55,8 +62,9 @@ import butterknife.Unbinder;
  * Created by khoinguyen on 9/12/16.
  */
 
-public class PhotoCollectionFragment extends BaseFragment implements PhotoCollectionView {
+public class PhotoCollectionFragment extends BaseFragment {
 	private static final String ARG_PHOTO_COLLECTION = "ARG_PHOTO_COLLECTION";
+	private FragmentPhotoCollectionBinding binding;
 
 	public static PhotoCollectionFragment instantiate(PhotoCollection photoCollection) {
 		PhotoCollectionFragment f = new PhotoCollectionFragment();
@@ -69,6 +77,10 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 
 	@Inject
 	NotificationManager notificationManager;
+	@Inject
+	PhotoListingUsecase photoListingUsecase;
+	@Inject
+	AnalyticsCollection analytics;
 
 	@BindView(R.id.toolbar)
 	Toolbar toolbar;
@@ -83,13 +95,12 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	@BindView(R.id.app_bar)
 	AppBarLayout appBarLayout;
 
-	protected PhotoDownloadProgressDialog progressDialog;
+	protected PhotoDownloadProgressDialog photoLoadingProgressDialog;
 
 	private NotificationCompat.Builder downloadNotificationBuilder;
 	protected PhotoDownloadNotificationsInfo downloadNotificationsInfo = new PhotoDownloadNotificationsInfo();
 
-	private PhotoCollectionViewPresenter photoListingPresenter;
-	private PhotoCollectionPresenter photoCollectionPresenter;
+	private PhotoCollectionViewModel photoCollectionViewModel;
 
 	private IEventBus photoViewerKitEventBus;
 	private Unbinder unbinder;
@@ -104,8 +115,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	public void onCreate(@Nullable Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		readArgs();
-		setupDi();
-		setupData();
+		getApplicationComponent().inject(this);
 	}
 
 	private void readArgs() {
@@ -129,15 +139,76 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	@Override
 	public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
+		setupDataBinding();
+		photoCollectionViewModel.loadFirstPhotoPage(photoCollection);
+	}
 
-		photoListingPresenter.loadPhotoPage(0, photoCollection.getQuery());
+	private void setupDataBinding() {
+		binding = DataBindingUtil.bind(getView());
+		photoCollectionViewModel = new PhotoCollectionViewModel(photoFileManager, photoListingUsecase, analytics);
+		photoCollectionViewModel.obsLoadPhotoProgress.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				updatePhotoLoadingProgressDialog((int) photoCollectionViewModel.obsLoadPhotoProgress.get());
+			}
+		});
+		photoCollectionViewModel.obsLoadWallpaperResult.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showWallpaperChooser(photoCollectionViewModel.obsLoadWallpaperResult.get());
+			}
+		});
+		photoCollectionViewModel.obsLastestPhotoPage.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				photoListingAdapter.removeProgressIndicator();
+				appendPhotoAdapters(photoCollectionViewModel.obsLastestPhotoPage.get());
+				enableWidgetPaging(photoCollectionViewModel.obsLastestPhotoPage.get());
+			}
+		});
+		photoCollectionViewModel.obsDownloadError.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showDownloadError(photoCollectionViewModel.obsDownloadError.get());
+			}
+		});
+		photoCollectionViewModel.obsDownloadPhotoResult.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showDownloadComplete(photoCollectionViewModel.obsDownloadPhotoResult.get());
+			}
+		});
+		photoCollectionViewModel.obsDownloadPhotoProgress.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				updateDownloadProgress(photoCollectionViewModel.obsDownloadPhotoProgress.get());
+			}
+		});
+		photoCollectionViewModel.obsDownloadPhotoResult.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showDownloadComplete(photoCollectionViewModel.obsDownloadPhotoResult.get());
+			}
+		});
+		photoCollectionViewModel.obsSharePhotoResult.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showSharingChooser(photoCollectionViewModel.obsSharePhotoResult.get());
+			}
+		});
+		binding.setPhotoCollection(photoCollectionViewModel);
+	}
+
+	private void enableWidgetPaging(DataPage<PhotoDisplayInfo> latestPhotoPage) {
+		if (latestPhotoPage != null && !latestPhotoPage.isDataEmpty()) {
+			photoKitWidget.enablePaging();
+		}
 	}
 
 	@Override
 	public void onStart() {
 		super.onStart();
 
-//		EventBus.getDefault().register(this);
 		photoViewerKitEventBus.register(photoKitEventListener);
 	}
 
@@ -145,7 +216,6 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	public void onStop() {
 		super.onStop();
 
-//		EventBus.getDefault().unregister(this);
 		photoViewerKitEventBus.unregister(photoKitEventListener);
 	}
 
@@ -159,20 +229,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 	public void onDestroy() {
 		super.onDestroy();
 
-		photoListingPresenter.trackListingLastItem();
-	}
-
-	private void setupDi() {
-		getApplicationComponent().inject(this);
-	}
-
-	private void setupData() {
-		photoCollectionPresenter = new PhotoCollectionPresenter(photoFileManager, localConfigManager, schedulerBackground, remoteConfigManager);
-		photoCollectionPresenter.setView(this);
-
-		photoListingPresenter = new PhotoCollectionViewPresenter(photoCollection);
-		photoListingPresenter.setView(this);
-		getApplicationComponent().inject(photoListingPresenter);
+		photoCollectionViewModel.trackListingLastItem(photoCollection);
 	}
 
 	private void setupViews() {
@@ -183,10 +240,11 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		photoKitWidget.setPagingListener(listingPagingListener);
 
 		photoListingAdapter = new PhotoListingAdapter();
-		photoListingAdapter.registerListingItemType(photoListingView.new PhotoItemType(PhotoListingAdapter.TYPE_PHOTO));
+		photoListingAdapter.registerListingItemType(photoListingView.new PhotoItemType(R.id.item_type_listing_photo));
+		photoListingAdapter.registerListingItemType(new ProgressIndicatorType());
 
 		photoGalleryAdapter = new PhotoGalleryAdapter();
-		photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(PhotoGalleryAdapter.TYPE_PHOTO));
+		photoGalleryAdapter.registerListingItemType(new PhotoGalleryView.PhotoItemType(R.id.item_type_listing_photo));
 
 		photoActionAdapter = new PhotoActionAdapter();
 
@@ -194,77 +252,63 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		photoGalleryView.setPhotoAdapter(photoGalleryAdapter);
 		photoOverlayView.setPhotoActionAdapter(photoActionAdapter);
 		photoOverlayView.setPhotoActionEventListener(photoActionListener);
+
+		Resources resources = getResources();
+		final int nLayoutCol = 4;   //resources.getInteger(R.integer.photo_page_col);
+		GridLayoutManager rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
+		rcvLayoutMan.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+			@Override
+			public int getSpanSize(int position) {
+				return photoListingAdapter.isProgressIndicatorItem(position) ? rcvLayoutMan.getSpanCount() : 1;
+			}
+		});
+
+		photoListingView.setLayoutManager(rcvLayoutMan);
+		photoListingView.addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(com.khoinguyen.photoviewerkit.R.dimen.photo_list_pager_item_offset)));
 	}
 
-	private PhotoActionView.PhotoActionEventListener photoActionListener = new PhotoActionView.PhotoActionEventListener() {
-		@Override
-		public void onPhotoActionSelect(int actionId, PhotoDisplayInfo photo) {
-			switch (actionId) {
-				case PhotoActionAdapter.TYPE_SHARE: {
-					sharePhoto(photo);
-					break;
-				}
+	private PhotoActionView.PhotoActionEventListener photoActionListener = (actionId, photo) -> {
+		switch (actionId) {
+			case PhotoActionAdapter.TYPE_SHARE: {
+				photoCollectionViewModel.sharePhoto(photo);
+				break;
+			}
 
-				case PhotoActionAdapter.TYPE_SET_WALLPAPER: {
-					setWallpaper(photo);
-					break;
-				}
+			case PhotoActionAdapter.TYPE_SET_WALLPAPER: {
+				photoCollectionViewModel.loadWallpaper(photo);
+				break;
+			}
 
-				case PhotoActionAdapter.TYPE_DOWNLOAD: {
-					downloadPhoto(photo);
-					break;
-				}
+			case PhotoActionAdapter.TYPE_DOWNLOAD: {
+				photoCollectionViewModel.downloadPhoto(photo);
+				break;
 			}
 		}
 	};
 
-	private void downloadPhoto(PhotoDisplayInfo photo) {
-		PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo);
-		if (photoDetails == null) {
-			return;
-		}
-
-		photoCollectionPresenter.downloadPhoto(photoDetails);
-	}
-
-	private void sharePhoto(PhotoDisplayInfo photo) {
-		PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo);
-		if (photoDetails == null) {
-			return;
-		}
-
-		photoCollectionPresenter.sharePhoto(photoDetails);
-	}
-
-	private void setWallpaper(PhotoDisplayInfo photo) {
-		PhotoDetails photoDetails = photoListingPresenter.findPhoto(photo);
-		if (photoDetails == null) {
-			return;
-		}
-
-		photoCollectionPresenter.loadWallpaperSetting(photoDetails);
-	}
-
-	private IPhotoViewerKitWidget.PagingListener listingPagingListener = new IPhotoViewerKitWidget.PagingListener() {
-		@Override
-		public void onPagingNext(IPhotoViewerKitWidget widget) {
-			photoListingPresenter.loadNextPhotoPage();
-		}
+	private IPhotoViewerKitWidget.PagingListener listingPagingListener = widget -> {
+		photoCollectionViewModel.loadNextPhotoPage(photoCollection);
+		photoListingAdapter.appendProgressIndicator();
+		photoListingAdapter.notifyDataSetChanged();
 	};
 
-	@Override
-	public void onPagingLoaded() {
-		photoListingAdapter.updateDataSet();
+	private void appendPhotoAdapters(DataPage<PhotoDisplayInfo> latestPhotoPage) {
+		if (latestPhotoPage.getStart() == 0) {
+			photoListingAdapter.clear();
+			photoGalleryAdapter.clear();
+		}
+
+		photoListingAdapter.append(latestPhotoPage.getData());
+		photoGalleryAdapter.append(latestPhotoPage.getData());
+
 		photoListingAdapter.notifyDataSetChanged();
-		photoGalleryAdapter.updateDataSet();
 		photoGalleryAdapter.notifyDataSetChanged();
 	}
 
-	@Override
-	public void showWallpaperChooser(PhotoDetails photoDetails) {
-		File photoFile = photoFileManager.getPhotoFile(photoDetails);
+	private void showWallpaperChooser(PhotoDisplayInfo photoDetails) {
+		File photoFile = photoDetails.getLocalFile();
 		if (!photoFile.exists()) {
-			showToast(getString(R.string.general_alert_please_retry));
+			showToast(getString(R.string.app_alert_please_retry));
 			return;
 		}
 
@@ -275,24 +319,16 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		intent.putExtra("mimeType", "image/*");
 
 		startActivity(Intent.createChooser(intent, getString(R.string.photo_actions_set_wp_chooser)));
-
-		analyticsCollection.trackSetWallpaperGalleryPhoto(photoDetails);
 	}
 
-	@Override
-	public void enablePaging() {
-		photoKitWidget.enablePaging();
-	}
-
-	@Override
-	public void updateDownloadProgress(PhotoDetails photoDetails, Float progress) {
+	public void updateDownloadProgress(PhotoCollectionViewModel.DownloadPhotoProgress progress) {
 		NotificationCompat.Builder notificationBuilder = getDownloadNotificationBuilder()
-			.setContentTitle(getString(R.string.download_notification_title, photoDetails.getIdentifierAsString()))
+			.setContentTitle(getString(R.string.download_notification_title, progress.photoDisplayInfo.getPhotoId()))
 			.setContentText(getString(R.string.download_notification_downloading_message))
 			.setOngoing(true)
-			.setProgress(100, (int) (progress * 100), false);
+			.setProgress(100, (int) (progress.progress * 100), false);
 
-		notificationManager.notify(downloadNotificationsInfo.getId(photoDetails), notificationBuilder.build());
+		notificationManager.notify(downloadNotificationsInfo.getId(progress.photoDisplayInfo), notificationBuilder.build());
 	}
 
 	private NotificationCompat.Builder getDownloadNotificationBuilder() {
@@ -304,78 +340,58 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		return downloadNotificationBuilder;
 	}
 
-	@Override
-	public void showDownloadComplete(PhotoDetails photoDetails) {
+	public void showDownloadComplete(PhotoDisplayInfo photoDisplayInfo) {
 		Intent resultIntent = new Intent(Intent.ACTION_VIEW);
-		resultIntent.setDataAndType(Uri.fromFile(photoFileManager.getPhotoFile(photoDetails)), "image/*");
+		resultIntent.setDataAndType(photoDisplayInfo.getLocalFileUri(), "image/*");
 		PendingIntent intentOpenExternal = PendingIntent.getActivity(getContext(), 0, resultIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
 		NotificationCompat.Builder notifBuilder = getDownloadNotificationBuilder()
-			.setContentTitle(getString(R.string.download_notification_title, photoDetails.getIdentifierAsString()))
+			.setContentTitle(getString(R.string.download_notification_title, photoDisplayInfo.getPhotoId()))
 			.setContentText(getString(R.string.download_notification_completed))
 			.setOngoing(false)
 			.setContentIntent(intentOpenExternal)
 			.setProgress(0, 0, false);
 
-		notificationManager.notify(downloadNotificationsInfo.getId(photoDetails), notifBuilder.build());
-
-		analyticsCollection.trackDownloadGalleryPhoto(photoDetails);
+		notificationManager.notify(downloadNotificationsInfo.getId(photoDisplayInfo), notifBuilder.build());
 	}
 
-	@Override
-	public void showDownloadError(PhotoDetails photoDetails, String message) {
+	public void showDownloadError(PhotoCollectionViewModel.DownloadPhotoError error) {
 		NotificationCompat.Builder notifBuilder = getDownloadNotificationBuilder()
-			.setContentTitle(getString(R.string.download_notification_title, photoDetails.getIdentifierAsString()))
-			.setContentText(getString(R.string.download_notification_error, message))
+			.setContentTitle(getString(R.string.download_notification_title, error.photoDisplayInfo.getPhotoId()))
+			.setContentText(getString(R.string.download_notification_error, error.throwable.getMessage()))
 			.setOngoing(false)
 			.setProgress(0, 0, false);
 
-		notificationManager.notify(downloadNotificationsInfo.getId(photoDetails), notifBuilder.build());
+		notificationManager.notify(downloadNotificationsInfo.getId(error.photoDisplayInfo), notifBuilder.build());
 	}
 
-	@Override
-	public void showSharingChooser(PhotoDetails photoDetails) {
+	public void showSharingChooser(PhotoDisplayInfo photoDisplayInfo) {
 		Intent i = new Intent();
 		i.setAction(Intent.ACTION_SEND);
-		i.putExtra(Intent.EXTRA_STREAM, Uri.fromFile(photoFileManager.getPhotoFile(photoDetails)));
+		i.putExtra(Intent.EXTRA_STREAM, photoDisplayInfo.getLocalFileUri());
 		i.setType("image/*");
 
 		startActivity(Intent.createChooser(i, getResources().getString(R.string.send_to)));
-
-		analyticsCollection.trackShareGalleryPhoto(photoDetails);
 	}
 
-	@Override
 	public void showToast(String message) {
 		Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
 	}
 
-	@Override
-	public void showProgressLoading(int messageResId) {
-		progressDialog = new PhotoDownloadProgressDialog(getContext());
-		progressDialog.setMessage(getString(messageResId));
-		progressDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-			@Override
-			public void onDismiss(DialogInterface dialog) {
-				photoCollectionPresenter.cancelBlockingTask();
-			}
-		});
-		progressDialog.show();
-	}
-
-	@Override
-	public void updateProgressLoading(int progress) {
-		if (progressDialog == null || !progressDialog.isShowing()) {
-			return;
+	private void updatePhotoLoadingProgressDialog(int progress) {
+		if (photoLoadingProgressDialog == null || !photoLoadingProgressDialog.isShowing()) {
+			photoLoadingProgressDialog = new PhotoDownloadProgressDialog(getContext());
+			photoLoadingProgressDialog.setMessage(getString(R.string.photo_gallery_downloading_message));
+			photoLoadingProgressDialog.setOnDismissListener(dialog -> photoCollectionViewModel.cancelPhotoLoadingTask());
+			photoLoadingProgressDialog.show();
 		}
 
-		progressDialog.setProgress(progress);
-	}
-
-	@Override
-	public void hideLoading() {
-		progressDialog.setOnDismissListener(null);
-		UiUtils.dismissDlg(progressDialog);
+		if (photoLoadingProgressDialog != null && photoLoadingProgressDialog.isShowing()) {
+			photoLoadingProgressDialog.setProgress(progress);
+			if (progress == 100) {
+				photoLoadingProgressDialog.dismiss();
+			}
+		}
 	}
 
 	protected Object photoKitEventListener = new Object() {
@@ -386,7 +402,7 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 
 		@com.khoinguyen.apptemplate.eventbus.Subscribe
 		public void handleOnGalleryPhotoPageSelect(OnPhotoGalleryPhotoSelect event) {
-			PhotoDetails photoDetails = photoListingPresenter.findPhoto(event.getPhotoDisplayInfo());
+			PhotoDetails photoDetails = photoCollectionViewModel.findPhoto(event.getPhotoDisplayInfo());
 			analyticsCollection.trackGalleryPhotoScreenView(photoDetails);
 		}
 
@@ -396,34 +412,88 @@ public class PhotoCollectionFragment extends BaseFragment implements PhotoCollec
 		}
 	};
 
-	private class PhotoListingAdapter extends BottomLoadingIndicatorAdapter {
-		public static final int TYPE_PHOTO = 2;
-
+	private class PhotoListingAdapter extends PartitionedListingAdapter<RecyclerListingViewHolder> {
 		@Override
 		protected List<ListingItem> createDataSet() {
-			List<ListingItem> listingItems = new ArrayList<>();
-			List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPages().getAllDisplayInfos();
-			for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
-				listingItems.add(new ListingItem(displayInfo, TYPE_PHOTO));
+			return new ArrayList<>();
+		}
+
+		public void append(List<PhotoDisplayInfo> lastPagePhotos) {
+			if (lastPagePhotos == null) {
+				return;
 			}
 
-			return listingItems;
+			for (PhotoDisplayInfo displayInfo : lastPagePhotos) {
+				dataSet.add(new ListingItem(displayInfo, R.id.item_type_listing_photo));
+			}
+		}
+
+		void clear() {
+			updateDataSet();
+		}
+
+		ListingItem getLastItem() {
+			if (dataSet.isEmpty()) {
+				return null;
+			}
+
+			return dataSet.get(dataSet.size() - 1);
+		}
+
+		void appendProgressIndicator() {
+			ListingItem lastItem = getLastItem();
+			if (lastItem != null && lastItem.getViewType() != R.id.item_type_listing_progress_indicator) {
+				dataSet.add(new ListingItem(null, R.id.item_type_listing_progress_indicator));
+			}
+		}
+
+		void removeProgressIndicator() {
+			ListingItem lastItem = getLastItem();
+			if (lastItem != null && lastItem.getViewType() == R.id.item_type_listing_progress_indicator) {
+				dataSet.remove(lastItem);
+			}
+		}
+
+		public boolean isProgressIndicatorItem(int position) {
+			return getViewType(position) == R.id.item_type_listing_progress_indicator;
 		}
 	}
 
 	private class PhotoGalleryAdapter extends PartitionedListingAdapter<BaseViewHolder> {
-		public static final int TYPE_PHOTO = 1;
-
 		@Override
 		protected List<ListingItem> createDataSet() {
-			List<ListingItem> listingItems = new ArrayList<>();
-			List<PhotoDisplayInfo> allPhotoDisplayInfos = photoListingPresenter.getAllPages().getAllDisplayInfos();
-			for (PhotoDisplayInfo displayInfo : allPhotoDisplayInfos) {
-				ListingItem photoListingItem = new ListingItem(displayInfo, TYPE_PHOTO);
-				listingItems.add(photoListingItem);
+			return new ArrayList<>();
+		}
+
+		public void append(List<PhotoDisplayInfo> lastPagePhotos) {
+			if (lastPagePhotos == null) {
+				return;
 			}
 
-			return listingItems;
+			for (PhotoDisplayInfo displayInfo : lastPagePhotos) {
+				dataSet.add(new ListingItem(displayInfo, R.id.item_type_listing_photo));
+			}
+		}
+
+		public void clear() {
+			updateDataSet();
+		}
+	}
+
+	private class ProgressIndicatorType extends ListingItemType<RecyclerListingViewHolder> {
+
+		public ProgressIndicatorType() {
+			super(R.id.item_type_listing_progress_indicator);
+		}
+
+		@Override
+		public View createView(ViewGroup container) {
+			return getLayoutInflater(container.getContext()).inflate(com.khoinguyen.photoviewerkit.R.layout.photokit_photo_listing_loading_indicator, container, false);
+		}
+
+		@Override
+		public RecyclerListingViewHolder createViewHolder(View view) {
+			return new RecyclerListingViewHolder(view);
 		}
 	}
 }

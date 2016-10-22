@@ -1,6 +1,7 @@
 package com.xkcn.gallery.usecase;
 
 import com.xkcn.gallery.manager.LocalConfigManager;
+import com.xkcn.gallery.manager.impl.LocalConfigManagerImpl;
 
 import rx.Observable;
 import rx.Subscriber;
@@ -19,7 +20,7 @@ public class PreferencesUsecase {
 		return Observable.create(new Observable.OnSubscribe<Integer>() {
 			@Override
 			public void call(Subscriber<? super Integer> subscriber) {
-				int perPage = prefRepo.getListPagerPhotoPerPage();
+				int perPage = LocalConfigManagerImpl.LISTING_PHOTO_PER_PAGE;
 				subscriber.onNext(perPage);
 				subscriber.onCompleted();
 			}

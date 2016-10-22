@@ -58,3 +58,6 @@
 ### Crashlytics
 -keepattributes SourceFile,LineNumberTable
 -keep public class * extends java.lang.Exception
+
+### Retrolambda
+-dontwarn java.lang.invoke.*

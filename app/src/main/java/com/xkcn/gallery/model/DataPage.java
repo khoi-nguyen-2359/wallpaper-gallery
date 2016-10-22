@@ -8,62 +8,15 @@ import java.util.List;
  */
 public class DataPage<T> {
 	private List<T> data = new ArrayList<>();
-	private int start;
-	private boolean hasEnded = false;
+	private final int start;
 
 	public DataPage(List<T> items, int start) {
-		append(items);
+		this.data = items;
 		this.start = start;
-	}
-
-	public DataPage() {
-		this(null, 0);
 	}
 
 	public List<T> getData() {
 		return data;
-	}
-
-	private void append(List<T> items) {
-		if (items == null) {
-			return;
-		}
-
-		if (!items.isEmpty()) {
-			data.addAll(items);
-		} else {
-			hasEnded = true;
-		}
-	}
-
-	/**
-	 * @param nextPage pass a page with empty data will end this data page.
-	 */
-	public void append(DataPage<T> nextPage) {
-		if (nextPage == null) {
-			return;
-		}
-
-		if (nextPage.getStart() == 0) {
-			reset();
-		}
-
-		append(nextPage.getData());
-	}
-
-	public void prepend(DataPage<T> prevPage) {
-		if (prevPage == null) {
-			return;
-		}
-
-		data.addAll(0, prevPage.data);
-		start = prevPage.start;
-	}
-
-	public void reset() {
-		data.clear();
-		hasEnded = false;
-		start = 0;
 	}
 
 	public int getStart() {
@@ -74,7 +27,7 @@ public class DataPage<T> {
 		return start + data.size();
 	}
 
-	public boolean hasEnded() {
-		return hasEnded;
+	public boolean isDataEmpty() {
+		return data == null || data.isEmpty();
 	}
 }

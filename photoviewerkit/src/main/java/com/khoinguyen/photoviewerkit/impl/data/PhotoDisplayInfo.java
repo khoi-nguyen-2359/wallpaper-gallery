@@ -80,4 +80,8 @@ public class PhotoDisplayInfo {
 	public void setLocalFile(File localFile) {
 		this.localFile = localFile;
 	}
+
+	public Uri getLocalFileUri() {
+		return Uri.fromFile(getLocalFile());
+	}
 }

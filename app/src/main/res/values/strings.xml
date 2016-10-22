@@ -37,7 +37,7 @@
 	<string name="photo_action_downloaded_already">Downloaded</string>
 	<string name="text_cancel">Cancel</string>
 	<string name="photo_gallery_downloading_message">Downloading photo ...</string>
-	<string name="general_alert_please_retry">Please retry ...</string>
+	<string name="app_alert_please_retry">Please retry ...</string>
 
 	<string name="remote_configs_nav_menu_items">[{\"id\":1,\"type\":\"collection\",\"title\":\"hotest\",\"data\":\"select * from photo where status=2 order by notes desc\",\"isDefault\":true},{\"id\":2,\"type\":\"collection\",\"title\":\"latest\",\"data\":\"select * from photo where status=2 order by identifier desc\",\"isDefault\":false}]</string>
 

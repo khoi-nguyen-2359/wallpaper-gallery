@@ -1,6 +1,6 @@
 package com.xkcn.gallery.model;
 
-import com.xkcn.gallery.data.local.model.PhotoDetails;
+import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,15 +10,15 @@ import java.util.Map;
  */
 
 public class PhotoDownloadNotificationsInfo {
-	private Map<String, Integer> mapDownloadUrlNotificationIds = new HashMap<>();
+	private Map<String, Integer> mapPhotoIdToNotificationIds = new HashMap<>();
 	private int currentMaxId = 0;
 
-	public int getId(PhotoDetails photoDetails) {
-		String downloadUrl = photoDetails.getDefaultDownloadUrl();
-		Integer nextId = mapDownloadUrlNotificationIds.get(downloadUrl);
+	public int getId(PhotoDisplayInfo photoDisplayInfo) {
+		String photoId = photoDisplayInfo.getPhotoId();
+		Integer nextId = mapPhotoIdToNotificationIds.get(photoId);
 		if (nextId == null) {
 			nextId = generateUniqueId();
-			mapDownloadUrlNotificationIds.put(downloadUrl, nextId);
+			mapPhotoIdToNotificationIds.put(photoId, nextId);
 		}
 
 		return nextId;

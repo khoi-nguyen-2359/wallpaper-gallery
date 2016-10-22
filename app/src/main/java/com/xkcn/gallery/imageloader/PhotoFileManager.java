@@ -25,13 +25,13 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.Executor;
 import java.util.concurrent.TimeUnit;
 
 import rx.Observable;
-import rx.Scheduler;
 import rx.Subscriber;
-import rx.functions.Action0;
 import rx.observables.ConnectableObservable;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by khoinguyen on 2/4/15.
@@ -46,10 +46,12 @@ public final class PhotoFileManager {
 
 	private Map<String, Observable<Float>> mapDownloadingObservables;
 
-	private BaseApp baseApp;
+	private Executor executorFetchPhoto;
+	private Executor executorCallback;
 
-	public PhotoFileManager(BaseApp baseApp) {
-		this.baseApp = baseApp;
+	public PhotoFileManager(BaseApp baseApp, Executor executorFetchPhoto, Executor executorCallback) {
+		this.executorFetchPhoto = executorFetchPhoto;
+		this.executorCallback = executorCallback;
 		resolveExternalPhotoDir(baseApp);
 		resolveInternalPhotoDir(baseApp);
 		logger = L.get(this);
@@ -103,10 +105,9 @@ public final class PhotoFileManager {
 
 	/**
 	 * @param photoUrl
-	 * @param executeScheduler need to give this because the return observable is hot.
 	 * @return
 	 */
-	private Observable<Float> getPhotoFileObservable(final String photoUrl, Scheduler executeScheduler) {
+	private Observable<Float> getPhotoFileObservable(final String photoUrl) {
 		Observable<Float> workingObservable = mapDownloadingObservables.get(photoUrl);
 		if (workingObservable == null) {
 			L.get().d("CREATE hot observable on %s", Thread.currentThread().getName());
@@ -132,14 +133,12 @@ public final class PhotoFileManager {
 					dataSource.subscribe(new PhotoDownloadSubscriber(subscriber, photoUrl), CallerThreadExecutor.getInstance());
 				}
 			})
-				.subscribeOn(executeScheduler)
+				.subscribeOn(Schedulers.from(executorFetchPhoto))
+				.observeOn(Schedulers.from(executorCallback))
 				.throttleFirst(300, TimeUnit.MILLISECONDS)
-				.doOnTerminate(new Action0() {
-					@Override
-					public void call() {
-						mapDownloadingObservables.remove(photoUrl);
-						logger.d("end photo fetching");
-					}
+				.doOnTerminate(() -> {
+					mapDownloadingObservables.remove(photoUrl);
+					logger.d("end photo fetching");
 				});
 
 			ConnectableObservable<Float> publishObservable = getFileObservable.replay();
@@ -166,9 +165,9 @@ public final class PhotoFileManager {
 		return getPhotoFile(photoDetails).exists();
 	}
 
-	public Observable<Float> getPhotoFileObservable(final PhotoDetails photoDetails, Scheduler executeScheduler) {
+	public Observable<Float> getPhotoFileObservable(final PhotoDetails photoDetails) {
 		final String downloadUrl = photoDetails.getDefaultDownloadUrl();
-		return getPhotoFileObservable(downloadUrl, executeScheduler);
+		return getPhotoFileObservable(downloadUrl);
 	}
 
 	private File savePhoto(InputStream is, String downloadUri) throws Exception {
@@ -197,13 +196,12 @@ public final class PhotoFileManager {
 	}
 
 	public File getPhotoDir() {
-		resolveExternalPhotoDir(baseApp);
 		// check this in case there are errors in creating the external dir while external storage is writable.
 		if (AndroidUtils.isExternalStorageWritable() && externalPhotoDir != null && externalPhotoDir.exists()) {
 			return externalPhotoDir;
 		}
 
-		return resolveInternalPhotoDir(baseApp);
+		return internalPhotoDir;
 	}
 
 	private File getDownloadFileWithFileName(String fileName) {

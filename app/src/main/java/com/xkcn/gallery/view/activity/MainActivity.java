@@ -96,6 +96,10 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 		}
 
 		NavigationItem navItem = (NavigationItem) intent.getSerializableExtra(EXTRAS_NAV_ITEM);
+		handleNavigationItem(navItem);
+	}
+
+	private void handleNavigationItem(NavigationItem navItem) {
 		if (navItem == null) {
 			return;
 		}
@@ -119,6 +123,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 
 				if (item.isDefault()) {
 					viewNavigation.setCheckedItem(item.getId());
+					handleNavigationItem(item);
 				}
 			}
 		}

@@ -9,7 +9,8 @@ import com.xkcn.gallery.manager.LocalConfigManager;
  * Created by khoinguyen on 11/1/15.
  */
 public class LocalConfigManagerImpl implements LocalConfigManager {
-	public static final int DEF_LISTING_PHOTO_PER_PAGE = 100;
+	public static final int LISTING_PHOTO_PER_PAGE = 100;
+
 	private static final String APP_PREF = "APP_PREF";
 	private static final long PERIOD_UPDATE = 86400000;
 	private static final String PREF_LAST_UPDATE = "PREF_LAST_UPDATE";
@@ -61,11 +62,6 @@ public class LocalConfigManagerImpl implements LocalConfigManager {
 	@Override
 	public void setLeftDrawerOpened(boolean b) {
 		getPref().edit().putBoolean(PREF_HAS_OPENED_LEFT_DRAWER, b).apply();
-	}
-
-	@Override
-	public int getListPagerPhotoPerPage() {
-		return DEF_LISTING_PHOTO_PER_PAGE;
 	}
 
 	@Override

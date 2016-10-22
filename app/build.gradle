@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
-apply plugin: 'realm-android'
 apply plugin: 'io.fabric'
 apply plugin: 'com.neenbedankt.android-apt'
+apply plugin: 'me.tatarka.retrolambda'
 
 def configs = rootProject.extensions.getByName("ext")
 
@@ -9,11 +9,16 @@ repositories {
   jcenter()
   maven { url 'https://maven.fabric.io/public' }
   flatDir { dirs '../aars' }
+  mavenCentral()
 }
 
 android {
   compileSdkVersion configs.androidCompileSdk
   buildToolsVersion configs.androidBuildToolVersion
+
+  dataBinding {
+    enabled = true
+  }
 
   defaultConfig {
     applicationId configs.applicationId
@@ -21,6 +26,11 @@ android {
     targetSdkVersion configs.androidMaxSdk
     versionCode 1
     versionName "1.0"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
   }
 
   dexOptions {
@@ -104,6 +114,7 @@ dependencies {
   provided 'javax.annotation:jsr250-api:1.0'
 
   compile 'com.google.code.gson:gson:2.7'
+  compile project(path: ':apptemplate')
 }
 
 apply plugin: 'com.google.gms.google-services'

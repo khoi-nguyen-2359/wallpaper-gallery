@@ -18,8 +18,6 @@ public interface LocalConfigManager {
 
 	void setLeftDrawerOpened(boolean b);
 
-	int getListPagerPhotoPerPage();
-
 	long getUpdatePeriod();
 
 	int getLastWatchedPhotoListPage();

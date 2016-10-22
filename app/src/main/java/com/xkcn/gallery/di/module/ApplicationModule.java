@@ -6,6 +6,7 @@ import com.google.firebase.remoteconfig.FirebaseRemoteConfig;
 import com.google.firebase.remoteconfig.FirebaseRemoteConfigSettings;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.khoinguyen.apptemplate.concurrency.AndroidExecutors;
 import com.xkcn.gallery.BaseApp;
 import com.xkcn.gallery.BuildConfig;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
@@ -25,6 +26,7 @@ import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.usecase.PreferencesUsecase;
 import com.xkcn.gallery.view.navigator.Navigator;
 
+import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
 
 import javax.inject.Named;
@@ -43,6 +45,8 @@ public class ApplicationModule {
 	private static final String PATTERN_SQLITE_LIMIT_CLAUSE = "PATTERN_SQLITE_LIMIT_CLAUSE";
 	public static final String SCHEDULER_BACKGROUND = "SCHEDULER_BACKGROUND";
 	private static final String GSON_REMOTE_CONFIG = "GSON_REMOTE_CONFIG";
+	private static final String EXECUTOR_PHOTO_MANAGER_CALLBACK = "EXECUTOR_PHOTO_MANAGER_CALLBACK";
+	private static final String EXECUTOR_PHOTO_MANAGER_WORKER = "EXECUTOR_PHOTO_MANAGER_WORKER";
 
 	private final BaseApp baseApp;
 
@@ -71,8 +75,8 @@ public class ApplicationModule {
 
 	@Provides
 	@Singleton
-	PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository) {
-		return new PhotoListingUsecase(photoDetailsRepository);
+	PhotoListingUsecase providePhotoListingUsecase(PhotoDetailsRepository photoDetailsRepository, @Named(EXECUTOR_PHOTO_MANAGER_WORKER) Executor exeWorker, @Named(EXECUTOR_PHOTO_MANAGER_CALLBACK) Executor exeCallback) {
+		return new PhotoListingUsecase(exeWorker, exeCallback, photoDetailsRepository);
 	}
 
 	@Provides
@@ -102,8 +106,22 @@ public class ApplicationModule {
 
 	@Provides
 	@Singleton
-	PhotoFileManager providePhotoFileManager() {
-		return new PhotoFileManager(baseApp);
+	@Named(EXECUTOR_PHOTO_MANAGER_CALLBACK)
+	Executor providesPhotoManagerFetchingExecutor() {
+		return AndroidExecutors.uiThread();
+	}
+
+	@Provides
+	@Singleton
+	@Named(EXECUTOR_PHOTO_MANAGER_WORKER)
+	Executor providesPhotoManagerWorkerExecutor() {
+		return AndroidExecutors.newCachedThreadPool();
+	}
+
+	@Provides
+	@Singleton
+	PhotoFileManager providePhotoFileManager(@Named(EXECUTOR_PHOTO_MANAGER_WORKER) Executor executorFetchPhoto, @Named(EXECUTOR_PHOTO_MANAGER_CALLBACK) Executor exeCallback) {
+		return new PhotoFileManager(baseApp, executorFetchPhoto, exeCallback);
 	}
 
 	@Provides

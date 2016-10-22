@@ -1,12 +1,10 @@
 package com.khoinguyen.photoviewerkit.impl.view;
 
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.RectF;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +16,7 @@ import com.facebook.drawee.generic.GenericDraweeHierarchyBuilder;
 import com.facebook.drawee.view.SimpleDraweeView;
 import com.khoinguyen.apptemplate.eventbus.IEventBus;
 import com.khoinguyen.apptemplate.eventbus.Subscribe;
+import com.khoinguyen.apptemplate.listing.adapter.IListingAdapter;
 import com.khoinguyen.apptemplate.listing.adapter.RecyclerListingAdapter;
 import com.khoinguyen.apptemplate.listing.item.ListingItemType;
 import com.khoinguyen.apptemplate.listing.item.RecyclerListingViewHolder;
@@ -31,9 +30,7 @@ import com.khoinguyen.photoviewerkit.impl.event.OnPhotoListingItemClick;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoListingView;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.util.AdapterPhotoFinder;
-import com.khoinguyen.photoviewerkit.util.BottomLoadingIndicatorAdapter;
 import com.khoinguyen.photoviewerkit.util.RecyclerViewPagingListener;
-import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.khoinguyen.util.log.L;
 
 /**
@@ -42,7 +39,7 @@ import com.khoinguyen.util.log.L;
 public class PhotoListingView extends RecyclerView implements IPhotoListingView<SharedData, RecyclerListingViewHolder> {
 	private static final int PAGING_OFFSET = 20;
 	protected GridLayoutManager rcvLayoutMan;
-	protected BottomLoadingIndicatorAdapter listingAdapter;
+	protected IListingAdapter<RecyclerListingViewHolder> listingAdapter;
 	protected AdapterPhotoFinder photoFinder;
 
 	protected IEventBus eventBus;
@@ -54,9 +51,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 		@Override
 		public void onNext(RecyclerView recyclerView) {
 			photoKitWidget.onPagingNext(PhotoListingView.this);
-			listingAdapter.showIndicator(true);
-			listingAdapter.updateDataSet();
-			listingAdapter.notifyDataSetChanged();
 		}
 	};
 
@@ -84,27 +78,25 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 		return new RectF();
 	}
 
+	@Override
+	public void setLayoutManager(LayoutManager layoutManager) {
+		super.setLayoutManager(layoutManager);
+		rcvLayoutMan = (GridLayoutManager) layoutManager;
+	}
+
+	@Override
+	public GridLayoutManager getLayoutManager() {
+		return (GridLayoutManager) super.getLayoutManager();
+	}
+
 	private void init() {
-		Resources resources = getResources();
-		final int nLayoutCol = 4;   //resources.getInteger(R.integer.photo_page_col);
-		rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
-		rcvLayoutMan.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
-			@Override
-			public int getSpanSize(int position) {
-				return listingAdapter.isIndicator(position) ? rcvLayoutMan.getSpanCount() : 1;
-			}
-		});
-
-		setLayoutManager(rcvLayoutMan);
-		addItemDecoration(new SimpleDividerItemDec(null, StaggeredGridLayoutManager.VERTICAL, resources.getDimensionPixelSize(R.dimen.photo_list_pager_item_offset)));
-
 		adapterPhotos = new RecyclerListingAdapter();
 		setAdapter(adapterPhotos);
 
 		addOnScrollListener(rcvPagingListener);
 	}
 
-	public void setPhotoAdapter(BottomLoadingIndicatorAdapter adapter) {
+	public void setPhotoAdapter(IListingAdapter<RecyclerListingViewHolder> adapter) {
 		this.listingAdapter = adapter;
 		adapterPhotos.setListingAdapter(listingAdapter);
 		updatePhotoFinder();
@@ -156,7 +148,6 @@ public class PhotoListingView extends RecyclerView implements IPhotoListingView<
 
 	@Override
 	public void enablePaging() {
-		listingAdapter.showIndicator(false);
 		rcvPagingListener.setEnable(true);
 	}
 
