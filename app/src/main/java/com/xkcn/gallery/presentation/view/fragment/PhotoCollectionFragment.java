@@ -64,7 +64,6 @@ import butterknife.Unbinder;
 
 public class PhotoCollectionFragment extends BaseFragment {
 	private static final String ARG_PHOTO_COLLECTION = "ARG_PHOTO_COLLECTION";
-	private FragmentPhotoCollectionBinding binding;
 
 	public static PhotoCollectionFragment instantiate(PhotoCollection photoCollection) {
 		PhotoCollectionFragment f = new PhotoCollectionFragment();
@@ -95,6 +94,8 @@ public class PhotoCollectionFragment extends BaseFragment {
 	@BindView(R.id.app_bar)
 	AppBarLayout appBarLayout;
 
+	private FragmentPhotoCollectionBinding binding;
+	private GridLayoutManager rcvLayoutMan;
 	protected PhotoDownloadProgressDialog photoLoadingProgressDialog;
 
 	private NotificationCompat.Builder downloadNotificationBuilder;
@@ -143,9 +144,42 @@ public class PhotoCollectionFragment extends BaseFragment {
 		photoCollectionViewModel.loadFirstPhotoPage(photoCollection);
 	}
 
+	@Override
+	public void onStart() {
+		super.onStart();
+
+		photoViewerKitEventBus.register(photoKitEventListener);
+	}
+
+	@Override
+	public void onStop() {
+		super.onStop();
+
+		photoViewerKitEventBus.unregister(photoKitEventListener);
+		saveLastWatchedPhotoPage();
+	}
+
+	private void saveLastWatchedPhotoPage() {
+		int firstVisibleItem = rcvLayoutMan.findFirstVisibleItemPosition();
+		localConfigManager.setLastWatchedPhotoListingItem(photoCollection.getName(), firstVisibleItem);
+	}
+
+	@Override
+	public void onDestroyView() {
+		super.onDestroyView();
+		unbinder.unbind();
+	}
+
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		photoCollectionViewModel.trackListingLastItem(photoCollection);
+	}
+
 	private void setupDataBinding() {
 		binding = DataBindingUtil.bind(getView());
-		photoCollectionViewModel = new PhotoCollectionViewModel(photoFileManager, photoListingUsecase, analytics);
+		photoCollectionViewModel = new PhotoCollectionViewModel(photoFileManager, photoListingUsecase, analytics, localConfigManager);
 		photoCollectionViewModel.obsLoadPhotoProgress.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
 			@Override
 			public void onPropertyChanged(Observable observable, int i) {
@@ -164,6 +198,7 @@ public class PhotoCollectionFragment extends BaseFragment {
 				photoListingAdapter.removeProgressIndicator();
 				appendPhotoAdapters(photoCollectionViewModel.obsLastestPhotoPage.get());
 				enableWidgetPaging(photoCollectionViewModel.obsLastestPhotoPage.get());
+				jumpToLastWatchedPhotoPage();
 			}
 		});
 		photoCollectionViewModel.obsDownloadError.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
@@ -199,37 +234,18 @@ public class PhotoCollectionFragment extends BaseFragment {
 		binding.setPhotoCollection(photoCollectionViewModel);
 	}
 
+	private void jumpToLastWatchedPhotoPage() {
+		if (photoCollectionViewModel.obsLastWatchedPhotoIndex.get() <= 0) {
+			return;
+		}
+
+		rcvLayoutMan.scrollToPosition(photoCollectionViewModel.obsLastWatchedPhotoIndex.get());
+	}
+
 	private void enableWidgetPaging(DataPage<PhotoDisplayInfo> latestPhotoPage) {
 		if (latestPhotoPage != null && !latestPhotoPage.isDataEmpty()) {
 			photoKitWidget.enablePaging();
 		}
-	}
-
-	@Override
-	public void onStart() {
-		super.onStart();
-
-		photoViewerKitEventBus.register(photoKitEventListener);
-	}
-
-	@Override
-	public void onStop() {
-		super.onStop();
-
-		photoViewerKitEventBus.unregister(photoKitEventListener);
-	}
-
-	@Override
-	public void onDestroyView() {
-		super.onDestroyView();
-		unbinder.unbind();
-	}
-
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-
-		photoCollectionViewModel.trackListingLastItem(photoCollection);
 	}
 
 	private void setupViews() {
@@ -255,7 +271,7 @@ public class PhotoCollectionFragment extends BaseFragment {
 
 		Resources resources = getResources();
 		final int nLayoutCol = 4;   //resources.getInteger(R.integer.photo_page_col);
-		GridLayoutManager rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
+		rcvLayoutMan = new GridLayoutManager(getContext(), nLayoutCol, GridLayoutManager.VERTICAL, false);
 		rcvLayoutMan.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
 			@Override
 			public int getSpanSize(int position) {

@@ -2,6 +2,7 @@ package com.xkcn.gallery.presentation.viewmodel;
 
 import android.databinding.ObservableField;
 import android.databinding.ObservableFloat;
+import android.databinding.ObservableInt;
 import android.support.annotation.Nullable;
 
 import com.khoinguyen.photoviewerkit.impl.data.PhotoDisplayInfo;
@@ -10,7 +11,7 @@ import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
-import com.xkcn.gallery.manager.impl.LocalConfigManagerImpl;
+import com.xkcn.gallery.manager.LocalConfigManager;
 import com.xkcn.gallery.model.DataPage;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 
@@ -38,6 +39,7 @@ public class PhotoCollectionViewModel {
 
 	public ObservableField<DownloadPhotoProgress> obsDownloadPhotoProgress = new ObservableField<>();
 	public ObservableField<DownloadPhotoError> obsDownloadError = new ObservableField<>();
+	public ObservableInt obsLastWatchedPhotoIndex = new ObservableInt();
 
 	public ObservableField<PhotoDisplayInfo> obsLoadWallpaperResult = new ObservableField<>();
 	public ObservableField<PhotoDisplayInfo> obsDownloadPhotoResult = new ObservableField<>();
@@ -50,11 +52,15 @@ public class PhotoCollectionViewModel {
 	private Action1<? super Float> actionLoadPhotoOnNext = progress -> obsLoadPhotoProgress.set(progress);
 	public ObservableField<PhotoDisplayInfo> obsSharePhotoResult = new ObservableField<>();
 	private AnalyticsCollection analytics;
+	private LocalConfigManager localConfigManager;
+	private final int listingPhotoPerPage;
 
-	public PhotoCollectionViewModel(PhotoFileManager photoFileManager, PhotoListingUsecase photoListingUsecase, AnalyticsCollection analytics) {
+	public PhotoCollectionViewModel(PhotoFileManager photoFileManager, PhotoListingUsecase photoListingUsecase, AnalyticsCollection analytics, LocalConfigManager localConfigManager) {
 		this.photoFileManager = photoFileManager;
 		this.photoListingUsecase = photoListingUsecase;
 		this.analytics = analytics;
+		this.localConfigManager = localConfigManager;
+		listingPhotoPerPage = localConfigManager.getListingPhotoPerPage();
 	}
 
 	public void loadWallpaper(PhotoDisplayInfo photoDisplayInfo) {
@@ -117,11 +123,19 @@ public class PhotoCollectionViewModel {
 	}
 
 	public void loadFirstPhotoPage(PhotoCollection photoCollection) {
-		loadPhotoPage(0, photoCollection.getQuery());
+		int perPage = listingPhotoPerPage;
+		int lastWatchedIndex = localConfigManager.getLastWatchedPhotoListingItem(photoCollection.getName());
+		if (lastWatchedIndex >= 0) {
+			perPage = lastWatchedIndex + listingPhotoPerPage;
+			obsLastWatchedPhotoIndex.set(lastWatchedIndex);
+		}
+
+		loadPhotoPage(0, photoCollection, perPage);
 	}
 
-	private void loadPhotoPage(int startIndex, final String query) {
-		photoListingUsecase.queryPhotos(query, startIndex, LocalConfigManagerImpl.LISTING_PHOTO_PER_PAGE)
+	private void loadPhotoPage(int startIndex, final PhotoCollection collection, int perPage) {
+		L.get("listing").d("collection=%s startIndex=%d perPage=%d", collection.getName(), startIndex, perPage);
+		photoListingUsecase.queryPhotos(collection.getQuery(), startIndex, perPage)
 			.doOnNext(photoDetailses -> {
 				if (startIndex == 0) {
 					loadedPhotos.clear();
@@ -150,7 +164,8 @@ public class PhotoCollectionViewModel {
 			return;
 		}
 
-		loadPhotoPage(lastestPhotoPage.getNextStart(), photoCollection.getQuery());
+		obsLastWatchedPhotoIndex.set(-1);
+		loadPhotoPage(lastestPhotoPage.getNextStart(), photoCollection, listingPhotoPerPage);
 	}
 
 	// TODO: 10/23/16 #perf

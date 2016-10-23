@@ -20,7 +20,9 @@ public interface LocalConfigManager {
 
 	long getUpdatePeriod();
 
-	int getLastWatchedPhotoListPage();
+	int getListingPhotoPerPage();
 
-	void setLastWatchedPhotoListPage(int position);
+	int getLastWatchedPhotoListingItem(String collectionName);
+
+	void setLastWatchedPhotoListingItem(String collectionName, int firstVisibleItem);
 }

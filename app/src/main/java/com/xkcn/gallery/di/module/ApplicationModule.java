@@ -33,6 +33,7 @@ import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
+import io.realm.Realm;
 import rx.Scheduler;
 import rx.schedulers.Schedulers;
 
@@ -93,8 +94,14 @@ public class ApplicationModule {
 
 	@Provides
 	@Singleton
-	LocalConfigManager provideLocalConfigManager() {
-		return new LocalConfigManagerImpl(baseApp);
+	Realm providesLocalConfigRealm() {
+		return Realm.getDefaultInstance();
+	}
+
+	@Provides
+	@Singleton
+	LocalConfigManager provideLocalConfigManager(Realm realm) {
+		return new LocalConfigManagerImpl(baseApp, realm);
 	}
 
 	@Provides

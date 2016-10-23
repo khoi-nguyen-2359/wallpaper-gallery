@@ -12,6 +12,7 @@ import com.xkcn.gallery.di.module.SystemServiceModule;
 import net.danlew.android.joda.JodaTimeAndroid;
 
 import io.fabric.sdk.android.Fabric;
+import io.realm.Realm;
 
 /**
  * Created by khoinguyen on 12/25/14.
@@ -23,6 +24,7 @@ public class BaseApp extends Application {
 	public void onCreate() {
 		super.onCreate();
 		Fabric.with(this, new Crashlytics());
+		Realm.init(this);
 		initInjector();
 		PhotoViewerKit.init(this);
 		JodaTimeAndroid.init(this);

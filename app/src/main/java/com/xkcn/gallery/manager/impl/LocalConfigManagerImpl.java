@@ -3,14 +3,16 @@ package com.xkcn.gallery.manager.impl;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.manager.LocalConfigManager;
+import com.xkcn.gallery.manager.model.LastWatchedPhotoPage;
+
+import io.realm.Realm;
 
 /**
  * Created by khoinguyen on 11/1/15.
  */
 public class LocalConfigManagerImpl implements LocalConfigManager {
-	public static final int LISTING_PHOTO_PER_PAGE = 100;
-
 	private static final String APP_PREF = "APP_PREF";
 	private static final long PERIOD_UPDATE = 86400000;
 	private static final String PREF_LAST_UPDATE = "PREF_LAST_UPDATE";
@@ -21,8 +23,11 @@ public class LocalConfigManagerImpl implements LocalConfigManager {
 	private static final String PREF_LAST_WATCHED_PHOTO_LIST_PAGE = "PREF_LAST_WATCHED_PHOTO_LIST_PAGE";
 	private SharedPreferences sharedPreferences;
 
-	public LocalConfigManagerImpl(Context context) {
+	private Realm realmLocalConfig;
+
+	public LocalConfigManagerImpl(Context context, Realm realmLocalConfig) {
 		sharedPreferences = context.getSharedPreferences(APP_PREF, 0);
+		this.realmLocalConfig = realmLocalConfig;
 	}
 
 	private SharedPreferences getPref() {
@@ -70,13 +75,25 @@ public class LocalConfigManagerImpl implements LocalConfigManager {
 	}
 
 	@Override
-	public int getLastWatchedPhotoListPage() {
-		return getPref().getInt(PREF_LAST_WATCHED_PHOTO_LIST_PAGE, 0);
+	public int getListingPhotoPerPage() {
+		return 100;
 	}
 
 	@Override
-	public void setLastWatchedPhotoListPage(int position) {
-		getPref().edit().putInt(PREF_LAST_WATCHED_PHOTO_LIST_PAGE, position).apply();
+	public int getLastWatchedPhotoListingItem(String collectionName) {
+		LastWatchedPhotoPage lastPage = realmLocalConfig.where(LastWatchedPhotoPage.class)
+			.equalTo(LastWatchedPhotoPage.FIELD_COLLECTION_NAME, collectionName)
+			.findFirst();
+
+		return lastPage == null ? -1 : lastPage.getLastWatchedFirstVisibleIndex();
 	}
 
+	@Override
+	public void setLastWatchedPhotoListingItem(String collectionName, int firstVisibleItem) {
+		LastWatchedPhotoPage lastPage = new LastWatchedPhotoPage();
+		lastPage.setCollectionName(collectionName);
+		lastPage.setLastWatchedFirstVisibleIndex(firstVisibleItem);
+		L.get("listing").d("set last watched %s %d", collectionName, firstVisibleItem);
+		realmLocalConfig.executeTransaction(realm -> realm.copyToRealmOrUpdate(lastPage));
+	}
 }
