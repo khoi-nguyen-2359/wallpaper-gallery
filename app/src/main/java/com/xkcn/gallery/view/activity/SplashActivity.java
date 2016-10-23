@@ -1,20 +1,20 @@
 package com.xkcn.gallery.view.activity;
 
 import android.content.Intent;
+import android.databinding.Observable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.xkcn.gallery.manager.RemoteConfigManager;
-import com.xkcn.gallery.presenter.SplashViewPresenter;
-import com.xkcn.gallery.view.interfaces.SplashView;
+import com.xkcn.gallery.viewmodel.SplashViewModel;
 
 import javax.inject.Inject;
 
 /**
  * Created by khoinguyen on 12/14/15.
  */
-public class SplashActivity extends BaseActivity implements SplashView {
-	private SplashViewPresenter presenter;
+public class SplashActivity extends BaseActivity {
+	private SplashViewModel splashViewModel;
 
 	@Inject
 	RemoteConfigManager remoteConfigManager;
@@ -26,15 +26,26 @@ public class SplashActivity extends BaseActivity implements SplashView {
 		getApplicationComponent().inject(this);
 
 		initData();
-		presenter.setupDefaultRemoteConfigs();
-		presenter.runInitTasks();
+		splashViewModel.setupDefaultRemoteConfigs();
+		splashViewModel.runInitTasks();
 	}
 
 	private void initData() {
-		presenter = new SplashViewPresenter(this, remoteConfigManager);
+		splashViewModel = new SplashViewModel(remoteConfigManager);
+		splashViewModel.obsInitTaskResult.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				finishSplash();
+			}
+		});
+		splashViewModel.obsError.addOnPropertyChangedCallback(new Observable.OnPropertyChangedCallback() {
+			@Override
+			public void onPropertyChanged(Observable observable, int i) {
+				showErrorDialog(splashViewModel.obsError.get());
+			}
+		});
 	}
 
-	@Override
 	public void finishSplash() {
 		Intent intent = new Intent(this, MainActivityImpl.class);
 		startActivity(intent);

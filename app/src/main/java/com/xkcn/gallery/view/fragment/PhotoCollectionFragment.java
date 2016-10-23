@@ -44,7 +44,7 @@ import com.xkcn.gallery.data.local.model.PhotoDetails;
 import com.xkcn.gallery.databinding.FragmentPhotoCollectionBinding;
 import com.xkcn.gallery.model.DataPage;
 import com.xkcn.gallery.model.PhotoDownloadNotificationsInfo;
-import com.xkcn.gallery.presenter.PhotoCollectionViewModel;
+import com.xkcn.gallery.viewmodel.PhotoCollectionViewModel;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
 import com.xkcn.gallery.view.dialog.PhotoDownloadProgressDialog;
 

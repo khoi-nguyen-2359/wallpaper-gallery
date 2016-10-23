@@ -3,6 +3,7 @@ package com.xkcn.gallery.view.activity;
 import android.app.NotificationManager;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 
 import com.xkcn.gallery.BaseApp;
@@ -77,5 +78,18 @@ public abstract class BaseActivity extends AppCompatActivity {
 
 		BaseFragment baseF = (BaseFragment) f;
 		return baseF.onBackPressed();
+	}
+
+	public void showErrorDialog(Throwable error) {
+		if (error == null) {
+			return;
+		}
+
+		new AlertDialog.Builder(this)
+			.setTitle("Oops..")
+			.setMessage(error.getMessage())
+			.setPositiveButton("OK", null)
+			.create()
+			.show();
 	}
 }

@@ -1,4 +1,4 @@
-package com.xkcn.gallery.presenter;
+package com.xkcn.gallery.viewmodel;
 
 import android.databinding.ObservableField;
 import android.databinding.ObservableFloat;

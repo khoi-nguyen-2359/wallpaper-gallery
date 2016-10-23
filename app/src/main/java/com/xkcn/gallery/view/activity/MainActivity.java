@@ -13,9 +13,7 @@ import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.model.NavigationItem;
-import com.xkcn.gallery.presenter.MainViewPresenter;
-import com.xkcn.gallery.service.UpdateService;
-import com.xkcn.gallery.view.interfaces.MainView;
+import com.xkcn.gallery.viewmodel.MainViewModel;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -26,7 +24,7 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public abstract class MainActivity extends BaseActivity implements MainView, NavigationView.OnNavigationItemSelectedListener {
+public abstract class MainActivity extends BaseActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 	private static final String EXTRAS_NAV_ITEM = "EXTRAS_NAV_ITEM";
 
@@ -38,7 +36,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 
 	L log = L.get(this);
 
-	protected MainViewPresenter mainViewPresenter;
+	protected MainViewModel mainViewModel;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -52,7 +50,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 	@Override
 	protected void onStart() {
 		super.onStart();
-		mainViewPresenter.checkToCrawlPhoto();
+		mainViewModel.crawlPhoto();
 		EventBus.getDefault().register(this);
 	}
 
@@ -86,8 +84,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 	}
 
 	private void initData() {
-		mainViewPresenter = new MainViewPresenter(remoteConfigManager, localConfigManager);
-		mainViewPresenter.setView(this);
+		mainViewModel = new MainViewModel(remoteConfigManager, localConfigManager, this);
 	}
 
 	private void handleNavigationItemIntent(Intent intent) {
@@ -111,7 +108,7 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 		viewNavigation.setNavigationItemSelectedListener(this);
 
 		Menu navMenu = viewNavigation.getMenu();
-		List<NavigationItem> navItems = mainViewPresenter.getNavigationItems();
+		List<NavigationItem> navItems = mainViewModel.getNavigationItems();
 		if (navItems != null) {
 			for (NavigationItem item : navItems) {
 				MenuItem menuItem = navMenu.add(Menu.NONE, item.getId(), Menu.NONE, item.getTitle());
@@ -139,11 +136,6 @@ public abstract class MainActivity extends BaseActivity implements MainView, Nav
 	protected void initMainViews() {
 		setContentView(R.layout.activity_main);
 		ButterKnife.bind(this);
-	}
-
-	@Override
-	public void startActionUpdate() {
-		UpdateService.startActionUpdate(this);
 	}
 
 	/***
