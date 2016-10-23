@@ -1,4 +1,4 @@
-package com.xkcn.gallery.adapter;
+package com.xkcn.gallery.presentation.adapter;
 
 import android.view.LayoutInflater;
 import android.view.View;

@@ -1,6 +1,6 @@
 package com.xkcn.gallery.model;
 
-import com.xkcn.gallery.view.navigator.Navigator;
+import com.xkcn.gallery.presentation.navigator.Navigator;
 
 import java.io.Serializable;
 

@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.activity;
+package com.xkcn.gallery.presentation.view.activity;
 
 import android.content.Intent;
 import android.databinding.Observable;
@@ -6,7 +6,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 
 import com.xkcn.gallery.manager.RemoteConfigManager;
-import com.xkcn.gallery.viewmodel.SplashViewModel;
+import com.xkcn.gallery.presentation.viewmodel.SplashViewModel;
 
 import javax.inject.Inject;
 

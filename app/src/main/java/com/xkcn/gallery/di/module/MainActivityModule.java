@@ -1,6 +1,6 @@
 package com.xkcn.gallery.di.module;
 
-import com.xkcn.gallery.view.activity.MainActivity;
+import com.xkcn.gallery.presentation.view.activity.MainActivity;
 
 import dagger.Module;
 import dagger.Provides;

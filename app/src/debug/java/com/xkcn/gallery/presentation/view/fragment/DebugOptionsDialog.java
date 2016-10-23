@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.fragment;
+package com.xkcn.gallery.presentation.view.fragment;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -17,7 +17,7 @@ import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.RefreshPhotoListingPager;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.service.UpdateService;
-import com.xkcn.gallery.view.activity.MainActivityImpl;
+import com.xkcn.gallery.presentation.view.activity.MainActivityImpl;
 
 import org.greenrobot.eventbus.EventBus;
 

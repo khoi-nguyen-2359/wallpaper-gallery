@@ -1,4 +1,4 @@
-package com.xkcn.gallery.viewmodel;
+package com.xkcn.gallery.presentation.viewmodel;
 
 import android.databinding.ObservableBoolean;
 import android.databinding.ObservableField;

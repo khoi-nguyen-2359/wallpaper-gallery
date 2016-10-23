@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.activity;
+package com.xkcn.gallery.presentation.view.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -13,7 +13,7 @@ import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.event.PhotoCrawlingFinishedEvent;
 import com.xkcn.gallery.model.NavigationItem;
-import com.xkcn.gallery.viewmodel.MainViewModel;
+import com.xkcn.gallery.presentation.viewmodel.MainViewModel;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

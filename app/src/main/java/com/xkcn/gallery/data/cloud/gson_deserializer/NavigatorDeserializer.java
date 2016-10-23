@@ -7,8 +7,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 import com.xkcn.gallery.data.cloud.DataContracts;
 import com.xkcn.gallery.data.cloud.model.PhotoCollection;
-import com.xkcn.gallery.view.navigator.CollectionNavigator;
-import com.xkcn.gallery.view.navigator.Navigator;
+import com.xkcn.gallery.presentation.navigator.CollectionNavigator;
+import com.xkcn.gallery.presentation.navigator.Navigator;
 
 import java.lang.reflect.Type;
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.xkcn.gallery.view.dialog;
+package com.xkcn.gallery.presentation.view.dialog;
 
 import android.animation.ObjectAnimator;
 import android.app.Dialog;

@@ -23,8 +23,7 @@ import com.xkcn.gallery.manager.impl.LocalConfigManagerImpl;
 import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.manager.impl.RemoteConfigManagerImpl;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.usecase.PreferencesUsecase;
-import com.xkcn.gallery.view.navigator.Navigator;
+import com.xkcn.gallery.presentation.navigator.Navigator;
 
 import java.util.concurrent.Executor;
 import java.util.regex.Pattern;
@@ -65,12 +64,6 @@ public class ApplicationModule {
 	@Singleton
 	public DbHelper providesDbHelper() {
 		return new DbHelper(baseApp);
-	}
-
-	@Provides
-	@Singleton
-	PreferencesUsecase providePreferencesUsecase(LocalConfigManager localConfigManager) {
-		return new PreferencesUsecase(localConfigManager);
 	}
 
 	@Provides

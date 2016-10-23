@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.navigator;
+package com.xkcn.gallery.presentation.navigator;
 
 import android.support.v4.app.FragmentActivity;
 

@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.navigator;
+package com.xkcn.gallery.presentation.navigator;
 
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -6,7 +6,7 @@ import android.support.v4.app.FragmentManager;
 import com.khoinguyen.util.log.L;
 import com.xkcn.gallery.R;
 import com.xkcn.gallery.data.cloud.model.PhotoCollection;
-import com.xkcn.gallery.view.fragment.PhotoCollectionFragment;
+import com.xkcn.gallery.presentation.view.fragment.PhotoCollectionFragment;
 
 /**
  * Created by khoinguyen on 9/11/16.

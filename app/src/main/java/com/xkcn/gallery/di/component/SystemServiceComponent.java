@@ -1,8 +1,8 @@
 package com.xkcn.gallery.di.component;
 
 import com.xkcn.gallery.di.module.SystemServiceModule;
-import com.xkcn.gallery.view.fragment.BaseFragment;
-import com.xkcn.gallery.view.fragment.PhotoCollectionFragment;
+import com.xkcn.gallery.presentation.view.fragment.BaseFragment;
+import com.xkcn.gallery.presentation.view.fragment.PhotoCollectionFragment;
 
 import dagger.Subcomponent;
 

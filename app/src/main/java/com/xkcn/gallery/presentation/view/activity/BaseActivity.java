@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.activity;
+package com.xkcn.gallery.presentation.view.activity;
 
 import android.app.NotificationManager;
 import android.os.Bundle;
@@ -16,8 +16,7 @@ import com.xkcn.gallery.imageloader.PhotoFileManager;
 import com.xkcn.gallery.manager.LocalConfigManager;
 import com.xkcn.gallery.manager.RemoteConfigManager;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.usecase.PreferencesUsecase;
-import com.xkcn.gallery.view.fragment.BaseFragment;
+import com.xkcn.gallery.presentation.view.fragment.BaseFragment;
 
 import javax.inject.Inject;
 
@@ -35,8 +34,6 @@ public abstract class BaseActivity extends AppCompatActivity {
 	PhotoFileManager photoFileManager;
 	@Inject
 	PhotoListingUsecase photoListingUsecase;
-	@Inject
-	PreferencesUsecase preferencesUsecase;
 	@Inject
 	AnalyticsCollection analyticsCollection;
 	@Inject

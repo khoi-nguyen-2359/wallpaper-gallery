@@ -8,7 +8,7 @@
 
 		<variable
 			name="photoCollection"
-			type="com.xkcn.gallery.viewmodel.PhotoCollectionViewModel"/>
+			type="com.xkcn.gallery.presentation.viewmodel.PhotoCollectionViewModel"/>
 	</data>
 
 	<android.support.design.widget.CoordinatorLayout

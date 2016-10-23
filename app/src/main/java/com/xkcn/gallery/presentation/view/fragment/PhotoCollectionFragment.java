@@ -1,4 +1,4 @@
-package com.xkcn.gallery.view.fragment;
+package com.xkcn.gallery.presentation.view.fragment;
 
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -37,16 +37,16 @@ import com.khoinguyen.photoviewerkit.impl.view.PhotoViewerKitWidget;
 import com.khoinguyen.photoviewerkit.interfaces.IPhotoViewerKitWidget;
 import com.khoinguyen.recyclerview.SimpleDividerItemDec;
 import com.xkcn.gallery.R;
-import com.xkcn.gallery.adapter.PhotoActionAdapter;
+import com.xkcn.gallery.presentation.adapter.PhotoActionAdapter;
 import com.xkcn.gallery.analytics.AnalyticsCollection;
 import com.xkcn.gallery.data.cloud.model.PhotoCollection;
 import com.xkcn.gallery.data.local.model.PhotoDetails;
 import com.xkcn.gallery.databinding.FragmentPhotoCollectionBinding;
 import com.xkcn.gallery.model.DataPage;
 import com.xkcn.gallery.model.PhotoDownloadNotificationsInfo;
-import com.xkcn.gallery.viewmodel.PhotoCollectionViewModel;
+import com.xkcn.gallery.presentation.viewmodel.PhotoCollectionViewModel;
 import com.xkcn.gallery.usecase.PhotoListingUsecase;
-import com.xkcn.gallery.view.dialog.PhotoDownloadProgressDialog;
+import com.xkcn.gallery.presentation.view.dialog.PhotoDownloadProgressDialog;
 
 import java.io.File;
 import java.util.ArrayList;

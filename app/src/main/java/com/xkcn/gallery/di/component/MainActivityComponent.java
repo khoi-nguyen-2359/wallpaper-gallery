@@ -2,8 +2,8 @@ package com.xkcn.gallery.di.component;
 
 import com.xkcn.gallery.di.module.ApplicationModule;
 import com.xkcn.gallery.di.module.SystemServiceModule;
-import com.xkcn.gallery.view.activity.MainActivity;
-import com.xkcn.gallery.view.navigator.Navigator;
+import com.xkcn.gallery.presentation.view.activity.MainActivity;
+import com.xkcn.gallery.presentation.navigator.Navigator;
 
 import dagger.Subcomponent;
 

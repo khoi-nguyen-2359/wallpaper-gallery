@@ -1,4 +1,4 @@
-package com.xkcn.gallery.viewmodel;
+package com.xkcn.gallery.presentation.viewmodel;
 
 import android.databinding.ObservableField;
 import android.databinding.ObservableFloat;
@@ -153,6 +153,7 @@ public class PhotoCollectionViewModel {
 		loadPhotoPage(lastestPhotoPage.getNextStart(), photoCollection.getQuery());
 	}
 
+	// TODO: 10/23/16 #perf
 	public
 	@Nullable
 	PhotoDetails findPhoto(PhotoDisplayInfo photoDisplayInfo) {
@@ -168,10 +169,6 @@ public class PhotoCollectionViewModel {
 		}
 
 		return null;
-	}
-
-	public List<PhotoDetails> getLoadedPhotos() {
-		return loadedPhotos;
 	}
 
 	public void trackListingLastItem(PhotoCollection photoCollection) {

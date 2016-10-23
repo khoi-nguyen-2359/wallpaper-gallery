@@ -2,12 +2,12 @@ package com.xkcn.gallery.di.component;
 
 import com.xkcn.gallery.di.module.ApplicationModule;
 import com.xkcn.gallery.di.module.SystemServiceModule;
-import com.xkcn.gallery.viewmodel.PhotoCollectionViewModel;
+import com.xkcn.gallery.presentation.viewmodel.PhotoCollectionViewModel;
 import com.xkcn.gallery.service.UpdateService;
-import com.xkcn.gallery.view.activity.BaseActivity;
-import com.xkcn.gallery.view.activity.SplashActivity;
-import com.xkcn.gallery.view.fragment.BaseFragment;
-import com.xkcn.gallery.view.fragment.PhotoCollectionFragment;
+import com.xkcn.gallery.presentation.view.activity.BaseActivity;
+import com.xkcn.gallery.presentation.view.activity.SplashActivity;
+import com.xkcn.gallery.presentation.view.fragment.BaseFragment;
+import com.xkcn.gallery.presentation.view.fragment.PhotoCollectionFragment;
 
 import javax.inject.Singleton;
 
